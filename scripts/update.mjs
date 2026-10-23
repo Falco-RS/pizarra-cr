@@ -30,12 +30,14 @@ const TYPE = {
   'Substitution': 'sub', 'Missed Penalty': 'mp', 'VAR Goal Cancelled': 'var',
 };
 
-let used = 0, remaining = null;
+let used = 0, remaining = null, limited = false;
+class LimitError extends Error {}
 async function api(path) {
   used++;
   const r = await fetch(BASE + path, { headers: { 'x-rapidapi-key': KEY } });
   remaining = r.headers.get('x-ratelimit-requests-remaining') ?? remaining;
   if (r.status === 404) return null;
+  if (r.status === 429) { limited = true; throw new LimitError('Se acabaron las consultas del día'); }
   if (!r.ok) throw new Error(`${r.status} en ${path}: ${(await r.text()).slice(0, 300)}`);
   return r.json();
 }
@@ -76,7 +78,12 @@ async function main() {
   try { mesa = JSON.parse(await fs.readFile(CORRECTIONS, 'utf8')); } catch { /* sin correcciones */ }
 
   // 1) Partidos del torneo
-  const raw = await allMatches(`leagueId=${LEAGUE_ID}&season=${SEASON}`);
+  let raw;
+  try { raw = await allMatches(`leagueId=${LEAGUE_ID}&season=${SEASON}`); }
+  catch (e) {
+    if (e instanceof LimitError) { console.log('Se acabaron las consultas del día. Los datos quedan como estaban; la próxima corrida sigue.'); return; }
+    throw e;
+  }
   if (!raw.length) throw new Error('La API no devolvió partidos. Revisá LEAGUE_ID y SEASON.');
   const teams = {};
   for (const m of raw) for (const k of ['homeTeam', 'awayTeam']) teams[m[k].id] = team(m[k]);
@@ -93,10 +100,16 @@ async function main() {
       [rec.hs, rec.as] = sc.split(' - ').map(Number);
       const prev = oldById.get(m.id);
       if (prev?.ev && isFinal(prev.s)) rec.ev = prev.ev;
-      else if (budget > 0) { budget--; rec.ev = compactEvents(await api(`/events/${m.id}`), m.homeTeam.id); }
-      if (!detail[m.id] && budget >= 2 && rec.s !== 'Awarded') {
+      else if (budget > 0 && !limited) {
+        budget--;
+        try { rec.ev = compactEvents(await api(`/events/${m.id}`), m.homeTeam.id); }
+        catch (e) { if (!(e instanceof LimitError)) throw e; }
+      }
+      if (!detail[m.id] && budget >= 2 && !limited && rec.s !== 'Awarded') {
         budget -= 2;
-        const [lu, st] = [await api(`/lineups/${m.id}`), await api(`/statistics/${m.id}`)];
+        let lu = null, st = null;
+        try { lu = await api(`/lineups/${m.id}`); st = await api(`/statistics/${m.id}`); }
+        catch (e) { if (!(e instanceof LimitError)) throw e; }
         if (lu && st) {
           const side = t => ({ f: t.formation, xi: (t.initialLineup || []).flat().map(p => ({ n: p.number, name: fixText(p.name), pos: p.position })) });
           detail[m.id] = {
@@ -111,13 +124,15 @@ async function main() {
   }
 
   // 2) Tabla oficial
-  const sd = await api(`/standings?leagueId=${LEAGUE_ID}&season=${SEASON}`);
-  const standings = (sd?.groups?.[0]?.standings || []).map(s => ({ t: s.team.id, pos: s.position, pts: s.points, total: s.total, home: s.home, away: s.away }));
+  let sd = null;
+  if (!limited) { try { sd = await api(`/standings?leagueId=${LEAGUE_ID}&season=${SEASON}`); } catch (e) { if (!(e instanceof LimitError)) throw e; } }
+  const standings = !sd ? (old.standings || []) : (sd.groups?.[0]?.standings || []).map(s => ({ t: s.team.id, pos: s.position, pts: s.points, total: s.total, home: s.home, away: s.away }));
 
   // 3) Internacionales con equipos ticos
   const ids = new Set(Object.keys(teams).map(Number));
-  const intl = [];
+  let intl = [];
   for (const name of INTL) {
+    if (limited) break;
     try {
       const list = await allMatches(`leagueName=${encodeURIComponent(name)}&season=${SEASON}`);
       for (const m of list) {
@@ -129,6 +144,7 @@ async function main() {
       }
     } catch (e) { console.warn(`No se pudo leer ${name}: ${e.message}`); }
   }
+  if (limited && !intl.length) intl = old.intl || [];
   intl.sort((a, b) => new Date(a.d) - new Date(b.d));
 
   const out = fixDeep({
@@ -139,7 +155,7 @@ async function main() {
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));
   const pending = matches.filter(m => m.hs !== undefined && !m.ev).length;
-  console.log(`Listo: ${matches.length} partidos, ${intl.length} internacionales. Consultas usadas: ${used}. Quedan hoy: ${remaining}.${pending ? ` Faltan ${pending} partidos por completar en la próxima corrida.` : ''}`);
+  console.log(`Listo: ${matches.length} partidos, ${intl.length} internacionales. Consultas usadas: ${used}. Quedan hoy: ${remaining}.${limited ? ' Se llegó al límite diario; se guardó lo que se alcanzó a bajar.' : ''}${pending ? ` Faltan ${pending} partidos por completar en la próxima corrida.` : ''}`);
 }
 
 main().catch(e => { console.error(e.message); process.exit(1); });
