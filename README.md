@@ -32,6 +32,17 @@ Datos de [Highlightly](https://highlightly.net).
 
 ## Consultas a la API
 
+Presupuesto diario con el plan gratis (100 consultas):
+- Actualización: 4 corridas al día × ~10 consultas = ~40.
+- Quedan ~60 para el en vivo: alcanza para un partido completo al día (1 consulta cada 5 min).
+
+Al pasar a un plan pagado:
+- Vercel: `LIVE_CACHE_SECONDS` = `60`.
+- GitHub → Settings → Secrets and variables → Actions → Variables: `MAX_NEW_PER_RUN` = `40`.
+- Opcional: en el workflow, cambiar el horario a cada 2 horas.
+
+Detalle:
+
 - Cada actualización: ~4 consultas fijas + 3 por cada partido recién terminado.
 - En vivo: 1 por torneo + 1 por partido en juego, una vez por intervalo.
 - El plan gratis (100/día) alcanza para todo menos el en vivo de una jornada completa. Para eso, el plan de $9.49/mes.

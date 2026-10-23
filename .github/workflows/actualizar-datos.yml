@@ -2,8 +2,8 @@ name: Actualizar datos
 
 on:
   schedule:
-    # cada 3 horas (hora UTC)
-    - cron: '17 */3 * * *'
+    # cada 6 horas: 6:17 a.m., 12:17 p.m., 6:17 p.m. y 12:17 a.m. hora de Costa Rica
+    - cron: '17 0,6,12,18 * * *'
   workflow_dispatch: {}   # botón "Run workflow" para correrlo a mano
 
 permissions:
@@ -24,6 +24,8 @@ jobs:
       - name: Descargar datos de Highlightly
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+          # consultas extra por corrida para completar partidos (plan gratis: 6; plan pagado: 40)
+          MAX_NEW_PER_RUN: ${{ vars.MAX_NEW_PER_RUN || '6' }}
         run: node scripts/update.mjs
       - name: Guardar cambios
         run: |

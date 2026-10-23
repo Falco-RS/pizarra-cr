@@ -13,7 +13,7 @@ const OUT = 'public/data/season.json';
 const CORRECTIONS = 'data/correcciones.json';
 const LEAGUE_ID = Number(process.env.LEAGUE_ID || 138646);   // Primera División de Costa Rica
 const SEASON = Number(process.env.SEASON || 2026);
-const MAX_NEW = Number(process.env.MAX_NEW_PER_RUN || 20);   // tope de consultas extra por corrida
+const MAX_NEW = Number(process.env.MAX_NEW_PER_RUN || 6);   // tope de consultas extra por corrida
 // Torneos internacionales donde juegan equipos ticos (se filtran por equipo)
 const INTL = (process.env.INTL_LEAGUES || 'Concacaf Central American Cup,CONCACAF Champions Cup')
   .split(',').map(s => s.trim()).filter(Boolean);
