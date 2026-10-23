@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Resultados, tabla, goleadores, disciplina y partidos en vivo del fútbol de Costa Rica.">
+<title>Pizarra CR</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="top gut">
+  <div class="inner">
+    <div class="brand"><span class="mark" aria-hidden="true">P</span><span>PIZARRA<em> CR</em></span></div>
+    <nav class="tabs" aria-label="Secciones" id="tabs">
+      <button data-v="inicio">Inicio</button>
+      <button data-v="tabla">Tabla</button>
+      <button data-v="goleadores">Goleadores</button>
+      <button data-v="disciplina">Disciplina</button>
+    </nav>
+    <span class="src" id="src"></span>
+  </div>
+</header>
+
+<section class="board gut" aria-label="Jornada">
+  <div class="inner">
+    <div class="live" id="live" hidden></div>
+    <div class="jhead">
+      <h1 id="jt">Jornada</h1>
+      <span class="sub">Primera División · Apertura 2026</span>
+      <div class="step">
+        <button id="prev" aria-label="Jornada anterior">←</button>
+        <label for="jsel" style="position:absolute;width:1px;height:1px;overflow:hidden">Elegir jornada</label>
+        <select id="jsel"></select>
+        <button id="next" aria-label="Jornada siguiente">→</button>
+      </div>
+    </div>
+    <div class="mgrid" id="mgrid"></div>
+    <div id="detail"></div>
+  </div>
+</section>
+
+<main class="main gut">
+  <div class="inner" id="view"></div>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

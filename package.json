@@ -1,0 +1,11 @@
+{
+  "name": "pizarra-cr",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update": "node scripts/update.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
