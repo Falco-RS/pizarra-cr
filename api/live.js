@@ -11,7 +11,7 @@ const BEFORE = 10 * 60e3;   // empezar a mirar 10 min antes del pitazo
 const AFTER = 150 * 60e3;   // y hasta 2 h 30 después
 
 export default async function handler(req, res) {
-  const key = process.env.HIGHLIGHTLY_KEY;
+  const key = process.env.HIGHLIGHTLY_KEY || process.env.HIGHLIGHT_KEY;
   const liveTtl = Number(process.env.LIVE_CACHE_SECONDS || 60);
   const send = (body, ttl) => {
     res.setHeader('Cache-Control', `public, s-maxage=${ttl}, stale-while-revalidate=30`);
