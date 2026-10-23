@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://pizarra-cr-776s.vercel.app/sitemap.xml

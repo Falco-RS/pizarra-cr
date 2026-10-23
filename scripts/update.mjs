@@ -3,6 +3,7 @@
 // Uso: HIGHLIGHTLY_KEY=tu_llave node scripts/update.mjs
 
 import fs from 'node:fs/promises';
+import { prerender } from './prerender.mjs';
 
 const KEY = process.env.HIGHLIGHTLY_KEY;
 if (!KEY) { console.error('Falta la variable HIGHLIGHTLY_KEY'); process.exit(1); }
@@ -154,6 +155,7 @@ async function main() {
   });
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));
+  await prerender();
   const pending = matches.filter(m => m.hs !== undefined && !m.ev).length;
   console.log(`Listo: ${matches.length} partidos, ${intl.length} internacionales. Consultas usadas: ${used}. Quedan hoy: ${remaining}.${limited ? ' Se llegó al límite diario; se guardó lo que se alcanzó a bajar.' : ''}${pending ? ` Faltan ${pending} partidos por completar en la próxima corrida.` : ''}`);
 }
