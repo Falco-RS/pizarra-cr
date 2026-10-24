@@ -14,6 +14,18 @@ export default async function handler(req, res) {
   if (!key) return send(500, { error: 'Falta HIGHLIGHTLY_KEY en Vercel' }, 60);
   if (!id) return send(400, { error: 'Falta el id del partido' }, 60);
 
+  // Solo partidos de nuestros torneos: el servicio no puede usarse como acceso abierto a la API
+  // (los términos de Highlightly prohíben revender o reenviar el acceso directo a su API).
+  try {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const proto = req.headers['x-forwarded-proto'] || (String(host).startsWith('localhost') ? 'http' : 'https');
+    const season = await (await fetch(`${proto}://${host}/data/season.json`)).json();
+    const known = new Set([...season.matches.map(m => String(m.id)), ...(season.intl || []).map(m => String(m.id))]);
+    if (!known.has(id)) return send(404, { error: 'Partido no disponible en Pizarra CR' }, 3600);
+  } catch (e) {
+    return send(503, { error: 'No se pudo verificar el partido' }, 30);
+  }
+
   const api = async p => {
     const r = await fetch(BASE + p, { headers: { 'x-rapidapi-key': key } });
     if (r.status === 404) return null;
