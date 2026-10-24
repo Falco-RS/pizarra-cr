@@ -8,7 +8,7 @@ const fmtTime = d => new Date(d).toLocaleTimeString('es-CR', { ...tz, hour:'nume
 const played = m => m.hs !== undefined;
 /* Resultados que cambió el tribunal: el marcador de cancha se muestra, la tabla usa el oficial */
 const MESA = D.mesa || {};
-const off = m => MESA[m.id] || m;
+const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
 const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
 const rounds = [...new Set(M.map(m => m.r))].sort((a,b) => a-b);
 const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
@@ -70,7 +70,25 @@ function formOf(tid, mode) {
     .slice(-5).map(m => { const o = off(m), gf = m.h === tid ? o.hs : o.as, ga = m.h === tid ? o.as : o.hs; return gf > ga ? 'W' : gf < ga ? 'L' : 'D'; });
 }
 function tableRows(mode) {
-  const rows = D.standings.map(s => { const o = s[mode]; return { t: s.t, pj: o.games, g: o.wins, e: o.draws, p: o.loses, gf: o.scoredGoals, gc: o.receivedGoals, pts: mode === 'total' ? s.pts : o.wins*3 + o.draws }; });
+  // Se calcula con los resultados (incluye partidos recién terminados y los ganados en la mesa),
+  // así no depende de que Highlightly actualice su tabla.
+  const acc = {};
+  for (const t of Object.keys(T)) acc[t] = { t: +t, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 };
+  const results = M.map(m => {
+    if (played(m)) return off(m);
+    const lv = LIVE.find(x => x.id === m.id && x.finished && x.score);
+    return lv ? { ...m, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1] } : null;
+  }).filter(Boolean);
+  for (const m of results) {
+    for (const [tid, gf, ga, isHome] of [[m.h, m.hs, m.as, true], [m.a, m.as, m.hs, false]]) {
+      if (mode === 'home' && !isHome) continue;
+      if (mode === 'away' && isHome) continue;
+      const r = acc[tid] ||= { t: tid, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 };
+      r.pj++; r.gf += gf; r.gc += ga;
+      if (gf > ga) { r.g++; r.pts += 3; } else if (gf === ga) { r.e++; r.pts += 1; } else r.p++;
+    }
+  }
+  const rows = Object.values(acc);
   rows.sort((a,b) => b.pts - a.pts || (b.gf-b.gc) - (a.gf-a.gc) || b.gf - a.gf);
   return rows;
 }
