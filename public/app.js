@@ -97,9 +97,11 @@ function renderBoard() {
   document.getElementById('prev').disabled = S.j <= rounds[0];
   document.getElementById('next').disabled = S.j >= rounds[rounds.length-1];
   document.getElementById('mgrid').innerHTML = list.map(m0 => {
-    const lv = LIVE.find(x => x.id === m0.id && x.started && !x.finished);
-    const m = lv ? { ...m0, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, liveClock: lv.clock } : m0;
-    const p = played(m), hl = p && !lv && m.hs < m.as, al = p && !lv && m.as < m.hs;
+    // también se usa el resultado del en vivo recién terminado, mientras llega la actualización de datos
+    const lv = !played(m0) && LIVE.find(x => x.id === m0.id && x.started && x.score);
+    const m = lv ? { ...m0, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, ...(lv.finished ? {} : { liveClock: lv.clock }) } : m0;
+    const live = lv && !lv.finished;
+    const p = played(m), hl = p && !live && m.hs < m.as, al = p && !live && m.as < m.hs;
     return `<button class="mc" data-id="${m.id}" aria-pressed="${S.sel === m.id}" ${p ? '' : 'aria-disabled="true"'}>
       <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${esc(statusLine(m))}</span></span>
       <span class="row ${hl ? 'lose' : ''}">${crest(m.h)}<span>${esc(T[m.h].name)}</span><span class="sc">${p ? m.hs : ''}</span></span>

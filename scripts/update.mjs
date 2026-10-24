@@ -75,6 +75,24 @@ async function main() {
   let old = { matches: [], detail: {} };
   try { old = JSON.parse(await fs.readFile(OUT, 'utf8')); } catch { /* primera corrida */ }
   const oldById = new Map((old.matches || []).map(m => [m.id, m]));
+
+  // Modo automático (corre cada hora): solo consulta la API si hay algo que traer,
+  // así las corridas sin novedades no gastan consultas.
+  if (process.env.SMART === '1' && old.updated) {
+    const now = Date.now();
+    const sinceUpdate = now - new Date(old.updated).getTime();
+    const all = [...(old.matches || []), ...(old.intl || [])];
+    const justEnded = all.some(m => {
+      const k = new Date(m.d).getTime();
+      return !isFinal(m.s) && now > k + 115 * 60e3 && now < k + 3 * 864e5;
+    });
+    const missingDetail = (old.matches || []).some(m => m.hs !== undefined && (!m.ev || !old.detail?.[m.id]) && m.s !== 'Awarded');
+    const due = sinceUpdate > 6 * 3600e3;
+    if (!justEnded && !due && !(missingDetail && sinceUpdate > 3 * 3600e3)) {
+      console.log('Nada nuevo que traer. No se usaron consultas.');
+      return;
+    }
+  }
   let mesa = {};
   try { mesa = JSON.parse(await fs.readFile(CORRECTIONS, 'utf8')); } catch { /* sin correcciones */ }
 

@@ -2,8 +2,9 @@ name: Actualizar datos
 
 on:
   schedule:
-    # cada 6 horas: 6:17 a.m., 12:17 p.m., 6:17 p.m. y 12:17 a.m. hora de Costa Rica
-    - cron: '17 0,6,12,18 * * *'
+    # cada hora; el script solo consulta la API si un partido terminó,
+    # si faltan detalles por completar o si pasaron 6 horas desde la última actualización
+    - cron: '17 * * * *'
   workflow_dispatch: {}   # botón "Run workflow" para correrlo a mano
 
 permissions:
@@ -26,6 +27,7 @@ jobs:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           # consultas extra por corrida para completar partidos (plan gratis: 6; plan pagado: 40)
           MAX_NEW_PER_RUN: ${{ vars.MAX_NEW_PER_RUN || '6' }}
+          SMART: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: node scripts/update.mjs
       - name: Guardar cambios
         run: |
