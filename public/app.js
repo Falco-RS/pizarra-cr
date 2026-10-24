@@ -246,27 +246,10 @@ function reconcile(events, hs, as) {
   // si la API después agrega su propio aviso de "gol anulado", no repetirlo
   return ev.filter(e => !(e[1] === 'var' && !e.fixed && ev.some(x => x.fixed && x[2] === e[2])));
 }
-/* Memoria del minuto a minuto: la API a veces borra eventos (un gol anulado desaparece).
-   Guardamos todo lo que ya vimos de cada partido; un gol que desaparece queda como anulado. */
-let SEEN = {};
-try { SEEN = JSON.parse(localStorage.getItem('pizarra-seen') || '{}'); } catch (e) { SEEN = {}; }
-const evKey = e => [e[0], e[1], e[2], e[3] || '', e[4] || ''].join('|');
-function remember(L) {
-  if (!L.started) return L;
-  const prev = SEEN[L.id] || [];
-  const now = new Set(L.events.map(evKey));
-  const isGoal = e => e[1] === 'goal' || e[1] === 'pen' || e[1] === 'og';
-  const lost = prev.filter(e => !now.has(evKey(e)) && isGoal(e) && !L.events.some(x => x[1] === 'var' && x[0] === e[0] && x[2] === e[2]))
-    .map(e => { const c = e.slice(); c[1] = 'var'; return c; });
-  const keptVar = prev.filter(e => e[1] === 'var' && !now.has(evKey(e)));
-  const merged = [...L.events, ...lost, ...keptVar.filter(v => !lost.some(l => l[0] === v[0] && l[2] === v[2] && l[3] === v[3]))];
-  SEEN[L.id] = merged.map(e => e.slice(0, 5));
-  try {
-    const keep = {}; Object.keys(SEEN).slice(-6).forEach(k => keep[k] = SEEN[k]);
-    localStorage.setItem('pizarra-seen', JSON.stringify(keep));
-  } catch (e) { /* sin almacenamiento: solo memoria de esta pestaña */ }
+/* El minuto a minuto sigue exactamente lo que diga la API, en orden de minuto (45+2 después de 45). */
+function sortEvents(L) {
   const order = t => { const [a, b] = String(t).split('+'); return (+a || 0) + (+b || 0) / 100; };
-  return { ...L, events: merged.sort((a, b) => order(a[0]) - order(b[0])) };
+  return { ...L, events: (L.events || []).slice().sort((a, b) => order(a[0]) - order(b[0])) };
 }
 const COMP = { 'Concacaf Central American Cup': 'Copa Centroamericana', 'CONCACAF Champions Cup': 'Copa de Campeones Concacaf' };
 function renderLive() {
@@ -299,7 +282,7 @@ async function pollLive() {
   try {
     const r = await fetch('/api/live', { cache: 'no-store' });
     const j = await r.json();
-    LIVE = (j.live || []).map(remember);
+    LIVE = (j.live || []).map(sortEvents);
     const lvM = LIVE.map(x => M.find(m => m.id === x.id && x.started && !x.finished)).find(Boolean);
     if (lvM && !S.moved) S.j = lvM.r;
   } catch (e) { /* sin conexión: se mantiene lo último */ }
