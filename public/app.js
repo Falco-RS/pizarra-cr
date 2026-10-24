@@ -13,7 +13,9 @@ const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
 const rounds = [...new Set(M.map(m => m.r))].sort((a,b) => a-b);
 const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
 
-let S = { view:'inicio', j:lastPlayed, sel:null, tmode:'total' };
+const soonRound = M.filter(m => !played(m) && new Date(m.d) - Date.now() < 3 * 864e5).map(m => m.r);
+const currentRound = soonRound.length && M.filter(m => m.r === lastPlayed).every(played) ? Math.min(...soonRound) : lastPlayed;
+let S = { view:'inicio', j:currentRound, sel:null, tmode:'total', moved:false };
 try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina'].includes(v)) S.view = v; } catch(e){}
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
@@ -77,9 +79,9 @@ const formHtml = f => `<span class="form" aria-label="Últimos 5: ${f.map(x => (
 /* ---------- jornada board ---------- */
 const jsel = document.getElementById('jsel');
 jsel.innerHTML = rounds.map(r => `<option value="${r}">Jornada ${r}</option>`).join('');
-jsel.onchange = () => { S.j = +jsel.value; S.sel = null; renderBoard(); };
-document.getElementById('prev').onclick = () => { S.j--; S.sel = null; renderBoard(); };
-document.getElementById('next').onclick = () => { S.j++; S.sel = null; renderBoard(); };
+jsel.onchange = () => { S.moved = true; S.j = +jsel.value; S.sel = null; renderBoard(); };
+document.getElementById('prev').onclick = () => { S.moved = true; S.j--; S.sel = null; renderBoard(); };
+document.getElementById('next').onclick = () => { S.moved = true; S.j++; S.sel = null; renderBoard(); };
 
 function statusLine(m) {
   if (m.liveClock !== undefined) return `EN VIVO ${m.liveClock ?? ''}'`;
@@ -130,7 +132,7 @@ function renderDetail() {
   const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, liveClock: lv.finished ? undefined : lv.clock } : base;
   if (!m) { box.innerHTML = `<p class="hint" style="background:transparent;color:var(--board-muted);padding:0;margin:0">Tocá un partido jugado para ver goles, tarjetas y cambios minuto a minuto.</p>`; return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
-  const det = D.detail[String(m.id)];
+  const det = lv && lv.stats && lv.stats.length === 2 ? { stats: lv.stats.map(t => t.s), statsTeams: lv.stats.map(t => t.t), lineups: null } : D.detail[String(m.id)];
   let extra = '';
   if (det) {
     const hi = det.statsTeams[0] === m.h ? 0 : 1, ai = 1 - hi;
@@ -142,7 +144,7 @@ function renderDetail() {
     }).join('');
     const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
     extra = `<div class="dcols"><div><h3>Estadísticas</h3>${bars}</div>
-      <div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div></div>`;
+      ${det.lineups ? `<div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div>` : ''}</div>`;
   } else if (!lv) {
     extra = `<p class="hint" style="margin-top:14px">Las estadísticas y alineaciones de este partido se completan en las próximas actualizaciones.</p>`;
   }
@@ -243,11 +245,17 @@ function renderLive() {
     const e = L.events[L.events.length - 1];
     const last = e ? `${esc(e[0])}' · ${e[1] === 'sub' ? `Entra <b>${esc(e[4])}</b> <span class="note">sale ${esc(e[3])}</span>` : `<b>${esc(e[3] || '')}</b> <span class="note">${EVL[e[1]] || esc(e[1])}</span>`}` : 'Sin eventos todavía';
     const clock = /half time/i.test(L.status) ? 'ENTRETIEMPO' : `EN VIVO ${L.clock ?? ''}'`;
-    return `<div class="litem">${L.started ? `<span class="tag"><i></i>${clock}</span>` : `<span class="tag soon">${esc(fmtTime(L.d))}</span>`}
+    const inLeague = M.some(x => x.id === L.id);
+    return `<${inLeague ? `button type="button" class="litem" data-live="${L.id}"` : 'div class="litem"'}>${L.started ? `<span class="tag"><i></i>${clock}</span>` : `<span class="tag soon">${esc(fmtTime(L.d))}</span>`}
       <span class="sc">${cr(L.h)}<span>${esc(L.h.name)}</span><b>${L.started ? `${hs} – ${as}` : 'vs'}</b><span>${esc(L.a.name)}</span>${cr(L.a)}</span>
-      <span class="comp">${esc(COMP[L.comp] || L.comp)}</span>${L.started ? `<span class="last">Último: ${last}</span>` : ''}</div>`;
+      <span class="comp">${esc(COMP[L.comp] || L.comp)}</span>${L.started ? `<span class="last">Último: ${last}</span>` : ''}${inLeague ? '<span class="go">Ver partido →</span>' : ''}</${inLeague ? 'button' : 'div'}>`;
   };
   el.innerHTML = [...now, ...soon].map(item).join('');
+  el.querySelectorAll('[data-live]').forEach(b => b.onclick = () => {
+    const m = M.find(x => x.id === +b.dataset.live); if (!m) return;
+    S.j = m.r; S.sel = m.id; S.moved = true; renderBoard();
+    document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 }
 async function pollLive() {
   if (document.hidden) return;
@@ -255,6 +263,8 @@ async function pollLive() {
     const r = await fetch('/api/live', { cache: 'no-store' });
     const j = await r.json();
     LIVE = j.live || [];
+    const lvM = LIVE.map(x => M.find(m => m.id === x.id && x.started && !x.finished)).find(Boolean);
+    if (lvM && !S.moved) S.j = lvM.r;
   } catch (e) { /* sin conexión: se mantiene lo último */ }
   renderLive(); renderBoard();
 }

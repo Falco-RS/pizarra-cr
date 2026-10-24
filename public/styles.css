@@ -100,6 +100,9 @@ h1,h2,h3{text-wrap:balance}
 .live{display:flex;flex-direction:column;gap:8px}
 .litem{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;border:1px solid var(--board-line);border-radius:10px;padding:12px 14px;background:#FFFFFF08}
 .live .tag.soon{background:var(--board-line)}
+button.litem{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+button.litem:hover{border-color:var(--board-muted)}
+.litem .go{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent)}
 .live .tag{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;letter-spacing:.4px}
 .live .tag i{width:7px;height:7px;border-radius:50%;background:#fff}
 @media (prefers-reduced-motion:no-preference){.live .tag i{animation:pulse 1.4s ease-in-out infinite}}

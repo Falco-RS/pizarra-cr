@@ -58,12 +58,15 @@ export default async function handler(req, res) {
       if (!m) continue;
       const st = m.state || {};
       const started = !/not started/i.test(st.description || '');
-      let events = [];
+      let events = [], stats = [];
       if (started) {
-        const ev = await api(`/events/${c.id}`);
-        events = (ev || []).map(e => [String(e.time), TYPE[e.type] || e.type, e.team?.id === m.homeTeam.id ? 1 : 0, e.player, e.substituted]);
+        // una sola consulta trae eventos y estadísticas
+        const raw = await api(`/matches/${c.id}`);
+        const full = Array.isArray(raw) ? raw[0] : raw;
+        events = (full?.events || []).map(e => [String(e.time), TYPE[e.type] || e.type, e.team?.id === m.homeTeam.id ? 1 : 0, e.player, e.substituted]);
+        stats = (full?.statistics || []).map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(x => [x.displayName, x.value])) }));
       }
-      live.push({ id: c.id, comp: c.comp, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events });
+      live.push({ id: c.id, comp: c.comp, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events, stats });
     }
     // si todavía no empezó ninguno, revisar cada 10 min para ahorrar consultas
     const anyStarted = live.some(m => m.started && !m.finished);
