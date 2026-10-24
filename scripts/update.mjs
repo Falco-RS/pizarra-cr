@@ -53,10 +53,14 @@ const fixDeep = o => Array.isArray(o) ? o.map(fixDeep)
   : fixText(o);
 
 const isFinal = s => /finish|award/i.test(s || '');
+// Escudos propios (data/escudos.json): reemplazan a los de la API
+let ESCUDOS = {};
+try { ESCUDOS = JSON.parse(await fs.readFile('data/escudos.json', 'utf8')); } catch { /* sin escudos propios */ }
+const logoOf = t => (ESCUDOS[t.id] ? `/escudos/${ESCUDOS[t.id]}` : t.logo || null);
 const team = t => {
   const clean = t.name.replace(/^(CD|CS|LD|AD|FC|CF|SD|Club|Deportivo)\s+/i, '').replace(/\s+(FC|CF)$/i, '');
   const [name, ab] = SHORT[t.name] || [clean, clean.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').slice(0, 3).toUpperCase()];
-  return { name, full: t.name, ab, logo: t.logo || null };
+  return { name, full: t.name, ab, logo: logoOf(t) };
 };
 const compactEvents = (ev, homeId) => (ev || []).map(e => [String(e.time), TYPE[e.type] || e.type, e.team?.id === homeId ? 1 : 0, fixText(e.player), fixText(e.substituted)]);
 
