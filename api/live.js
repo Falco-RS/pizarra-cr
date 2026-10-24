@@ -7,7 +7,7 @@ const TYPE = {
   'Goal': 'goal', 'Penalty': 'pen', 'Own Goal': 'og', 'Yellow Card': 'yc', 'Red Card': 'rc',
   'Substitution': 'sub', 'Missed Penalty': 'mp', 'VAR Goal Cancelled': 'var',
 };
-const BEFORE = 10 * 60e3;   // empezar a mirar 10 min antes del pitazo
+const BEFORE = 60 * 60e3;   // empezar a mirar 1 h antes (por si adelantaron el partido)
 const AFTER = 150 * 60e3;   // y hasta 2 h 30 después
 
 export default async function handler(req, res) {
@@ -65,7 +65,9 @@ export default async function handler(req, res) {
       }
       live.push({ id: c.id, comp: c.comp, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events });
     }
-    send({ updated: new Date().toISOString(), live }, liveTtl);
+    // si todavía no empezó ninguno, revisar cada 10 min para ahorrar consultas
+    const anyStarted = live.some(m => m.started && !m.finished);
+    send({ updated: new Date().toISOString(), live }, anyStarted ? liveTtl : Math.max(liveTtl, 600));
   } catch (e) {
     send({ error: e.message, live: [] }, 30);
   }
