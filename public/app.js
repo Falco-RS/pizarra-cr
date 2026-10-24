@@ -240,10 +240,11 @@ function reconcile(events, hs, as) {
   for (const [side, max] of [[1, hs], [0, as]]) {
     let count = ev.filter(e => isGoal(e) && e[2] === side).length;
     for (let i = ev.length - 1; i >= 0 && count > max; i--) {
-      if (isGoal(ev[i]) && ev[i][2] === side) { ev[i][1] = 'var'; count--; }
+      if (isGoal(ev[i]) && ev[i][2] === side) { ev[i][1] = 'var'; ev[i].fixed = true; count--; }
     }
   }
-  return ev;
+  // si la API después agrega su propio aviso de "gol anulado", no repetirlo
+  return ev.filter(e => !(e[1] === 'var' && !e.fixed && ev.some(x => x.fixed && x[2] === e[2])));
 }
 const COMP = { 'Concacaf Central American Cup': 'Copa Centroamericana', 'CONCACAF Champions Cup': 'Copa de Campeones Concacaf' };
 function renderLive() {
