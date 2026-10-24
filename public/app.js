@@ -114,7 +114,7 @@ function renderBoard() {
   renderDetail();
 }
 
-const EVL = { goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado por VAR' };
+const EVL = { goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
 const ICO = { goal:'goal', pen:'goal', og:'goal', yc:'yc', rc:'rc', mp:'miss', var:'miss' };
 function evHtml(e) {
   const [time, type, , player, subIn] = e;
@@ -129,7 +129,7 @@ function renderDetail() {
   const box = document.getElementById('detail');
   const base = M.find(x => x.id === S.sel);
   const lv = base && LIVE.find(x => x.id === base.id && x.started);
-  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, liveClock: lv.finished ? undefined : lv.clock } : base;
+  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(lv.events, +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
   if (!m) { box.innerHTML = `<p class="hint" style="background:transparent;color:var(--board-muted);padding:0;margin:0">Tocá un partido jugado para ver goles, tarjetas y cambios minuto a minuto.</p>`; return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
   const det = lv && lv.stats && lv.stats.length === 2 ? { stats: lv.stats.map(t => t.s), statsTeams: lv.stats.map(t => t.t), lineups: null } : D.detail[String(m.id)];
@@ -232,6 +232,19 @@ function renderView() {
 function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));
 
+/* Si el minuto a minuto tiene más goles que el marcador (gol anulado que la API no ha borrado),
+   el marcador manda y los goles sobrantes, de atrás para adelante, se marcan como anulados. */
+function reconcile(events, hs, as) {
+  const ev = events.map(e => e.slice());
+  const isGoal = e => e[1] === 'goal' || e[1] === 'pen' || e[1] === 'og';
+  for (const [side, max] of [[1, hs], [0, as]]) {
+    let count = ev.filter(e => isGoal(e) && e[2] === side).length;
+    for (let i = ev.length - 1; i >= 0 && count > max; i--) {
+      if (isGoal(ev[i]) && ev[i][2] === side) { ev[i][1] = 'var'; count--; }
+    }
+  }
+  return ev;
+}
 const COMP = { 'Concacaf Central American Cup': 'Copa Centroamericana', 'CONCACAF Champions Cup': 'Copa de Campeones Concacaf' };
 function renderLive() {
   const el = document.getElementById('live');
@@ -242,7 +255,8 @@ function renderLive() {
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
   const item = L => {
     const [hs, as] = (L.score || '0 - 0').split(' - ');
-    const e = L.events[L.events.length - 1];
+    const evs = reconcile(L.events, +hs, +as);
+    const e = evs[evs.length - 1];
     const last = e ? `${esc(e[0])}' · ${e[1] === 'sub' ? `Entra <b>${esc(e[4])}</b> <span class="note">sale ${esc(e[3])}</span>` : `<b>${esc(e[3] || '')}</b> <span class="note">${EVL[e[1]] || esc(e[1])}</span>`}` : 'Sin eventos todavía';
     const clock = /half time/i.test(L.status) ? 'ENTRETIEMPO' : `EN VIVO ${L.clock ?? ''}'`;
     const inLeague = M.some(x => x.id === L.id);
