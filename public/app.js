@@ -307,6 +307,8 @@ async function pollLive() {
     if (lvM && !S.moved) S.j = lvM.r;
   } catch (e) { /* sin conexión: se mantiene lo último */ }
   renderLive(); renderBoard();
+  // la tabla y los goleadores también usan los resultados recién terminados
+  if (S.view === 'inicio' || S.view === 'tabla') renderView();
 }
 renderLive(); renderBoard(); renderView();
 pollLive(); setInterval(pollLive, 60000);

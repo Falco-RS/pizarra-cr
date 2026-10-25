@@ -29,7 +29,9 @@ export default async function handler(req, res) {
     const candidates = [
       ...season.matches.map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: season.league.id, comp: season.league.name, h: season.teams[m.h], a: season.teams[m.a] })),
       ...(season.intl || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.leagueId, comp: m.comp, h: m.h, a: m.a })),
-    ].filter(m => { const k = new Date(m.d).getTime(); return now >= k - BEFORE && now <= k + AFTER && !done(m.s); });
+    // En juego, o ya terminado pero todavía sin guardar en los datos (hasta 24 h después),
+    // para que la página siga mostrando el resultado final mientras corre la actualización.
+    ].filter(m => { const k = new Date(m.d).getTime(); return now >= k - BEFORE && now <= k + 24 * 3600e3 && !done(m.s); });
 
     if (!candidates.length) return send({ updated: new Date().toISOString(), live: [] }, 300);
 
@@ -57,6 +59,8 @@ export default async function handler(req, res) {
       const m = states.get(c.id);
       if (!m) continue;
       const st = m.state || {};
+      // pasado el tiempo normal y sin empezar: suspendido o con datos atrasados, no se muestra
+      if (/not started/i.test(st.description || '') && now > new Date(c.d).getTime() + AFTER) continue;
       const started = !/not started/i.test(st.description || '');
       let events = [], stats = [];
       if (started) {
@@ -68,9 +72,20 @@ export default async function handler(req, res) {
       }
       live.push({ id: c.id, comp: c.comp, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events, stats });
     }
-    // si todavía no empezó ninguno, revisar cada 10 min para ahorrar consultas
+    // Un partido terminó y todavía no está en los datos: pedir la actualización a GitHub ya
+    // (necesita GH_TOKEN en Vercel; sin él, la actualización horaria lo recoge igual).
+    const pendingSave = live.some(m => m.finished);
+    if (pendingSave && process.env.GH_TOKEN) {
+      await fetch('https://api.github.com/repos/' + (process.env.GH_REPO || 'Falco-RS/pizarra-cr') + '/actions/workflows/actualizar-datos.yml/dispatches', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'pizarra-cr' },
+        body: JSON.stringify({ ref: 'main' }),
+      }).catch(() => {});
+    }
+    // en juego: el intervalo normal; nada en juego todavía: 10 min; solo terminados esperando guardarse: 1 h
     const anyStarted = live.some(m => m.started && !m.finished);
-    send({ updated: new Date().toISOString(), live }, anyStarted ? liveTtl : Math.max(liveTtl, 600));
+    const ttl = anyStarted ? liveTtl : live.some(m => !m.started) ? Math.max(liveTtl, 600) : 3600;
+    send({ updated: new Date().toISOString(), live }, ttl);
   } catch (e) {
     send({ error: e.message, live: [] }, 30);
   }
