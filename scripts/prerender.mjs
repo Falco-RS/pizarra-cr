@@ -6,7 +6,7 @@
 
 import fs from 'node:fs/promises';
 
-const SITE_URL = (process.env.SITE_URL || 'https://pizarra-cr-776s.vercel.app').replace(/\/$/, '');
+const SITE_URL = (process.env.SITE_URL || 'https://pizarracr.com').replace(/\/$/, '');
 const START = '<!--PRERENDER-->', END = '<!--/PRERENDER-->';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
