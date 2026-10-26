@@ -296,7 +296,14 @@ function yellowsHtml(n) {
   return `<ol class="list">${topYellow.slice(0, n).map(y => `<li>${crest(y.t)}<span class="nm"><b>${esc(y.name)}</b><span>${esc(T[y.t].name)} · última en J${y.last}${y.n >= YELLOW_LIMIT ? ' · ya cumplió suspensión' : ''}</span></span>${y.cycle === YELLOW_LIMIT - 1 ? '<span class="chip cap4">En capilla</span>' : ''}${cardRow(y.n)}<span class="big" style="font-size:22px;min-width:22px;text-align:right">${y.n}</span></li>`).join('')}</ol>`;
 }
 
+// El bloque de la jornada solo va en Inicio; en las otras pestañas queda solo la franja en vivo (si hay)
+function syncBoard() {
+  const home = S.view === 'inicio';
+  document.querySelectorAll('[data-home]').forEach(el => { el.hidden = !home; });
+  document.querySelector('.board').hidden = !home && document.getElementById('live').hidden;
+}
 function renderView() {
+  syncBoard();
   document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.v === S.view ? 'page' : 'false'));
   const v = document.getElementById('view');
   const seg = `<div class="seg" role="group" aria-label="Tipo de tabla">${[['total','General'],['home','Local'],['away','Visita']].map(([k,l]) => `<button data-t="${k}" aria-pressed="${S.tmode === k}">${l}</button>`).join('')}</div>`;
@@ -478,8 +485,8 @@ function renderLive() {
   const el = document.getElementById('live');
   const now = LIVE.filter(x => x.started && !x.finished);
   const soon = LIVE.filter(x => !x.started);
-  if (!now.length && !soon.length) { el.hidden = true; return; }
-  el.hidden = false;
+  if (!now.length && !soon.length) { el.hidden = true; syncBoard(); return; }
+  el.hidden = false; syncBoard();
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
   const item = L => {
     const [hs, as] = (L.score || '0 - 0').split(' - ');
