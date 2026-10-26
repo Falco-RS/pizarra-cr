@@ -16,7 +16,7 @@ const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
 const soonRound = M.filter(m => !played(m) && new Date(m.d) - Date.now() < 3 * 864e5).map(m => m.r);
 const currentRound = soonRound.length && M.filter(m => m.r === lastPlayed).every(played) ? Math.min(...soonRound) : lastPlayed;
 let S = { view:'inicio', j:currentRound, sel:null, tmode:'total', moved:false };
-try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina'].includes(v)) S.view = v; } catch(e){}
+try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina','copa'].includes(v)) S.view = v; } catch(e){}
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
 
@@ -318,6 +318,8 @@ function renderView() {
   } else if (S.view === 'goleadores') {
     v.innerHTML = `<section class="panel"><div class="ph2"><h2>Goleadores · Apertura 2026</h2></div>${scorersHtml(30)}
       <p class="foot">Calculado a partir del minuto a minuto de los ${M.filter(played).length} partidos jugados. Los autogoles no cuentan para el jugador. La API no trae asistencias para esta liga.</p></section>`;
+  } else if (S.view === 'copa') {
+    v.innerHTML = copaHtml();
   } else {
     const fair = Object.entries(teamCards).map(([t,c]) => ({ t:+t, ...c })).sort((a,b) => (b.y + b.r*3) - (a.y + a.r*3));
     v.innerHTML = `<div class="cols">
@@ -343,6 +345,56 @@ function renderView() {
   }
   v.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.tmode = b.dataset.t; renderView(); });
   v.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+}
+/* ---------- Copa Centroamericana ---------- */
+const ROUND_ES = { 'Play-in': 'Repechaje a la Copa de Campeones', 'Final': 'Final', 'Semi-finals': 'Semifinales', 'Quarter-finals': 'Cuartos de final', 'Round of 16': 'Octavos de final', 'Group Stage': 'Fase de grupos' };
+const ROUND_ORDER = ['Final', 'Semi-finals', 'Play-in', 'Quarter-finals', 'Round of 16', 'Group Stage'];
+const TICOS = new Set(Object.keys(T).map(Number));
+function copaHtml() {
+  const list = (D.intl || []).filter(m => /central american/i.test(m.comp || ''));
+  if (!list.length) return '<section class="panel"><h2 class="ch">Copa Centroamericana</h2><p class="hint">Todavía no hay partidos de equipos ticos en este torneo.</p></section>';
+  // Highlightly llama "Final" a series que no lo son (p. ej. el repechaje a Concachampions):
+  // si un equipo de esa serie fue eliminado en una ronda anterior, es repechaje.
+  const lostIn = r => { const out = new Set(); const ties = {};
+    list.filter(m => m.round === r && m.hs != null).forEach(m => { const k = [m.hId, m.aId].sort().join('-'); (ties[k] ||= []).push(m); });
+    Object.values(ties).forEach(legs => { if (legs.length < 2) return; const x = legs[0].hId; let gx = 0, gy = 0;
+      legs.forEach(l => { if (l.hId === x) { gx += l.hs; gy += l.as; } else { gx += l.as; gy += l.hs; } });
+      if (gx !== gy) out.add(gx < gy ? x : legs[0].aId); }); return out; };
+  const outQF = lostIn('Quarter-finals');
+  const fixRound = m => m.round === 'Final' && (outQF.has(m.hId) || outQF.has(m.aId)) ? 'Play-in' : m.round;
+  const withLive = list.map(m => ({ ...m, round: fixRound(m) })).map(m => {
+    const lv = LIVE.find(x => x.id === m.id && x.started && x.score);
+    if (!lv) return m;
+    const [hs, as] = lv.score.split(' - ').map(Number);
+    return { ...m, hs, as, live: !lv.finished, clock: lv.clock, s: lv.finished ? 'Finished' : lv.status };
+  });
+  const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="" loading="lazy">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
+  const isPlayed = m => m.hs !== undefined && m.hs !== null;
+  const status = m => m.live ? `<span class="lv">EN VIVO ${m.clock ?? ''}'</span>` : isPlayed(m) ? 'Final' : fmtTime(m.d);
+  const line = (t, tid, g, lose) => `<span class="row ${lose ? 'lose' : ''}${TICOS.has(tid) ? ' tico' : ''}">${cr(t)}<span>${esc(t.name)}</span><span class="sc">${g ?? ''}</span></span>`;
+  const card = m => { const p = isPlayed(m) && !m.live; return `<div class="cc">
+    <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${status(m)}</span></span>
+    ${line(m.h, m.hId, isPlayed(m) ? m.hs : '', p && m.hs < m.as)}${line(m.a, m.aId, isPlayed(m) ? m.as : '', p && m.as < m.hs)}</div>`; };
+  const byRound = {};
+  for (const m of withLive) (byRound[m.round] ||= []).push(m);
+  const order = Object.keys(byRound).sort((a, b) => (ROUND_ORDER.indexOf(a) + 1 || 99) - (ROUND_ORDER.indexOf(b) + 1 || 99));
+  const section = r => {
+    const ms = byRound[r].sort((a, b) => new Date(a.d) - new Date(b.d));
+    if (/group/i.test(r)) return `<section class="panel"><h2 class="ch">${esc(ROUND_ES[r] || r)}</h2><p class="lead">Partidos de los equipos ticos.</p><div class="cgrid">${ms.map(card).join('')}</div></section>`;
+    // eliminatorias: agrupar ida y vuelta por pareja y sacar el global
+    const ties = {};
+    for (const m of ms) (ties[[m.hId, m.aId].sort().join('-')] ||= []).push(m);
+    return `<section class="panel"><h2 class="ch">${esc(ROUND_ES[r] || r)}</h2><div class="ties">${Object.values(ties).map(legs => {
+      const [x, y] = [legs[0].hId, legs[0].aId];
+      const tx = legs[0].h, ty = legs[0].a;
+      let gx = 0, gy = 0, done = 0;
+      for (const l of legs) if (isPlayed(l)) { done++; if (l.hId === x) { gx += l.hs; gy += l.as; } else { gx += l.as; gy += l.hs; } }
+      const agg = done ? `<p class="agg">Global: <b>${esc(tx.name)} ${gx}–${gy} ${esc(ty.name)}</b>${done < legs.length ? ' · falta la vuelta' : ''}</p>` : '';
+      return `<div class="tie">${legs.map((l, i) => `<div><p class="leg">${legs.length > 1 ? (i ? 'Vuelta' : 'Ida') : 'Partido'}</p>${card(l)}</div>`).join('')}${agg}</div>`;
+    }).join('')}</div></section>`;
+  };
+  return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · los equipos ticos</span></div>${order.map(section).join('')}
+    <p class="foot">En vivo con la misma franja de arriba. Los ticos van resaltados.</p></div>`;
 }
 function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));
@@ -403,7 +455,7 @@ async function pollLive() {
   } catch (e) { /* sin conexión: se mantiene lo último */ }
   renderLive(); renderBoard();
   // la tabla y los goleadores también usan los resultados recién terminados
-  if (S.view === 'inicio' || S.view === 'tabla') renderView();
+  if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa') renderView();
 }
 renderLive(); renderBoard(); renderView();
 pollLive(); setInterval(pollLive, 60000);
