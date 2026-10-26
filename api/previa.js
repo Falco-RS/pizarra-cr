@@ -38,12 +38,10 @@ export default async function handler(req, res) {
     const m = Array.isArray(raw) ? raw[0] : raw;
     if (!m) return send(404, { error: 'Partido no encontrado' }, 300);
     const h = m.homeTeam.id, a = m.awayTeam.id;
-    const [lineups, lastH, lastA, h2h] = await Promise.all([
-      api(`/lineups/${id}`).catch(() => null),
-      api(`/last-five-games?teamId=${h}`).catch(() => null),
-      api(`/last-five-games?teamId=${a}`).catch(() => null),
-      api(`/head-2-head?teamIdOne=${h}&teamIdTwo=${a}`).catch(() => null),
-    ]);
+    // Últimos 5 y cara a cara los calcula la página con nuestros datos: aquí solo alineación oficial.
+    const kickoff = new Date(m.date).getTime();
+    const near = kickoff - Date.now() < 2 * 3600e3;
+    const lineups = near ? await api(`/lineups/${id}`).catch(() => null) : null;
     const slim = g => (g || []).map(x => ({
       id: x.id, date: x.date, league: x.league?.name, round: x.round,
       h: { id: x.homeTeam?.id, name: x.homeTeam?.name, logo: x.homeTeam?.logo },
@@ -64,9 +62,7 @@ export default async function handler(req, res) {
       venue: m.venue || null, referee: m.referee || null, forecast: m.forecast || null,
       predictions: m.predictions || null, news: (m.news || []).slice(0, 6),
       lineups: hasLineups ? { home: side(lineups.homeTeam), away: side(lineups.awayTeam) } : null,
-      lastFive: { home: slim(lastH), away: slim(lastA) },
-      h2h: slim(h2h).slice(0, 6),
-    }, hasLineups ? 300 : 600);
+    }, hasLineups ? 3600 : near ? 600 : 6 * 3600);
   } catch (e) {
     send(502, { error: e.message }, 30);
   }

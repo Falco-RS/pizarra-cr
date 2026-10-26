@@ -120,7 +120,7 @@ function renderBoard() {
     const m = lv ? { ...m0, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, ...(lv.finished ? {} : { liveClock: lv.clock }) } : m0;
     const live = lv && !lv.finished;
     const p = played(m), hl = p && !live && m.hs < m.as, al = p && !live && m.as < m.hs;
-    return `<button class="mc" data-id="${m.id}" aria-pressed="${S.sel === m.id}" ${p ? '' : 'aria-disabled="true"'}>
+    return `<button class="mc" data-id="${m.id}" aria-pressed="${S.sel === m.id}">
       <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${esc(statusLine(m))}</span></span>
       <span class="row ${hl ? 'lose' : ''}">${crest(m.h)}<span>${esc(T[m.h].name)}</span><span class="sc">${p ? m.hs : ''}</span></span>
       <span class="row ${al ? 'lose' : ''}">${crest(m.a)}<span>${esc(T[m.a].name)}</span><span class="sc">${p ? m.as : ''}</span></span>
@@ -128,10 +128,104 @@ function renderBoard() {
   }).join('');
   document.querySelectorAll('.mc').forEach(b => b.onclick = () => {
     const id = +b.dataset.id, m = M.find(x => x.id === id);
-    if (!played(m) && !LIVE.some(x => x.id === id && x.started)) return;
     S.sel = S.sel === id ? null : id; renderBoard();
   });
   renderDetail();
+}
+
+/* ---------- previa ---------- */
+const PREVIA = {};   // respuestas de /api/previa por partido (alineación oficial y probabilidades)
+const POS = { Goalkeeper: 0, Defender: 1, Midfielder: 2, Forward: 3 };
+// Arma las líneas de la cancha con la formación ("4-3-3") y la lista de once en orden.
+function rowsFrom(formation, xi) {
+  const nums = String(formation || '').split('-').map(Number).filter(Boolean);
+  if (!xi || xi.length !== 11 || nums.reduce((a, b) => a + b, 0) !== 10) {
+    const g = [[], [], [], []]; (xi || []).forEach(p => g[POS[p.pos] ?? 2].push(p)); return g.filter(r => r.length);
+  }
+  const rows = [xi.slice(0, 1)]; let i = 1;
+  for (const n of nums) { rows.push(xi.slice(i, i + n)); i += n; }
+  return rows;
+}
+// La última alineación conocida de un equipo (la "probable" mientras no sale la oficial)
+function lastLineup(tid) {
+  const ms = M.filter(x => played(x) && (x.h === tid || x.a === tid) && D.detail[String(x.id)]?.lineups).reverse();
+  for (const x of ms) {
+    const L = D.detail[String(x.id)].lineups[x.h === tid ? 'h' : 'a'];
+    if (L && L.xi && L.xi.length) return { formation: L.f, rows: rowsFrom(L.f, L.xi), from: x };
+  }
+  return null;
+}
+const surname = n => { const parts = String(n || '').split(' '); return /^[A-ZÁÉÍÓÚÑ]\.$/.test(parts[0]) ? parts.slice(1).join(' ') : String(n || ''); };
+function pitchHtml(home, away) {
+  const place = (side, rows, top) => rows.map((row, i) => {
+    const t = rows.length === 1 ? 0.5 : i / (rows.length - 1), y = top ? 7 + t * 36 : 93 - t * 36;
+    return row.map((p, j) => `<div class="pl ${side}" style="left:${(j + 1) / (row.length + 1) * 100}%;top:${y}%;width:${row.length >= 5 ? 18 : 22}%"><b>${esc(p.n ?? '')}</b><span>${esc(surname(p.name))}</span></div>`).join('');
+  }).join('');
+  return `<div class="pitch" role="img" aria-label="Alineaciones en la cancha">
+    <div class="ln out"></div><div class="ln mid"></div><div class="ln circle"></div><div class="ln box1"></div><div class="ln box2"></div>
+    ${home ? place('h', home.rows, true) : '<p class="pempty top">Sin alineación todavía</p>'}
+    ${away ? place('a', away.rows, false) : '<p class="pempty bot">Sin alineación todavía</p>'}</div>`;
+}
+function renderPrevia(m, box) {
+  const P = PREVIA[m.id];
+  if (P === undefined) {
+    PREVIA[m.id] = null;
+    fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.sel === m.id) renderDetail(); });
+  }
+  const off_ = P && P.lineups;
+  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : lastLineup(tid);
+  const H = side(m.h, 'home'), A = side(m.a, 'away');
+  const lineNote = off_ ? '<span class="chip ok">Alineación oficial</span>'
+    : `<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale entre 30 y 60 min antes del pitazo.`;
+
+  const rows = tableRows('total'), pos = t => rows.findIndex(r => r.t === t) + 1, row = t => rows.find(r => r.t === t);
+  const hr = row(m.h), ar = row(m.a);
+  const rec = (t, mode) => { const r = tableRows(mode).find(x => x.t === t); return r ? `${r.g}-${r.e}-${r.p}` : '—'; };
+  const avg = (a, b) => b ? (a / b).toFixed(1) : '—';
+  const cmp = [
+    ['Posición', `${pos(m.h)}.º`, `${pos(m.a)}.º`], ['Puntos', hr.pts, ar.pts],
+    ['Récord (G-E-P)', `${hr.g}-${hr.e}-${hr.p}`, `${ar.g}-${ar.e}-${ar.p}`],
+    ['Goles por partido', avg(hr.gf, hr.pj), avg(ar.gf, ar.pj)], ['Recibe por partido', avg(hr.gc, hr.pj), avg(ar.gc, ar.pj)],
+    [`${esc(T[m.h].name)} de local / ${esc(T[m.a].name)} de visita`, rec(m.h, 'home'), rec(m.a, 'away')],
+  ];
+  const isNext = t => nextMatchOf(t)?.id === m.id;
+  const bajas = t => `<div><h3>${esc(T[t].name)}</h3><ul class="plist">
+    ${isNext(t) ? suspendedNext.filter(x => x.t === t).map(x => `<li><span class="chip sus">No juega</span>${esc(x.name)}<span class="x">${esc(x.why)}</span></li>`).join('') : '<li><span class="x" style="margin:0">Las bajas se confirman al terminar su partido anterior</span></li>'}
+    ${onFour.filter(y => y.t === t).map(y => `<li><span class="chip cap4">4 amarillas</span>${esc(y.name)}<span class="x">en capilla</span></li>`).join('')}
+    ${isNext(t) && !suspendedNext.some(x => x.t === t) && !onFour.some(y => y.t === t) ? '<li><span class="x" style="margin:0">Sin suspendidos ni jugadores en capilla</span></li>' : ''}</ul></div>`;
+  const last5 = t => `<div><h3>${esc(T[t].name)}</h3><ul class="plist">${M.filter(x => played(x) && (x.h === t || x.a === t)).slice(-5).reverse().map(x0 => {
+    const x = off(x0), home = x.h === t, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+    return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(T[home ? x.a : x.h].name)}<span class="x">${gf}–${ga} · J${x.r}</span></li>`; }).join('')}</ul></div>`;
+  const h2h = M.filter(x => played(x) && ((x.h === m.h && x.a === m.a) || (x.h === m.a && x.a === m.h))).map(off);
+  const gol = t => `<div><h3>${esc(T[t].name)}</h3><ul class="plist">${topScorers.filter(g => g.t === t).slice(0, 3).map(g => `<li>${esc(g.name)}${isNext(t) && suspendedNext.some(x => x.t === t && x.name === g.name) ? ' <span class="chip sus">No juega</span>' : ''}<span class="x">${g.g} ${g.g === 1 ? 'gol' : 'goles'}</span></li>`).join('') || '<li><span class="x" style="margin:0">Sin goles todavía</span></li>'}</ul></div>`;
+  const pr = P && P.predictions?.prematch?.length ? P.predictions.prematch[P.predictions.prematch.length - 1].probabilities : null;
+  const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
+    return `<div class="pred"><div class="bar"><i style="flex:${h};background:var(--accent)"></i><i style="flex:${d};background:var(--draw)"></i><i style="flex:${a};background:var(--away)"></i></div>
+      <div class="lab"><span>${esc(T[m.h].name)} <b>${Math.round(h)}%</b></span><span>Empate <b>${Math.round(d)}%</b></span><span>${esc(T[m.a].name)} <b>${Math.round(a)}%</b></span></div></div>`; })() : '';
+
+  box.innerHTML = `<div class="detail">
+    <div class="dscore">
+      <div class="dteam r"><span>${esc(T[m.h].name)}</span>${crest(m.h)}</div>
+      <div><div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div></div>
+      <div class="dteam">${crest(m.a)}<span>${esc(T[m.a].name)}</span></div>
+    </div>
+    <div class="dmeta">Previa · ${esc(fmtDay(m.d))} · Jornada ${m.r}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>
+    ${prob}
+    <div class="pv">
+      <section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${lineNote}</p>
+        <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(H?.formation || '')}</span></div>
+        ${pitchHtml(H, A)}
+        <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(A?.formation || '')}</span></div>
+        ${!off_ && (H?.from || A?.from) ? `<p class="foot">Probable según su último partido con alineación registrada.</p>` : ''}
+      </section>
+      <div class="pv-data">
+        <section><h3>Bajas y alertas</h3><div class="two">${bajas(m.h)}${bajas(m.a)}</div></section>
+        <section><h3>Cómo llegan</h3><table class="cmp"><tr><td>${esc(T[m.h].ab)}</td><td></td><td>${esc(T[m.a].ab)}</td></tr>${cmp.map(c => `<tr><td>${c[1]}</td><td>${c[0]}</td><td>${c[2]}</td></tr>`).join('')}</table></section>
+        <section><h3>Últimos 5</h3><div class="two">${last5(m.h)}${last5(m.a)}</div></section>
+        <section><h3>Cara a cara en el torneo</h3><ul class="plist">${h2h.length ? h2h.map(x => `<li>J${x.r} · ${esc(T[x.h].name)} <b>${x.hs}–${x.as}</b> ${esc(T[x.a].name)}</li>`).join('') : '<li><span class="x" style="margin:0">No se han enfrentado en este torneo</span></li>'}</ul></section>
+        <section><h3>Goleadores</h3><div class="two">${gol(m.h)}${gol(m.a)}</div></section>
+      </div>
+    </div></div>`;
 }
 
 const EVL = { goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
@@ -150,7 +244,8 @@ function renderDetail() {
   const base = M.find(x => x.id === S.sel);
   const lv = base && LIVE.find(x => x.id === base.id && x.started);
   const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(lv.events, +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
-  if (!m) { box.innerHTML = `<p class="hint" style="background:transparent;color:var(--board-muted);padding:0;margin:0">Tocá un partido jugado para ver goles, tarjetas y cambios minuto a minuto.</p>`; return; }
+  if (!m) { box.innerHTML = `<p class="hint" style="background:transparent;color:var(--board-muted);padding:0;margin:0">Tocá un partido: los jugados muestran el minuto a minuto; los que vienen, la previa con alineaciones.</p>`; return; }
+  if (!played(m) && !lv) { renderPrevia(m, box); return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
   const det = lv && lv.stats && lv.stats.length === 2 ? { stats: lv.stats.map(t => t.s), statsTeams: lv.stats.map(t => t.t), lineups: null } : D.detail[String(m.id)];
   let extra = '';
