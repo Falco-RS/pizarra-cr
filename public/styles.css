@@ -215,3 +215,8 @@ td.pts{font-weight:700}
 .cc .row.tico span:nth-child(2){font-weight:700}
 .cc .sc{font-family:var(--display);font-weight:700;font-size:22px;line-height:1}
 .cc .crest.ph{background:var(--sunk);color:var(--ink)}
+
+button.cc{font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+button.cc:hover{border-color:var(--muted)}
+button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.detail.cd{margin-bottom:4px}

@@ -320,6 +320,10 @@ function renderView() {
       <p class="foot">Calculado a partir del minuto a minuto de los ${M.filter(played).length} partidos jugados. Los autogoles no cuentan para el jugador. La API no trae asistencias para esta liga.</p></section>`;
   } else if (S.view === 'copa') {
     v.innerHTML = copaHtml();
+    v.querySelectorAll('[data-intl]').forEach(b => b.onclick = () => {
+      S.cid = S.cid === +b.dataset.intl ? null : +b.dataset.intl; renderView();
+      if (S.cid) document.getElementById('cdetail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   } else {
     const fair = Object.entries(teamCards).map(([t,c]) => ({ t:+t, ...c })).sort((a,b) => (b.y + b.r*3) - (a.y + a.r*3));
     v.innerHTML = `<div class="cols">
@@ -372,9 +376,9 @@ function copaHtml() {
   const isPlayed = m => m.hs !== undefined && m.hs !== null;
   const status = m => m.live ? `<span class="lv">EN VIVO ${m.clock ?? ''}'</span>` : isPlayed(m) ? 'Final' : fmtTime(m.d);
   const line = (t, tid, g, lose) => `<span class="row ${lose ? 'lose' : ''}${TICOS.has(tid) ? ' tico' : ''}">${cr(t)}<span>${esc(t.name)}</span><span class="sc">${g ?? ''}</span></span>`;
-  const card = m => { const p = isPlayed(m) && !m.live; return `<div class="cc">
+  const card = m => { const p = isPlayed(m) && !m.live; return `<button type="button" class="cc" data-intl="${m.id}" aria-pressed="${S.cid === m.id}">
     <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${status(m)}</span></span>
-    ${line(m.h, m.hId, isPlayed(m) ? m.hs : '', p && m.hs < m.as)}${line(m.a, m.aId, isPlayed(m) ? m.as : '', p && m.as < m.hs)}</div>`; };
+    ${line(m.h, m.hId, isPlayed(m) ? m.hs : '', p && m.hs < m.as)}${line(m.a, m.aId, isPlayed(m) ? m.as : '', p && m.as < m.hs)}</button>`; };
   const byRound = {};
   for (const m of withLive) (byRound[m.round] ||= []).push(m);
   const order = Object.keys(byRound).sort((a, b) => (ROUND_ORDER.indexOf(a) + 1 || 99) - (ROUND_ORDER.indexOf(b) + 1 || 99));
@@ -393,8 +397,59 @@ function copaHtml() {
       return `<div class="tie">${legs.map((l, i) => `<div><p class="leg">${legs.length > 1 ? (i ? 'Vuelta' : 'Ida') : 'Partido'}</p>${card(l)}</div>`).join('')}${agg}</div>`;
     }).join('')}</div></section>`;
   };
-  return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · los equipos ticos</span></div>${order.map(section).join('')}
+  const sel = withLive.find(m => m.id === S.cid);
+  return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · los equipos ticos · tocá un partido para ver el en vivo o la previa</span></div>
+    <div id="cdetail">${sel ? intlDetailHtml(sel) : ''}</div>${order.map(section).join('')}
     <p class="foot">En vivo con la misma franja de arriba. Los ticos van resaltados.</p></div>`;
+}
+function intlDetailHtml(m) {
+  const lv = LIVE.find(x => x.id === m.id && x.started);
+  const tm = (t, tid) => ({ ...t, tid });
+  const H = tm(m.h, m.hId), A = tm(m.a, m.aId);
+  const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
+  const head = mid => `<div class="dscore"><div class="dteam r"><span>${esc(H.name)}</span>${cr(H)}</div><div>${mid}</div><div class="dteam">${cr(A)}<span>${esc(A.name)}</span></div></div>`;
+  const roundName = ROUND_ES[m.round] || m.round;
+  if (lv) {
+    const [hs, as] = (lv.score || '0 - 0').split(' - ').map(Number);
+    const ev = reconcile(lv.events, hs, as);
+    const sts = lv.stats && lv.stats.length === 2 ? lv.stats : null;
+    const hi = sts && sts[0].t === m.hId ? 0 : 1;
+    const bars = sts ? STATS.map(([k, lab, f = v => v]) => { const h = sts[hi].s[k], a = sts[1 - hi].s[k]; if (h === undefined) return ''; const tot = (h + a) || 1;
+      return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div><div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`; }).join('') : '';
+    return `<div class="detail cd">${head(`<div class="dnum">${hs} – ${as}</div>`)}
+      <div class="dmeta">${lv.finished ? 'Final' : /half time/i.test(lv.status) ? 'Entretiempo' : `EN VIVO ${lv.clock ?? ''}'`} · ${esc(roundName)} · ${esc(fmtDay(m.d))}</div>
+      <div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Sin eventos todavía.</p>'}</div>
+      ${bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : ''}</div></div>`;
+  }
+  if (m.hs != null) {
+    return `<div class="detail cd">${head(`<div class="dnum">${m.hs} – ${m.as}</div>`)}<div class="dmeta">Final · ${esc(roundName)} · ${esc(fmtDay(m.d))}</div>
+      <p class="hint" style="margin-top:12px">En la Copa, el minuto a minuto se muestra durante el partido.</p></div>`;
+  }
+  // previa
+  const P = PREVIA[m.id];
+  if (P === undefined) { PREVIA[m.id] = null; fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.view === 'copa' && S.cid === m.id) renderView(); }); }
+  const off_ = P && P.lineups;
+  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : (TICOS.has(tid) ? lastLineup(tid) : null);
+  const HL = side(m.hId, 'home'), AL = side(m.aId, 'away');
+  const pr = P && P.predictions?.prematch?.length ? P.predictions.prematch[P.predictions.prematch.length - 1].probabilities : null;
+  const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
+    return `<div class="pred"><div class="bar"><i style="flex:${h};background:var(--accent)"></i><i style="flex:${d};background:var(--draw)"></i><i style="flex:${a};background:var(--away)"></i></div>
+      <div class="lab"><span>${esc(H.name)} <b>${Math.round(h)}%</b></span><span>Empate <b>${Math.round(d)}%</b></span><span>${esc(A.name)} <b>${Math.round(a)}%</b></span></div></div>`; })() : '';
+  const ida = (D.intl || []).filter(x => x.id !== m.id && x.hs != null && [x.hId, x.aId].sort().join() === [m.hId, m.aId].sort().join());
+  const recent = tid => TICOS.has(tid) ? `<div><h3>${esc(T[tid].name)} · últimos 5</h3><ul class="plist">${[...M.filter(x => played(x) && (x.h === tid || x.a === tid)).map(x => ({ d: x.d, h: x.h, a: x.a, hs: off(x).hs, as: off(x).as, hn: T[x.h].name, an: T[x.a].name, c: 'Liga' })),
+      ...(D.intl || []).filter(x => x.hs != null && (x.hId === tid || x.aId === tid)).map(x => ({ d: x.d, h: x.hId, a: x.aId, hs: x.hs, as: x.as, hn: x.h.name, an: x.a.name, c: 'Copa' }))]
+      .sort((a, b) => new Date(a.d) - new Date(b.d)).slice(-5).reverse().map(x => { const home = x.h === tid, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+        return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.an : x.hn)}<span class="x">${gf}–${ga} · ${x.c}</span></li>`; }).join('')}</ul></div>` : '';
+  return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
+    <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
+    <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la del equipo tico en su último partido con alineación. La oficial sale cerca del pitazo.'}</p>
+      <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
+      <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div></section>
+    <div class="pv-data">
+      ${ida.length ? `<section><h3>Partido de ida</h3><ul class="plist">${ida.map(x => `<li>${esc(fmtDay(x.d))} · ${esc(x.h.name)} <b>${x.hs}–${x.as}</b> ${esc(x.a.name)}</li>`).join('')}</ul></section>` : ''}
+      <section><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
+      <p class="foot">Las suspensiones de la Copa se rigen por su propio reglamento y no se calculan aquí.</p>
+    </div></div></div>`;
 }
 function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));
@@ -432,14 +487,15 @@ function renderLive() {
     const e = evs[evs.length - 1];
     const last = e ? `${esc(e[0])}' · ${e[1] === 'sub' ? `Entra <b>${esc(e[4])}</b> <span class="note">sale ${esc(e[3])}</span>` : `<b>${esc(e[3] || '')}</b> <span class="note">${EVL[e[1]] || esc(e[1])}</span>`}` : 'Sin eventos todavía';
     const clock = /half time/i.test(L.status) ? 'ENTRETIEMPO' : `EN VIVO ${L.clock ?? ''}'`;
-    const inLeague = M.some(x => x.id === L.id);
+    const inLeague = M.some(x => x.id === L.id) || (D.intl || []).some(x => x.id === L.id);
     return `<${inLeague ? `button type="button" class="litem" data-live="${L.id}"` : 'div class="litem"'}>${L.started ? `<span class="tag"><i></i>${clock}</span>` : `<span class="tag soon">${esc(fmtTime(L.d))}</span>`}
       <span class="sc">${cr(L.h)}<span>${esc(L.h.name)}</span><b>${L.started ? `${hs} – ${as}` : 'vs'}</b><span>${esc(L.a.name)}</span>${cr(L.a)}</span>
       <span class="comp">${esc(COMP[L.comp] || L.comp)}</span>${L.started ? `<span class="last">Último: ${last}</span>` : ''}${inLeague ? '<span class="go">Ver partido →</span>' : ''}</${inLeague ? 'button' : 'div'}>`;
   };
   el.innerHTML = [...now, ...soon].map(item).join('');
   el.querySelectorAll('[data-live]').forEach(b => b.onclick = () => {
-    const m = M.find(x => x.id === +b.dataset.live); if (!m) return;
+    const m = M.find(x => x.id === +b.dataset.live);
+    if (!m) { S.cid = +b.dataset.live; go('copa'); setTimeout(() => document.getElementById('cdetail')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); return; }
     S.j = m.r; S.sel = m.id; S.moved = true; renderBoard();
     document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
