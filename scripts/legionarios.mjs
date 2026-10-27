@@ -1,5 +1,5 @@
 // Legionarios: partidos de sus clubes, resultados y estadísticas de temporada.
-// Corre una vez al día y gasta como máximo LEGIO_BUDGET consultas (35 por defecto, para el plan gratis).
+// Corre lunes y jueves y gasta como máximo LEGIO_BUDGET consultas (45 por defecto, para el plan gratis).
 // Lo que no alcanza a bajar hoy, lo completa en las corridas siguientes.
 // Uso: HIGHLIGHTLY_KEY=... node scripts/legionarios.mjs
 
@@ -9,7 +9,7 @@ const KEY = process.env.HIGHLIGHTLY_KEY;
 if (!KEY) { console.error('Falta HIGHLIGHTLY_KEY'); process.exit(1); }
 const BASE = 'https://soccer.highlightly.net';
 const OUT = 'public/data/legionarios.json';
-let budget = Number(process.env.LEGIO_BUDGET || 35);
+let budget = Number(process.env.LEGIO_BUDGET || 45);
 const log = [];
 const say = s => { log.push(s); console.log(s); };
 

@@ -270,3 +270,14 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .lm .did{grid-column:2/-1}
 @media (max-width:520px){.lgh h2{font-size:32px}.lm{grid-template-columns:1fr auto}.lm .d{grid-column:1/-1}.lm .did{grid-column:1/-1}}
 .lg .lgmore{background:none;border:0;color:var(--accent);font-weight:600;padding:10px 0 0}
+/* ---------- La Sele ---------- */
+.sele .flagcr{font-size:32px;vertical-align:-2px}
+.sele .sr{font-weight:700}.sele .sr.W{color:var(--win)}.sele .sr.L{color:var(--loss)}.sele .sr.D{color:var(--muted)}
+.sele .cc{text-align:left}
+.sele .cc .row.tico{font-weight:700}
+.staff li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 0}
+.snums{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;background:var(--sunk);border-radius:10px;padding:12px 6px}
+.snums span{display:flex;flex-direction:column;align-items:center}
+.snums b{font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
+.snums i{font-style:normal;font-size:11px;color:var(--muted);letter-spacing:.5px}
+.staff li .x{text-align:left}

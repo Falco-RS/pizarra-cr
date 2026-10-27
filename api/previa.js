@@ -20,7 +20,8 @@ export default async function handler(req, res) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const proto = req.headers['x-forwarded-proto'] || (String(host).startsWith('localhost') ? 'http' : 'https');
     const season = await (await fetch(`${proto}://${host}/data/season.json`)).json();
-    const known = new Set([...season.matches.map(m => String(m.id)), ...(season.intl || []).map(m => String(m.id))]);
+    const sele = await fetch(`${proto}://${host}/data/sele.json`).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+    const known = new Set([...season.matches, ...(season.intl || []), ...(sele.matches || [])].map(m => String(m.id)));
     if (!known.has(id)) return send(404, { error: 'Partido no disponible en Pizarra CR' }, 3600);
   } catch (e) {
     return send(503, { error: 'No se pudo verificar el partido' }, 30);

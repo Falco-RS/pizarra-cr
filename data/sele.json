@@ -1,0 +1,9 @@
+{
+  "_nota": "Cuerpo técnico de la Sele (se edita a mano). 'teamId' se llena solo la primera vez; si la API escoge mal, se pone aquí.",
+  "staff": [
+    { "rol": "Entrenador", "nombre": "Brian Ruiz" },
+    { "rol": "Asistente técnico", "nombre": "Wilmer López" },
+    { "rol": "Asistente técnico", "nombre": "Cristian Bolaños" },
+    { "rol": "Asistente técnico", "nombre": "Guardi Alfaro", "nota": "se incorpora en enero" }
+  ]
+}

@@ -1,0 +1,31 @@
+name: La Sele
+
+# Solo a mano: la Sele juega pocas veces al año, así que se corre después de cada fecha FIFA
+# (o cuando se anuncien partidos nuevos). Gasta unas 10-15 consultas.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sele:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Descargar partidos de la Sele
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+        run: node scripts/sele.mjs
+      - name: Guardar cambios
+        run: |
+          git add public/data/sele.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git config user.name "pizarra-bot"
+          git config user.email "pizarra-bot@users.noreply.github.com"
+          git commit -m "Actualizar la Sele"
+          git pull --rebase origin main
+          git push
