@@ -1,9 +1,38 @@
 {
-  "_nota": "Cuerpo técnico de la Sele (se edita a mano). 'teamId' se llena solo la primera vez; si la API escoge mal, se pone aquí.",
+  "_nota": "Cuerpo técnico y próximos partidos anunciados de la Sele (se editan a mano). Los 'proximos' se muestran hasta que la API publique el partido; ahí se usa el de la API con su previa. 'teamId' se llena solo; si la API escoge mal, se pone aquí.",
   "staff": [
-    { "rol": "Entrenador", "nombre": "Brian Ruiz" },
-    { "rol": "Asistente técnico", "nombre": "Wilmer López" },
-    { "rol": "Asistente técnico", "nombre": "Cristian Bolaños" },
-    { "rol": "Asistente técnico", "nombre": "Guardi Alfaro", "nota": "se incorpora en enero" }
+    {
+      "rol": "Entrenador",
+      "nombre": "Brian Ruiz"
+    },
+    {
+      "rol": "Asistente técnico",
+      "nombre": "Wilmer López"
+    },
+    {
+      "rol": "Asistente técnico",
+      "nombre": "Cristian Bolaños"
+    },
+    {
+      "rol": "Asistente técnico",
+      "nombre": "Guardi Alfaro",
+      "nota": "se incorpora en enero"
+    }
+  ],
+  "proximos": [
+    {
+      "fecha": "2026-11-13",
+      "local": "Ecuador",
+      "visita": "Costa Rica",
+      "torneo": "Amistoso",
+      "sede": "Ecuador (estadio por confirmar)"
+    },
+    {
+      "fecha": "2026-11-17",
+      "local": "Argentina",
+      "visita": "Costa Rica",
+      "torneo": "Amistoso",
+      "sede": "Buenos Aires (estadio por definir)"
+    }
   ]
 }

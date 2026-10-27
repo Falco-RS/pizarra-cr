@@ -560,31 +560,47 @@ function renderLegio(v) {
   v.querySelector('[data-lpclose]')?.addEventListener('click', () => { LGsel = null; renderView(); });
 }
 /* ---------- La Sele: se actualiza a mano después de cada fecha FIFA (scripts/sele.mjs) ---------- */
-let SE = null, SEsel = null;
+let SE = null, SEsel = null, SEms = [];
 function renderSele(v) {
   if (!SE) {
     v.innerHTML = '<section class="panel"><p class="hint">Cargando la Sele…</p></section>';
     if (SE === null) { SE = false; fetch('/data/sele.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : { matches: [] }).catch(() => ({ matches: [] })).then(j => { SE = j; if (S.view === 'sele') renderView(); }); }
     return;
   }
-  const CR = SE.teamId, ms = SE.matches || [], now = Date.now();
-  const done = ms.filter(m => m.hs != null), next = ms.filter(m => m.hs == null && new Date(m.d).getTime() > now - 3 * 3600e3);
+  const ES = { England: 'Inglaterra', Haiti: 'Haití', Iran: 'Irán', Jordan: 'Jordania', Panama: 'Panamá', Mexico: 'México', 'USA': 'Estados Unidos', 'United States': 'Estados Unidos', Canada: 'Canadá', Peru: 'Perú', Brazil: 'Brasil', Japan: 'Japón', 'South Korea': 'Corea del Sur', Scotland: 'Escocia', Wales: 'Gales', Morocco: 'Marruecos', Belgium: 'Bélgica', Spain: 'España', Germany: 'Alemania', France: 'Francia', Italy: 'Italia', 'Saudi Arabia': 'Arabia Saudita', 'Trinidad and Tobago': 'Trinidad y Tobago', 'Dominican Republic': 'República Dominicana', Suriname: 'Surinam', Guadeloupe: 'Guadalupe', Martinique: 'Martinica', 'St. Kitts and Nevis': 'San Cristóbal y Nieves' };
+  const CR = SE.teamId, ms = (SE.matches || []).map(m => ({ ...m, h: { ...m.h, name: ES[m.h.name] || m.h.name }, a: { ...m.a, name: ES[m.a.name] || m.a.name } })), now = Date.now();
+  SEms = ms;
+  const done = ms.filter(m => m.hs != null), apiNext = ms.filter(m => m.hs == null && new Date(m.d).getTime() > now - 3 * 3600e3);
+  // partidos anunciados que la API todavía no publica (se escriben a mano en data/sele.json)
+  const nn = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const manual = (SE.proximos || []).map((x, i) => ({ id: -(i + 1), manual: true, d: x.fecha + 'T12:00:00-06:00', comp: x.torneo, sede: x.sede,
+      h: { id: nn(x.local) === 'costa rica' ? CR : null, name: x.local, logo: null }, a: { id: nn(x.visita) === 'costa rica' ? CR : null, name: x.visita, logo: null } }))
+    .filter(x => new Date(x.d).getTime() > now - 864e5 && !ms.some(m => Math.abs(new Date(m.d) - new Date(x.d)) < 3 * 864e5 && [m.h.name, m.a.name].some(n => nn(n) === nn(x.h.id === CR ? x.a.name : x.h.name))));
+  const next = [...apiNext, ...manual].sort((a, b) => new Date(a.d) - new Date(b.d));
+  const logoOf = name => { for (const m of ms) for (const t of [m.h, m.a]) if (nn(t.name) === nn(name) && t.logo) return t.logo; return null; };
+  for (const x of manual) for (const t of [x.h, x.a]) t.logo = logoOf(t.name);
+  const all = [...ms, ...manual];
   const year = new Date().getFullYear();
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="" loading="lazy">` : `<span class="crest ph" aria-hidden="true">${esc((t.name || '?').slice(0, 3).toUpperCase())}</span>`;
   const resOf = m => { const home = m.h.id === CR, gf = home ? m.hs : m.as, ga = home ? m.as : m.hs; return gf > ga ? 'W' : gf < ga ? 'L' : 'D'; };
   const compName = c => ({ 'Friendlies': 'Amistoso', 'Friendlies International': 'Amistoso', 'International Friendlies': 'Amistoso', 'CONCACAF Gold Cup': 'Copa Oro', 'CONCACAF Nations League': 'Liga de Naciones', 'World Cup - Qualification CONCACAF': 'Eliminatoria mundialista', 'FIFA World Cup': 'Mundial' })[c] || c || '';
   const card = m => { const p = m.hs != null, r = p ? resOf(m) : null;
     return `<button type="button" class="cc" data-sele="${m.id}" aria-pressed="${SEsel === m.id}">
-      <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${p ? `<b class="sr ${r}">${({ W: 'Ganó', D: 'Empató', L: 'Perdió' })[r]}</b>` : esc(fmtTime(m.d))}</span></span>
+      <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${p ? `<b class="sr ${r}">${({ W: 'Ganó', D: 'Empató', L: 'Perdió' })[r]}</b>` : m.manual ? 'Hora por definir' : esc(fmtTime(m.d))}</span></span>
       ${[[m.h, m.hs], [m.a, m.as]].map(([t, g]) => `<span class="row${t.id === CR ? ' tico' : ''}${p && t.id !== CR && r !== 'L' ? ' lose' : ''}">${cr(t)}<span>${esc(t.name)}</span><span class="sc">${g ?? ''}</span></span>`).join('')}
-      <span class="meta"><span>${esc(compName(m.comp))}</span></span></button>`; };
+      <span class="meta"><span>${esc(compName(m.comp))}${m.sede ? ' · ' + esc(m.sede) : ''}</span></span></button>`; };
   // números del año y goleadores (de los partidos con minuto a minuto)
   const yr = done.filter(m => new Date(m.d).getFullYear() === year);
   const tot = yr.reduce((a, m) => { const home = m.h.id === CR, gf = home ? m.hs : m.as, ga = home ? m.as : m.hs; a.pj++; a[resOf(m)]++; a.gf += gf; a.gc += ga; return a; }, { pj: 0, W: 0, D: 0, L: 0, gf: 0, gc: 0 });
   const gls = {};
-  for (const m of yr) for (const [, type, isHome, player] of (m.ev || [])) { if (!player || (type !== 'goal' && type !== 'pen')) continue; if ((isHome ? m.h.id : m.a.id) !== CR) continue; gls[player] = (gls[player] || 0) + 1; }
-  const topG = Object.entries(gls).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const sel = ms.find(m => m.id === SEsel);
+  const title = n => /[A-ZÁÉÍÓÚÑ]/.test(n) ? n : n.replace(/(^|\s)\S/g, c => c.toUpperCase());
+  for (const m of yr) for (const [, type, isHome, player] of (m.ev || [])) {
+    if (!player || (type !== 'goal' && type !== 'pen')) continue; if ((isHome ? m.h.id : m.a.id) !== CR) continue;
+    const parts = nn(player).replace(/\./g, '').split(/\s+/), k = parts[0][0] + ' ' + parts.slice(1).join(' ');
+    const g = gls[k] ||= { name: title(player), n: 0 }; g.n++; if (player.length > g.name.length && !/\./.test(player)) g.name = title(player);
+  }
+  const topG = Object.values(gls).sort((a, b) => b.n - a.n).slice(0, 5).map(g => [g.name, g.n]);
+  const sel = all.find(m => m.id === SEsel);
   const upd = SE.updated ? new Date(SE.updated).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }) : '';
   v.innerHTML = `<div class="copa sele">
     <div class="chead"><h1><span class="flagcr" aria-hidden="true">🇨🇷</span> La Sele</h1><span>Selección de Costa Rica${upd ? ` · datos al ${esc(upd)}` : ''} · tocá un partido para ver la previa o el resumen</span></div>
@@ -609,6 +625,8 @@ function seleDetailHtml(m, CR, compName) {
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc((t.name || '?').slice(0, 3).toUpperCase())}</span>`;
   const head = mid => `<div class="dscore"><div class="dteam r"><span>${esc(m.h.name)}</span>${cr(m.h)}</div><div>${mid}</div><div class="dteam">${cr(m.a)}<span>${esc(m.a.name)}</span></div></div>`;
   const meta = `${esc(compName(m.comp))} · ${esc(fmtDay(m.d))}`;
+  if (m.manual) return `<div class="detail cd">${head('<div class="dnum" style="font-size:20px;white-space:nowrap">Por definir</div>')}<div class="dmeta">Previa · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div>
+    <p class="hint" style="margin-top:12px">Partido anunciado. La hora, el pronóstico y las alineaciones aparecen cuando el partido esté publicado en nuestros datos.</p></div>`;
   if (m.hs != null) {
     const ev = sortEvents({ events: m.ev || [] }).events;
     const sts = m.stats && m.stats.length === 2 ? m.stats : null, hi = sts && sts[0].t === m.h.id ? 0 : 1;
@@ -626,7 +644,7 @@ function seleDetailHtml(m, CR, compName) {
     return `<div class="pred"><div class="bar"><i style="flex:${h};background:var(--accent)"></i><i style="flex:${d};background:var(--draw)"></i><i style="flex:${a};background:var(--away)"></i></div>
       <div class="lab"><span>${esc(m.h.name)} <b>${Math.round(h)}%</b></span><span>Empate <b>${Math.round(d)}%</b></span><span>${esc(m.a.name)} <b>${Math.round(a)}%</b></span></div></div>`; })() : '';
   const rival = m.h.id === CR ? m.a : m.h;
-  const ms = SE.matches || [];
+  const ms = SEms;
   const h2h = ms.filter(x => x.hs != null && (x.h.id === rival.id || x.a.id === rival.id));
   const last5 = ms.filter(x => x.hs != null).slice(-5).reverse();
   const line = x => { const home = x.h.id === CR, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';

@@ -68,5 +68,5 @@ for (const m of need) {
   if (st.length === 2) m.stats = st.map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(s => [s.displayName, s.value])) }));
 }
 
-await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, staff: cfg.staff, matches }));
+await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, staff: cfg.staff, proximos: cfg.proximos || [], matches }));
 console.log(`Listo: ${matches.length} partidos (${matches.filter(m => m.hs === undefined).length} por jugar). Consultas restantes hoy: ${remaining}.`);
