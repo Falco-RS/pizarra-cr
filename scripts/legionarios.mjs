@@ -110,9 +110,12 @@ async function main() {
       if (!c.name) { const m = got[0]; const t = m && (m.homeTeam?.id == tid ? m.homeTeam : m.awayTeam); if (t) { c.name = t.name; c.logo = t.logo || null; } }
       if (!got.length) {
         // club equivocado (o sin calendario): se descarta y en la próxima corrida se prueba otra opción
-        say(`Sin partidos de la temporada ${season} para el club ${c.name || tid}: se descarta`);
-        skip.add(String(tid)); delete clubs[tid];
-        for (const p of players) if (p.teamId == tid) { p.teamId = undefined; p.playerId = undefined; }
+        say(`Sin partidos de la temporada ${season} para el club ${c.name || tid}`);
+        const manual = cfg.jugadores.some(j => j.teamId == tid);
+        if (!manual) {
+          skip.add(String(tid)); delete clubs[tid];
+          for (const p of players) if (p.teamId == tid) { p.teamId = undefined; p.playerId = undefined; }
+        }
       }
     }
 

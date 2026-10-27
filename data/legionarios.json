@@ -17,6 +17,6 @@
     {"nombre": "Keylor Navas", "pos": "Portero", "club": "Pumas UNAM", "buscar": ["U.N.A.M. - Pumas", "Pumas UNAM", "UNAM Pumas", "Pumas U.N.A.M."], "pais": "México", "bandera": "🇲🇽", "paisApi": "Mexico"},
     {"nombre": "Juan Pablo Vargas", "pos": "Defensa", "club": "Puebla", "buscar": "Puebla", "pais": "México", "bandera": "🇲🇽"},
     {"nombre": "Orlando Galo", "pos": "Mediocampista", "club": "Riga FC", "buscar": ["Riga FC", "Riga", "FK Riga"], "pais": "Letonia", "bandera": "🇱🇻", "paisApi": "Latvia"},
-    {"nombre": "Carlos Mora", "pos": "Extremo", "club": "Universitatea Craiova", "buscar": ["Universitatea Craiova", "CS Universitatea Craiova", "U Craiova", "FC U Craiova 1948"], "pais": "Rumania", "bandera": "🇷🇴", "paisApi": "Romania"}
+    {"nombre": "Carlos Mora", "pos": "Extremo", "club": "Universitatea Craiova", "buscar": "Universitatea Craiova", "teamId": 538616, "pais": "Rumania", "bandera": "🇷🇴", "paisApi": "Romania"}
   ]
 }
