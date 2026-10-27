@@ -163,8 +163,8 @@ function pitchHtml(home, away) {
   }).join('');
   return `<div class="pitch" role="img" aria-label="Alineaciones en la cancha">
     <div class="ln out"></div><div class="ln mid"></div><div class="ln circle"></div><div class="ln box1"></div><div class="ln box2"></div>
-    ${home ? place('h', home.rows, true) : '<p class="pempty top">Sin alineación todavía</p>'}
-    ${away ? place('a', away.rows, false) : '<p class="pempty bot">Sin alineación todavía</p>'}</div>`;
+    ${home ? place('h', home.rows, true) : '<p class="pempty top">Sin alineación disponible</p>'}
+    ${away ? place('a', away.rows, false) : '<p class="pempty bot">Sin alineación disponible</p>'}</div>`;
 }
 function renderPrevia(m, box) {
   const P = PREVIA[m.id];
@@ -452,6 +452,7 @@ function intlDetailHtml(m) {
   const hist = (D.h2h || {})[[m.hId, m.aId].sort((a, b) => a - b).join('-')] || [];
   const ida = (D.intl || []).filter(x => x.id !== m.id && x.hs != null && [x.hId, x.aId].sort().join() === [m.hId, m.aId].sort().join());
   // Últimos resultados: Copa o liga local, con un botón para cambiar
+  const clean = n => String(n || '').replace(/^(CD|CS|LD|AD|FC|CF|SD|CSD|Club|Deportivo)\s+/i, '').replace(/\s+(FC|CF|SC)$/i, '');
   const isCup = c => /central american|concacaf|champions cup/i.test(c || '');
   const isLocal = c => !isCup(c) && !/friendl|amistos|leagues cup/i.test(c || '');
   const recentOf = tid => {
@@ -464,9 +465,9 @@ function intlDetailHtml(m) {
   };
   const recent = tid => { const t = tid === m.hId ? H : A, xs = recentOf(tid);
     return `<div><h3>${esc(t.name)}</h3>${xs.length ? `<ul class="plist">${xs.map(x => { const r = x.gf > x.ga ? 'W' : x.gf < x.ga ? 'L' : 'D';
-      return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${x.home ? 'vs' : 'en'} ${esc(x.opp)}<span class="x">${x.gf}–${x.ga} · ${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}</span></li>`; }).join('')}</ul>` : '<p class="hint">Sin partidos cargados.</p>'}</div>`; };
+      return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${x.home ? 'vs' : 'en'} ${esc(clean(x.opp))}<span class="x">${x.gf}–${x.ga} · ${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}</span></li>`; }).join('')}</ul>` : '<p class="hint">Sin partidos cargados.</p>'}</div>`; };
   const cfSeg = `<div class="seg" role="group" aria-label="Últimos resultados">${[['copa', 'Copa'], ['liga', 'Liga local']].map(([k, l]) => `<button type="button" data-cf="${k}" aria-pressed="${(S.cf || 'copa') === k}">${l}</button>`).join('')}</div>`;
-  const luFrom = L => L && L.vs ? `vs ${esc(L.vs)}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
+  const luFrom = L => L && L.vs ? `vs ${esc(clean(L.vs))}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
     <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
