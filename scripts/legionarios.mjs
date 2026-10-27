@@ -1,5 +1,5 @@
 // Legionarios: partidos de sus clubes, resultados y estadísticas de temporada.
-// Corre lunes y jueves y gasta como máximo LEGIO_BUDGET consultas (45 por defecto, para el plan gratis).
+// Corre cada 2 horas y gasta como máximo LEGIO_BUDGET consultas (45 por defecto).
 // Lo que no alcanza a bajar hoy, lo completa en las corridas siguientes.
 // Uso: HIGHLIGHTLY_KEY=... node scripts/legionarios.mjs
 

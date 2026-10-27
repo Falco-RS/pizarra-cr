@@ -2,9 +2,9 @@ name: Legionarios
 
 on:
   schedule:
-    # dos veces por semana, lunes y jueves a las 5:47 a.m. de Costa Rica (11:47 UTC):
-    # el lunes trae lo del fin de semana; el jueves, lo de media semana (copas europeas, MLS)
-    - cron: '47 11 * * 1,4'
+    # cada 2 horas (plan pagado): trae resultados de los partidos que terminaron y,
+    # si el jugador jugó, sus números de temporada. Cada corrida gasta pocas consultas.
+    - cron: '37 */2 * * *'
   workflow_dispatch:
     inputs:
       presupuesto:
@@ -34,7 +34,7 @@ jobs:
       - name: Descargar datos de los legionarios
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
-          # máximo de consultas por corrida (plan gratis: 45 de las 100 diarias, dos días por semana)
+          # máximo de consultas por corrida (plan pagado; con el gratis, volver a correr 2 veces por semana)
           LEGIO_BUDGET: ${{ github.event.inputs.presupuesto || vars.LEGIO_BUDGET || '45' }}
           LEGIO_DEBUG: ${{ github.event.inputs.depurar }}
         run: node scripts/legionarios.mjs

@@ -469,7 +469,7 @@ function intlDetailHtml(m) {
     </div></div></div>`;
 }
 /* ---------- Legionarios: se actualiza una vez al día (scripts/legionarios.mjs) ---------- */
-let LG = null, LGpos = 'Todos', LGsel = null, LGall = false;
+let LG = null, LGpos = 'Todos', LGsel = null, LGall = {};
 const nrm = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 const LPOS = ['Todos', 'Portero', 'Defensa', 'Mediocampista', 'Extremo', 'Delantero'];
 const isFin = s => /finish|award|after|penalt/i.test(s || '');
@@ -513,17 +513,23 @@ function renderLegio(v) {
   const fx = p => (C[p.teamId]?.fixtures || []);
   // agenda: partidos de sus clubes desde hace 3 días hasta dentro de 7, en hora de Costa Rica
   const ag = [];
-  for (const p of P) for (const m of fx(p)) { const t = new Date(m.d).getTime(); if (t > now - 4 * 864e5 && t < now + 5 * 864e5) ag.push([m, p]); }
-  ag.sort((a, b) => new Date(a[0].d) - new Date(b[0].d));
+  for (const p of P) for (const m of fx(p)) { const t = new Date(m.d).getTime(); if (t > now - 4 * 864e5 && t < now + 5 * 864e5 && !/postp|cancel/i.test(m.s || '')) ag.push([m, p]); }
+  // Primero lo más reciente que se jugó (o se está jugando); después lo que viene, del más cercano al más lejano
+  const started = ([m]) => new Date(m.d).getTime() <= now;
+  const played_ = ag.filter(started).sort((a, b) => new Date(b[0].d) - new Date(a[0].d));
+  const coming = ag.filter(x => !started(x)).sort((a, b) => new Date(a[0].d) - new Date(b[0].d));
   const AGMAX = 8;
-  const agHtml = ag.length ? `<div class="agenda">${ag.slice(0, LGall ? ag.length : AGMAX).map(([m, p]) => {
+  const agCard = ([m, p]) => {
       const home = m.h.id == p.teamId, opp = home ? m.a : m.h, sc = scoreOf(m), r = resFor(m, p.teamId), did = didIn(m, p);
       const club = C[p.teamId]?.name || p.club;
       return `<button type="button" class="ag" data-lp="${esc(p.nombre)}"><span class="when"><span>${esc(fmtDay(m.d))} · ${esc(fmtTime(m.d))}</span><small>${esc(m.comp || '')}</small></span>
         <span class="who"><span class="flag" aria-hidden="true">${p.bandera || ''}</span>${esc(p.nombre)}</span>
         <span class="vs">${esc(club)} ${home ? 'vs' : 'en'} ${esc(opp.name)}</span>
-        ${r ? `<span class="res"><span class="tag ${r}">${RES[r]} ${home ? sc[0] : sc[1]}–${home ? sc[1] : sc[0]}</span>${did.map(([k, l]) => `<span class="tag ${k}">${esc(l)}</span>`).join('')}</span>` : new Date(m.d).getTime() < now ? '<span class="res">Resultado en la próxima actualización</span>' : ''}</button>`;
-    }).join('')}</div>${ag.length > AGMAX ? `<button type="button" class="more lgmore" data-lgall>${LGall ? 'Ver menos' : `Ver los ${ag.length} partidos`}</button>` : ''}` : '<p class="hint">Sin partidos de sus clubes en estos días' + (P.some(p => p.teamId) ? '.' : ' (los calendarios se están cargando; se completan en los próximos días).') + '</p>';
+        ${r ? `<span class="agres"><span class="tag ${r}">${RES[r]} ${home ? sc[0] : sc[1]}–${home ? sc[1] : sc[0]}</span>${did.map(([k, l]) => `<span class="tag ${k}">${esc(l)}</span>`).join('')}</span>` : started([m]) ? '<span class="agres">Resultado en la próxima actualización</span>' : ''}</button>`;
+  };
+  const group = (list, key, title) => list.length ? `<h3 class="agh">${title}</h3><div class="agenda">${list.slice(0, LGall[key] ? list.length : AGMAX).map(agCard).join('')}</div>${list.length > AGMAX ? `<button type="button" class="more lgmore" data-lgall="${key}">${LGall[key] ? 'Ver menos' : `Ver los ${list.length}`}</button>` : ''}` : '';
+  const agHtml = ag.length ? group(played_, 'res', 'Últimos resultados') + group(coming, 'next', 'Próximos partidos')
+    : '<p class="hint">Sin partidos de sus clubes en estos días' + (P.some(p => p.teamId) ? '.' : ' (los calendarios se están cargando; se completan en los próximos días).') + '</p>';
   const ini = n => n.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('');
   const form = p => fx(p).filter(m => isFin(m.s) && new Date(m.d) < now).slice(-5).map(m => resFor(m, p.teamId)).filter(Boolean);
   const card = p => {
@@ -552,7 +558,7 @@ function renderLegio(v) {
   const upd = LG.updated ? new Date(LG.updated).toLocaleString('es-CR', { ...tz, day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
   v.innerHTML = `<div class="lg">
     <div class="lgh"><h2>Legionarios</h2><span>Ticos que juegan en el exterior · ${P.length} jugadores${upd ? ` · actualizado ${esc(upd)}` : ''}</span></div>
-    <section class="panel"><div class="ph2"><h2>Esta semana</h2></div><p class="lead">Partidos de sus clubes de los últimos 4 días y los próximos 5, en hora de Costa Rica. Se actualiza los lunes y jueves de madrugada.</p>${agHtml}</section>
+    <section class="panel"><div class="ph2"><h2>Esta semana</h2></div><p class="lead">Partidos de sus clubes de los últimos 4 días y los próximos 5, en hora de Costa Rica. Se actualiza cada 2 horas.</p>${agHtml}</section>
     <div class="filters" role="group" aria-label="Filtrar por posición">${LPOS.map(x => `<button type="button" aria-pressed="${x === LGpos}" data-lpos="${x}">${x === 'Todos' ? 'Todos' : x + 's'}</button>`).join('')}</div>
     ${detail}
     <div class="lgrid">${list.map(card).join('')}</div>
@@ -563,7 +569,7 @@ function renderLegio(v) {
     const el = document.getElementById('lpdetail');
     if (LGsel && el) { const top = el.getBoundingClientRect().top + scrollY - (document.querySelector('.top')?.offsetHeight || 0) - 12; window.scrollTo({ top, behavior: 'smooth' }); }
   });
-  v.querySelector('[data-lgall]')?.addEventListener('click', () => { LGall = !LGall; renderView(); });
+  v.querySelectorAll('[data-lgall]').forEach(b => b.onclick = () => { LGall[b.dataset.lgall] = !LGall[b.dataset.lgall]; renderView(); });
   v.querySelector('[data-lpclose]')?.addEventListener('click', () => { LGsel = null; renderView(); });
 }
 /* ---------- La Sele: se actualiza a mano después de cada fecha FIFA (scripts/sele.mjs) ---------- */
