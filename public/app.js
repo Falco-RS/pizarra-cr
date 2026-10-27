@@ -16,7 +16,7 @@ const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
 const soonRound = M.filter(m => !played(m) && new Date(m.d) - Date.now() < 3 * 864e5).map(m => m.r);
 const currentRound = soonRound.length && M.filter(m => m.r === lastPlayed).every(played) ? Math.min(...soonRound) : lastPlayed;
 let S = { view:'inicio', j:currentRound, sel:null, tmode:'total', moved:false };
-try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina','copa'].includes(v)) S.view = v; } catch(e){}
+try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina','copa','legionarios'].includes(v)) S.view = v; } catch(e){}
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
 
@@ -325,6 +325,8 @@ function renderView() {
   } else if (S.view === 'goleadores') {
     v.innerHTML = `<section class="panel"><div class="ph2"><h2>Goleadores · Apertura 2026</h2></div>${scorersHtml(30)}
       <p class="foot">Calculado a partir del minuto a minuto de los ${M.filter(played).length} partidos jugados. Los autogoles no cuentan para el jugador. La API no trae asistencias para esta liga.</p></section>`;
+  } else if (S.view === 'legionarios') {
+    renderLegio(v);
   } else if (S.view === 'copa') {
     v.innerHTML = copaHtml();
     v.querySelectorAll('[data-intl]').forEach(b => b.onclick = () => {
@@ -457,6 +459,103 @@ function intlDetailHtml(m) {
       <section><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
       <p class="foot">Las suspensiones de la Copa se rigen por su propio reglamento y no se calculan aquí.</p>
     </div></div></div>`;
+}
+/* ---------- Legionarios: se actualiza una vez al día (scripts/legionarios.mjs) ---------- */
+let LG = null, LGpos = 'Todos', LGsel = null, LGall = false;
+const nrm = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const LPOS = ['Todos', 'Portero', 'Defensa', 'Mediocampista', 'Extremo', 'Delantero'];
+const isFin = s => /finish|award|after|penalt/i.test(s || '');
+function scoreOf(m) { const [h, a] = String(m.score || '').split(' - ').map(Number); return Number.isFinite(h) && Number.isFinite(a) ? [h, a] : null; }
+// resultado desde el punto de vista del club del jugador: W, D, L
+function resFor(m, tid) { const sc = scoreOf(m); if (!sc || !isFin(m.s)) return null; const [mine, opp] = m.h.id == tid ? sc : [sc[1], sc[0]]; return mine > opp ? 'W' : mine < opp ? 'L' : 'D'; }
+// lo que hizo el jugador en ese partido, según el minuto a minuto (goles, tarjetas, cambios)
+function didIn(m, p) {
+  const sur = nrm(p.nombre).split(' ').slice(-1)[0], first = nrm(p.nombre)[0];
+  const me = n => { const x = nrm(n); return x && x.includes(sur) && (x.startsWith(first) || !/^[a-z]\.? /.test(x) || x.split(' ').length === 1); };
+  const out = [];
+  for (const e of (m.ev || [])) {
+    if (e.team != p.teamId) continue;
+    const t = String(e.t).replace(/\D+$/, '');
+    if (/own/i.test(e.type)) continue;
+    if (/goal|penalty/i.test(e.type) && !/miss/i.test(e.type) && me(e.player)) out.push(['g', `Gol ${t}'`]);
+    else if (/goal/i.test(e.type) && me(e.assist)) out.push(['a', `Asistencia ${t}'`]);
+    else if (/yellow/i.test(e.type) && me(e.player)) out.push(['yc', `Amarilla ${t}'`]);
+    else if (/red/i.test(e.type) && me(e.player)) out.push(['rc', `Roja ${t}'`]);
+    else if (/subst/i.test(e.type) && me(e.sub)) out.push(['in', `Entró ${t}'`]);
+    else if (/subst/i.test(e.type) && me(e.player)) out.push(['out', `Salió ${t}'`]);
+  }
+  return out;
+}
+const RES = { W: 'Ganó', D: 'Empató', L: 'Perdió' };
+function lgMatchLine(m, p, withDate = true) {
+  const home = m.h.id == p.teamId, opp = home ? m.a : m.h, sc = scoreOf(m), r = resFor(m, p.teamId);
+  const did = didIn(m, p);
+  return `<li class="lm">${withDate ? `<span class="d">${esc(fmtDay(m.d))}</span>` : ''}
+    <span class="o">${home ? 'vs' : 'en'} ${opp.logo ? `<img class="crest" src="${esc(opp.logo)}" alt="" loading="lazy">` : ''}<b>${esc(opp.name)}</b> <small>${esc(m.comp || '')}</small></span>
+    ${r ? `<span class="r ${r}">${RES[r]} ${home ? sc[0] : sc[1]}–${home ? sc[1] : sc[0]}</span>` : `<span class="r">${esc(fmtTime(m.d))}</span>`}
+    ${did.length ? `<span class="did">${did.map(([k, l]) => `<span class="tag ${k}">${esc(l)}</span>`).join('')}</span>` : ''}</li>`;
+}
+function renderLegio(v) {
+  if (!LG) {
+    v.innerHTML = '<section class="panel"><p class="hint">Cargando legionarios…</p></section>';
+    if (LG === null) { LG = false; fetch('/data/legionarios.json', { cache: 'no-cache' }).then(r => r.json()).then(j => { LG = j; }).catch(() => { LG = { players: [], clubs: {} }; }).then(() => { if (S.view === 'legionarios') renderView(); }); }
+    return;
+  }
+  const P = LG.players || [], C = LG.clubs || {}, now = Date.now();
+  const fx = p => (C[p.teamId]?.fixtures || []);
+  // agenda: partidos de sus clubes desde hace 3 días hasta dentro de 7, en hora de Costa Rica
+  const ag = [];
+  for (const p of P) for (const m of fx(p)) { const t = new Date(m.d).getTime(); if (t > now - 2 * 864e5 && t < now + 5 * 864e5) ag.push([m, p]); }
+  ag.sort((a, b) => new Date(a[0].d) - new Date(b[0].d));
+  const AGMAX = 8;
+  const agHtml = ag.length ? `<div class="agenda">${ag.slice(0, LGall ? ag.length : AGMAX).map(([m, p]) => {
+      const home = m.h.id == p.teamId, opp = home ? m.a : m.h, sc = scoreOf(m), r = resFor(m, p.teamId), did = didIn(m, p);
+      const club = C[p.teamId]?.name || p.club;
+      return `<button type="button" class="ag" data-lp="${esc(p.nombre)}"><span class="when"><span>${esc(fmtDay(m.d))} · ${esc(fmtTime(m.d))}</span><small>${esc(m.comp || '')}</small></span>
+        <span class="who"><span class="flag" aria-hidden="true">${p.bandera || ''}</span>${esc(p.nombre)}</span>
+        <span class="vs">${esc(club)} ${home ? 'vs' : 'en'} ${esc(opp.name)}</span>
+        ${r ? `<span class="res"><span class="tag ${r}">${RES[r]} ${home ? sc[0] : sc[1]}–${home ? sc[1] : sc[0]}</span>${did.map(([k, l]) => `<span class="tag ${k}">${esc(l)}</span>`).join('')}</span>` : new Date(m.d).getTime() < now ? '<span class="res">Resultado en la próxima actualización</span>' : ''}</button>`;
+    }).join('')}</div>${ag.length > AGMAX ? `<button type="button" class="more lgmore" data-lgall>${LGall ? 'Ver menos' : `Ver los ${ag.length} partidos`}</button>` : ''}` : '<p class="hint">Sin partidos de sus clubes en estos días' + (P.some(p => p.teamId) ? '.' : ' (los calendarios se están cargando; se completan en los próximos días).') + '</p>';
+  const ini = n => n.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('');
+  const form = p => fx(p).filter(m => isFin(m.s) && new Date(m.d) < now).slice(-5).map(m => resFor(m, p.teamId)).filter(Boolean);
+  const card = p => {
+    const s = p.stats, gk = p.pos === 'Portero', f = form(p), club = C[p.teamId];
+    const n = k => s ? (s[k] ?? 0) : '–';
+    return `<button type="button" class="pc" data-lp="${esc(p.nombre)}" aria-expanded="${LGsel === p.nombre}">
+      <span class="row1">${p.foto ? `<img class="av" src="${esc(p.foto)}" alt="" loading="lazy">` : `<span class="av" aria-hidden="true">${esc(ini(p.nombre))}</span>`}<span class="nm"><b>${esc(p.nombre)}</b><span>${esc(p.pos)}</span></span></span>
+      <span class="club">${club?.logo ? `<img class="crest" src="${esc(club.logo)}" alt="" loading="lazy">` : `<span class="flag" aria-hidden="true">${p.bandera || ''}</span>`}${esc(p.club)}${p.nota ? ` <small>(${esc(p.nota)})</small>` : ''} <small>· ${esc(p.pais)}</small></span>
+      <span class="stats"><span><b>${n('games')}</b><i>PJ</i></span>${gk ? `<span><b>${n('cleanSheets')}</b><i>Valla inv.</i></span><span><b>${n('conceded')}</b><i>Recibidos</i></span>` : `<span><b>${n('goals')}</b><i>Goles</i></span><span><b>${n('assists')}</b><i>Asist.</i></span>`}<span><b>${n('minutes')}</b><i>Min</i></span></span>
+      <span class="last">${f.length ? `Club, últimos ${f.length}: ${f.map(r => `<i class="dot ${r}" title="${RES[r]}"></i>`).join('')}` : 'Club: sin partidos cargados todavía'}</span>
+    </button>`;
+  };
+  const list = P.filter(p => LGpos === 'Todos' || p.pos === LGpos);
+  const sel = P.find(p => p.nombre === LGsel);
+  const detail = sel ? (() => {
+    const s = sel.stats, past = fx(sel).filter(m => new Date(m.d) < now).slice(-8).reverse(), next = fx(sel).filter(m => new Date(m.d) >= now).slice(0, 3);
+    return `<section class="panel lpd" id="lpdetail"><div class="ph2"><h2>${esc(sel.nombre)}</h2><button class="more" data-lpclose>Cerrar ✕</button></div>
+      <p class="lead">${esc(sel.pos)} · ${esc(sel.club)}${sel.nota ? ` (${esc(sel.nota)})` : ''} · ${esc(sel.pais)} ${sel.bandera || ''}</p>
+      ${s ? `<div class="kv">${[['Partidos', s.games], ['Minutos', s.minutes], ...(sel.pos === 'Portero' ? [['Vallas invictas', s.cleanSheets], ['Goles recibidos', s.conceded]] : [['Goles', s.goals], ['Asistencias', s.assists]]), ['Amarillas', s.yc], ['Rojas', s.rc]].map(([k, x]) => `<span><b>${x ?? 0}</b><i>${k}</i></span>`).join('')}</div>
+        ${(s.comps || []).length > 1 ? `<p class="foot">Por torneo: ${s.comps.map(c => `${esc(c.league)} ${c.games ?? 0} PJ${c.goals ? ', ' + c.goals + (c.goals === 1 ? ' gol' : ' goles') : ''}`).join(' · ')}</p>` : ''}` : '<p class="hint">Sus números de la temporada aparecen en la próxima actualización.</p>'}
+      ${next.length ? `<h3>Próximos partidos</h3><ul class="lms">${next.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
+      ${past.length ? `<h3>Últimos partidos de su club</h3><ul class="lms">${past.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
+      <p class="foot">Goles, tarjetas y cambios salen del minuto a minuto del partido; si no aparece nada, puede que no haya jugado o que la API no tenga ese detalle para esa liga.</p></section>`;
+  })() : '';
+  const upd = LG.updated ? new Date(LG.updated).toLocaleString('es-CR', { ...tz, day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+  v.innerHTML = `<div class="lg">
+    <div class="lgh"><h2>Legionarios</h2><span>Ticos que juegan en el exterior · ${P.length} jugadores${upd ? ` · actualizado ${esc(upd)}` : ''}</span></div>
+    <section class="panel"><div class="ph2"><h2>Esta semana</h2></div><p class="lead">Partidos de sus clubes de los últimos 2 días y los próximos 5, en hora de Costa Rica. Se actualiza una vez al día, de madrugada.</p>${agHtml}</section>
+    <div class="filters" role="group" aria-label="Filtrar por posición">${LPOS.map(x => `<button type="button" aria-pressed="${x === LGpos}" data-lpos="${x}">${x === 'Todos' ? 'Todos' : x + 's'}</button>`).join('')}</div>
+    ${detail}
+    <div class="lgrid">${list.map(card).join('')}</div>
+  </div>`;
+  v.querySelectorAll('[data-lpos]').forEach(b => b.onclick = () => { LGpos = b.dataset.lpos; renderView(); });
+  v.querySelectorAll('[data-lp]').forEach(b => b.onclick = () => {
+    LGsel = LGsel === b.dataset.lp && b.classList.contains('pc') ? null : b.dataset.lp; renderView();
+    const el = document.getElementById('lpdetail');
+    if (LGsel && el) { const top = el.getBoundingClientRect().top + scrollY - (document.querySelector('.top')?.offsetHeight || 0) - 12; window.scrollTo({ top, behavior: 'smooth' }); }
+  });
+  v.querySelector('[data-lgall]')?.addEventListener('click', () => { LGall = !LGall; renderView(); });
+  v.querySelector('[data-lpclose]')?.addEventListener('click', () => { LGsel = null; renderView(); });
 }
 function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));

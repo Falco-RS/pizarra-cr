@@ -1,0 +1,39 @@
+name: Legionarios
+
+on:
+  schedule:
+    # una vez al día, 5:47 a.m. de Costa Rica (11:47 UTC): ya terminaron los partidos de MLS y Liga MX
+    # de la noche anterior y todavía no empieza Europa
+    - cron: '47 11 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: legionarios
+  cancel-in-progress: false
+
+jobs:
+  legionarios:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Descargar datos de los legionarios
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+          # máximo de consultas por corrida (plan gratis: 35 de las 100 diarias)
+          LEGIO_BUDGET: ${{ vars.LEGIO_BUDGET || '35' }}
+        run: node scripts/legionarios.mjs
+      - name: Guardar cambios
+        run: |
+          git add public/data/legionarios.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git config user.name "pizarra-bot"
+          git config user.email "pizarra-bot@users.noreply.github.com"
+          git commit -m "Actualizar legionarios"
+          git pull --rebase origin main
+          git push
