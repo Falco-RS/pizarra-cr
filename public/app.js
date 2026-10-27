@@ -331,6 +331,7 @@ function renderView() {
     renderLegio(v);
   } else if (S.view === 'copa') {
     v.innerHTML = copaHtml();
+    v.querySelectorAll('[data-cf]').forEach(b => b.onclick = () => { S.cf = b.dataset.cf; renderView(); });
     v.querySelectorAll('[data-intl]').forEach(b => b.onclick = () => {
       S.cid = S.cid === +b.dataset.intl ? null : +b.dataset.intl; renderView();
       if (S.cid) document.getElementById('cdetail').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -440,7 +441,9 @@ function intlDetailHtml(m) {
   const P = PREVIA[m.id];
   if (P === undefined) { PREVIA[m.id] = null; fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.view === 'copa' && S.cid === m.id) renderView(); }); }
   const off_ = P && P.lineups;
-  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : (TICOS.has(tid) ? lastLineup(tid) : null);
+  const F = D.form || {};
+  // Oficial si ya salió; si no, la última alineación del equipo (de cualquier torneo); para ticos, también la de la liga
+  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : (F[tid]?.lineup || (TICOS.has(tid) ? lastLineup(tid) : null));
   const HL = side(m.hId, 'home'), AL = side(m.aId, 'away');
   const pr = P && P.predictions?.prematch?.length ? P.predictions.prematch[P.predictions.prematch.length - 1].probabilities : null;
   const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
@@ -448,21 +451,31 @@ function intlDetailHtml(m) {
       <div class="lab"><span>${esc(H.name)} <b>${Math.round(h)}%</b></span><span>Empate <b>${Math.round(d)}%</b></span><span>${esc(A.name)} <b>${Math.round(a)}%</b></span></div></div>`; })() : '';
   const hist = (D.h2h || {})[[m.hId, m.aId].sort((a, b) => a - b).join('-')] || [];
   const ida = (D.intl || []).filter(x => x.id !== m.id && x.hs != null && [x.hId, x.aId].sort().join() === [m.hId, m.aId].sort().join());
-  const recentIntl = tid => { const t = tid === m.hId ? H : A; const xs = (D.intl || []).filter(x => x.hs != null && x.id !== m.id && (x.hId === tid || x.aId === tid)).slice(-5).reverse();
-    return xs.length ? `<div><h3>${esc(t.name)} · en la Copa</h3><ul class="plist">${xs.map(x => { const home = x.hId === tid, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
-      return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.a.name : x.h.name)}<span class="x">${gf}–${ga}</span></li>`; }).join('')}</ul></div>` : ''; };
-  const recent = tid => !TICOS.has(tid) ? recentIntl(tid) : `<div><h3>${esc(T[tid].name)} · últimos 5</h3><ul class="plist">${[...M.filter(x => played(x) && (x.h === tid || x.a === tid)).map(x => ({ d: x.d, h: x.h, a: x.a, hs: off(x).hs, as: off(x).as, hn: T[x.h].name, an: T[x.a].name, c: 'Liga' })),
-      ...(D.intl || []).filter(x => x.hs != null && (x.hId === tid || x.aId === tid)).map(x => ({ d: x.d, h: x.hId, a: x.aId, hs: x.hs, as: x.as, hn: x.h.name, an: x.a.name, c: 'Copa' }))]
-      .sort((a, b) => new Date(a.d) - new Date(b.d)).slice(-5).reverse().map(x => { const home = x.h === tid, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
-        return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.an : x.hn)}<span class="x">${gf}–${ga} · ${x.c}</span></li>`; }).join('')}</ul></div>`;
+  // Últimos resultados: Copa o liga local, con un botón para cambiar
+  const isCup = c => /central american|concacaf|champions cup/i.test(c || '');
+  const isLocal = c => !isCup(c) && !/friendl|amistos|leagues cup/i.test(c || '');
+  const recentOf = tid => {
+    let xs = (F[tid]?.recent || []).map(x => ({ d: x.d, home: x.hId === tid, opp: x.hId === tid ? x.a : x.h, gf: x.hId === tid ? x.hs : x.as, ga: x.hId === tid ? x.as : x.hs, c: x.comp }));
+    if (!xs.length && TICOS.has(tid)) xs = [...M.filter(x => played(x) && (x.h === tid || x.a === tid)).map(x => { const o = off(x), home = x.h === tid; return { d: x.d, home, opp: T[home ? x.a : x.h].name, gf: home ? o.hs : o.as, ga: home ? o.as : o.hs, c: 'Liga' }; }),
+      ...(D.intl || []).filter(x => x.hs != null && (x.hId === tid || x.aId === tid)).map(x => { const home = x.hId === tid; return { d: x.d, home, opp: home ? x.a.name : x.h.name, gf: home ? x.hs : x.as, ga: home ? x.as : x.hs, c: 'Concacaf Central American Cup' }; })]
+      .sort((a, b) => new Date(b.d) - new Date(a.d));
+    if (!F[tid]?.recent?.length && !TICOS.has(tid)) xs = (D.intl || []).filter(x => x.hs != null && (x.hId === tid || x.aId === tid)).map(x => { const home = x.hId === tid; return { d: x.d, home, opp: home ? x.a.name : x.h.name, gf: home ? x.hs : x.as, ga: home ? x.as : x.hs, c: 'Concacaf Central American Cup' }; }).reverse();
+    return xs.filter(x => S.cf === 'liga' ? isLocal(x.c) : isCup(x.c)).slice(0, 5);
+  };
+  const recent = tid => { const t = tid === m.hId ? H : A, xs = recentOf(tid);
+    return `<div><h3>${esc(t.name)}</h3>${xs.length ? `<ul class="plist">${xs.map(x => { const r = x.gf > x.ga ? 'W' : x.gf < x.ga ? 'L' : 'D';
+      return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${x.home ? 'vs' : 'en'} ${esc(x.opp)}<span class="x">${x.gf}–${x.ga} · ${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}</span></li>`; }).join('')}</ul>` : '<p class="hint">Sin partidos cargados.</p>'}</div>`; };
+  const cfSeg = `<div class="seg" role="group" aria-label="Últimos resultados">${[['copa', 'Copa'], ['liga', 'Liga local']].map(([k, l]) => `<button type="button" data-cf="${k}" aria-pressed="${(S.cf || 'copa') === k}">${l}</button>`).join('')}</div>`;
+  const luFrom = L => L && L.vs ? `vs ${esc(L.vs)}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
-    <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la del equipo tico en su último partido con alineación. La oficial sale cerca del pitazo.'}</p>
+    <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
-      <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div></section>
+      <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div>
+      ${!off_ && (HL?.vs || AL?.vs) ? `<p class="foot">${HL?.vs ? `${esc(H.name)}: ${luFrom(HL)}. ` : ''}${AL?.vs ? `${esc(A.name)}: ${luFrom(AL)}.` : ''}</p>` : ''}</section>
     <div class="pv-data">
       ${ida.length ? `<section><h3>Partido de ida</h3><ul class="plist">${ida.map(x => `<li>${esc(fmtDay(x.d))} · ${esc(x.h.name)} <b>${x.hs}–${x.as}</b> ${esc(x.a.name)}</li>`).join('')}</ul></section>` : ''}
-      <section><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
+      <section><div class="ph2" style="margin-bottom:6px"><h3 style="margin:0">Últimos resultados</h3>${cfSeg}</div><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
       ${hist.length ? `<section><h3>Historial entre ellos</h3><ul class="plist">${hist.map(x => `<li><span class="x" style="margin:0;min-width:84px;text-align:left">${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }))}</span>${esc(x.hId === m.hId ? H.name : x.hId === m.aId ? A.name : x.h)} <b>${x.hs}–${x.as}</b> ${esc(x.aId === m.aId ? A.name : x.aId === m.hId ? H.name : x.a)}<span class="x">${esc(COMP[x.comp] || x.comp || '')}</span></li>`).join('')}</ul>
         <p class="foot">${(() => { let w1 = 0, w2 = 0, d = 0; hist.forEach(x => { const g1 = x.hId === m.hId ? x.hs : x.as, g2 = x.hId === m.hId ? x.as : x.hs; g1 > g2 ? w1++ : g1 < g2 ? w2++ : d++; }); return `Últimos ${hist.length}: ${esc(H.name)} ganó ${w1}, ${esc(A.name)} ganó ${w2}, ${d} empates.`; })()}</p></section>` : ''}
       <p class="foot">Las suspensiones de la Copa se rigen por su propio reglamento y no se calculan aquí.</p>

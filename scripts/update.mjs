@@ -196,10 +196,42 @@ async function main() {
     } catch (e) { if (!(e instanceof LimitError)) console.warn(`Sin historial para ${m.h.name} vs ${m.a.name}: ${e.message}`); }
   }
 
+  // Forma de los equipos de la Copa que juegan pronto: últimos partidos (Copa y liga local) y su última alineación.
+  // Se refresca cada 6 horas como máximo; unas 3-5 consultas por equipo.
+  const form = { ...(old.form || {}) };
+  const nowMs = Date.now();
+  const soonTeams = new Set(intl.filter(x => x.hs === undefined && new Date(x.d) > nowMs - 3 * 3600e3 && new Date(x.d) < nowMs + 10 * 864e5).flatMap(x => [x.hId, x.aId]));
+  for (const tid of soonTeams) {
+    if (limited) break;
+    if (form[tid] && nowMs - Date.parse(form[tid].at) < 6 * 3600e3) continue;
+    try {
+      const got = new Map();
+      for (const side of ['homeTeamId', 'awayTeamId']) for (const season of [SEASON, SEASON - 1]) {
+        const page = await api(`/matches?${side}=${tid}&season=${season}&limit=100`);
+        for (const x of page?.data || []) got.set(x.id, x);
+      }
+      const fin = [...got.values()].filter(x => isFinal(x.state?.description) && x.state?.score?.current).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const recent = fin.slice(0, 30).map(x => { const [hs, as] = x.state.score.current.split(' - ').map(Number);
+        return { id: x.id, d: x.date, comp: x.league?.name, h: fixText(x.homeTeam?.name), hId: x.homeTeam?.id, a: fixText(x.awayTeam?.name), aId: x.awayTeam?.id, hs, as }; });
+      let lineup = null;
+      for (const x of fin.slice(0, 3)) {
+        const lu = await api(`/lineups/${x.id}`);
+        const t = lu && (lu.homeTeam?.id === tid ? lu.homeTeam : lu.awayTeam?.id === tid ? lu.awayTeam : (x.homeTeam?.id === tid ? lu.homeTeam : lu.awayTeam));
+        if (t?.initialLineup?.length) {
+          const opp = x.homeTeam?.id === tid ? x.awayTeam : x.homeTeam;
+          lineup = { formation: t.formation || null, rows: t.initialLineup.map(row => row.map(p => ({ n: p.number, name: fixText(p.name) }))), d: x.date, vs: fixText(opp?.name), comp: x.league?.name };
+          break;
+        }
+      }
+      form[tid] = { at: new Date().toISOString(), recent, lineup: lineup || form[tid]?.lineup || null };
+      console.log(`Forma de ${tid}: ${recent.length} partidos, alineación ${lineup ? 'sí' : 'no'}`);
+    } catch (e) { if (!(e instanceof LimitError)) console.warn(`Sin forma para ${tid}: ${e.message}`); }
+  }
+
   const out = fixDeep({
     updated: new Date().toISOString(),
     league: { id: LEAGUE_ID, name: 'Primera División', season: SEASON },
-    teams, matches, standings, detail, intl, mesa, h2h,
+    teams, matches, standings, detail, intl, mesa, h2h, form,
   });
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));
