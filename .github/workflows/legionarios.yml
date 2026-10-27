@@ -5,7 +5,12 @@ on:
     # una vez al día, 5:47 a.m. de Costa Rica (11:47 UTC): ya terminaron los partidos de MLS y Liga MX
     # de la noche anterior y todavía no empieza Europa
     - cron: '47 11 * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      presupuesto:
+        description: 'Máximo de consultas a la API en esta corrida'
+        required: false
+        default: '35'
 
 permissions:
   contents: write
@@ -26,7 +31,7 @@ jobs:
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           # máximo de consultas por corrida (plan gratis: 35 de las 100 diarias)
-          LEGIO_BUDGET: ${{ vars.LEGIO_BUDGET || '35' }}
+          LEGIO_BUDGET: ${{ github.event.inputs.presupuesto || vars.LEGIO_BUDGET || '35' }}
         run: node scripts/legionarios.mjs
       - name: Guardar cambios
         run: |

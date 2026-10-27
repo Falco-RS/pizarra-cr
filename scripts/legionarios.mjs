@@ -42,25 +42,35 @@ async function main() {
   // La lista manda: nombre, club, posición; de la corrida anterior se conservan ids y estadísticas
   const players = cfg.jugadores.map(j => {
     const o = oldByName.get(j.nombre) || {};
-    const sameClub = o.club === j.club;
-    return { ...j, teamId: j.teamId ?? (sameClub ? o.teamId : undefined), playerId: j.playerId ?? o.playerId,
+    const clave = [].concat(j.buscar).join('|');
+    const sameClub = o.club === j.club && o.clave === clave;
+    return { ...j, clave, teamId: j.teamId ?? (sameClub ? o.teamId : undefined), playerId: j.playerId ?? o.playerId,
       stats: sameClub ? o.stats : undefined, statsAt: sameClub ? o.statsAt : undefined };
   });
 
+  const skip = new Set((old.skipTeams || []).map(String));
   try {
-    // 1) Identificar cada club en la API (una sola vez)
+    // 1) Identificar cada club en la API (una sola vez). La búsqueda de Highlightly es por nombre exacto,
+    //    así que "buscar" puede ser una lista de variantes; se prueba una por una hasta encontrarlo.
     for (const p of players) {
       if (p.teamId) continue;
-      const known = players.find(x => x !== p && x.teamId && x.buscar === p.buscar);
+      const names = [].concat(p.buscar);
+      const known = players.find(x => x !== p && x.teamId && x.clave === p.clave);
       if (known) { p.teamId = known.teamId; continue; }
-      const res = (await api(`/teams?name=${encodeURIComponent(p.buscar)}&limit=10`))?.data || [];
-      const cands = res.filter(t => !/national/i.test(t.type || ''));
-      const want = norm(p.buscar);
-      const pick = cands.find(t => norm(t.name) === want) || cands.find(t => norm(t.name).startsWith(want)) || cands[0];
-      if (!pick) { say(`Sin club en la API para "${p.buscar}" (${p.nombre})`); continue; }
+      let pick = null;
+      for (const name of names) {
+        const res = (await api(`/teams?name=${encodeURIComponent(name)}&limit=20`))?.data || [];
+        const youth = t => /women|femen|\bW$|\bU\d\d\b/i.test(t.name) && !/women|\bU\d\d\b/i.test(name);
+        const cands = res.filter(t => !skip.has(String(t.id)) && !/national/i.test(t.type || '') && !youth(t));
+        const inCountry = p.paisApi ? cands.filter(t => norm(t.country?.name) === norm(p.paisApi)) : [];
+        const pool = inCountry.length ? inCountry : cands;
+        pick = pool.find(t => norm(t.name) === norm(name)) || pool[0] || null;
+        if (res.length > 1) say(`"${name}": ${res.slice(0, 6).map(t => `${t.name}${t.country?.name ? ' [' + t.country.name + ']' : ''} (${t.id})`).join(', ')}`);
+        if (pick) break;
+      }
+      if (!pick) { say(`Sin club en la API para ${names.map(n => `"${n}"`).join(' / ')} (${p.nombre})`); continue; }
       p.teamId = pick.id;
       clubs[pick.id] = { ...(clubs[pick.id] || {}), name: pick.name, logo: pick.logo || null };
-      if (cands.length > 1) say(`Club "${p.buscar}" → ${pick.name} (${pick.id}). Otras opciones: ${cands.slice(0, 5).filter(t => t.id !== pick.id).map(t => `${t.name} (${t.id})`).join(', ')}`);
     }
 
     // 2) Resultados: partidos ya jugados de los que todavía no tenemos el marcador final
@@ -98,7 +108,12 @@ async function main() {
       }).sort((a, b) => new Date(a.d) - new Date(b.d));
       c.fixturesAt = new Date().toISOString();
       if (!c.name) { const m = got[0]; const t = m && (m.homeTeam?.id == tid ? m.homeTeam : m.awayTeam); if (t) { c.name = t.name; c.logo = t.logo || null; } }
-      if (!got.length) say(`Sin partidos de la temporada ${season} para el club ${c.name || tid}`);
+      if (!got.length) {
+        // club equivocado (o sin calendario): se descarta y en la próxima corrida se prueba otra opción
+        say(`Sin partidos de la temporada ${season} para el club ${c.name || tid}: se descarta`);
+        skip.add(String(tid)); delete clubs[tid];
+        for (const p of players) if (p.teamId == tid) { p.teamId = undefined; p.playerId = undefined; }
+      }
     }
 
     // 4) Identificar a cada jugador (una sola vez): buscar por nombre y confirmar con su club
@@ -133,7 +148,7 @@ async function main() {
   }
 
   // Los ids nuevos se guardan en el archivo de salida (la lista que editás no se toca)
-  const out = { updated: new Date().toISOString(), season, players: players.map(({ buscar, ...p }) => p), clubs, log };
+  const out = { updated: new Date().toISOString(), season, players: players.map(({ buscar, paisApi, ...p }) => p), clubs, skipTeams: [...skip], log };
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));
   console.log(`Listo. Consultas de la API restantes hoy: ${remaining}.`);
