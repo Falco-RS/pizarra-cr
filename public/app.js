@@ -729,7 +729,7 @@ async function pollLive() {
   if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa') renderView();
 }
 renderLive(); renderBoard(); renderView();
-pollLive(); setInterval(pollLive, 60000);
+pollLive(); setInterval(pollLive, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pollLive(); });
 }
 let LIVE = [];

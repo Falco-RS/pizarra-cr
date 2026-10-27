@@ -119,22 +119,27 @@ async function main() {
       }
     }
 
-    // 4) Identificar a cada jugador (una sola vez): buscar por nombre y confirmar con su club
+    // 4) Identificar a cada jugador (una sola vez): buscar por nombre (varias formas) y confirmar con su club
     for (const p of players) {
       if (p.playerId || !p.teamId) continue;
-      const q = norm(p.nombre);
-      const res = (await api(`/players?name=${encodeURIComponent(q)}&limit=10`))?.data || [];
-      const clubName = norm(clubs[p.teamId]?.name || p.club);
-      let pick = null;
-      for (const cand of res.slice(0, 3)) {
-        const st = await api(`/players/${cand.id}/statistics`);
-        const s0 = Array.isArray(st) ? st[0] : st;
-        const clubsOf = [...(s0?.perClub || []).map(c => c.club || c.name), ...(s0?.perCompetition || []).map(c => c.club)].map(norm);
-        if (process.env.LEGIO_DEBUG) say(`  ${p.nombre}? ${cand.name} (${cand.id}): ${[...new Set(clubsOf)].slice(0, 6).join(', ')} · claves: ${Object.keys(s0 || {}).join(',')}`);
-        if (clubsOf.some(c => c && (c.includes(clubName) || clubName.includes(c)))) { pick = cand; p.stats = summarize(s0, clubName, season); p.statsAt = new Date().toISOString(); break; }
+      const parts = norm(p.nombre).split(' '), sur = parts[parts.length - 1], first = parts[0];
+      const club = clubs[p.teamId]?.name || p.club;
+      let pick = null; const seen = new Set();
+      for (const q of [norm(p.nombre), `${first[0]} ${sur}`, sur]) {
+        const res = (await api(`/players?name=${encodeURIComponent(q)}&limit=20`))?.data || [];
+        const cands = res.filter(c => !seen.has(c.id) && norm(c.name).split(' ').includes(sur) && (norm(c.name).startsWith(first[0]) || norm(c.fullName || '').includes(first))).slice(0, 8);
+        for (const cand of cands) {
+          seen.add(cand.id);
+          const st = await api(`/players/${cand.id}/statistics`);
+          const s0 = Array.isArray(st) ? st[0] : st;
+          const clubsOf = [...(s0?.perClub || []).map(c => c.club || c.name), ...(s0?.perCompetition || []).map(c => c.club)];
+          if (process.env.LEGIO_DEBUG) say(`  ${p.nombre}? ${cand.name} (${cand.id}): ${[...new Set(clubsOf.map(norm))].slice(0, 6).join(', ')}`);
+          if (clubsOf.some(c => sameClub(c, club))) { pick = cand; p.stats = summarize(s0, club); p.statsAt = new Date().toISOString(); break; }
+        }
+        if (pick) break;
       }
       if (pick) { p.playerId = pick.id; p.foto = pick.logo || null; }
-      else say(`No pude confirmar a ${p.nombre} en ${clubs[p.teamId]?.name || p.club} (${res.length} resultados)`);
+      else say(`No pude confirmar a ${p.nombre} en ${club}`);
     }
 
     // 5) Estadísticas de temporada: primero quien jugó desde la última vez
@@ -144,7 +149,7 @@ async function main() {
     for (const p of due) {
       const st = await api(`/players/${p.playerId}/statistics`);
       const s0 = Array.isArray(st) ? st[0] : st;
-      if (s0) { p.stats = summarize(s0, norm(clubs[p.teamId]?.name || p.club), season); p.statsAt = new Date().toISOString(); if (!p.foto && s0.logo) p.foto = s0.logo; }
+      if (s0) { p.stats = summarize(s0, clubs[p.teamId]?.name || p.club); p.statsAt = new Date().toISOString(); if (!p.foto && s0.logo) p.foto = s0.logo; }
     }
   } catch (e) {
     if (!(e instanceof OutOfBudget)) throw e;
@@ -158,15 +163,28 @@ async function main() {
   console.log(`Listo. Consultas de la API restantes hoy: ${remaining}.`);
 }
 
-// Suma las competencias de la temporada actual con su club actual
+// ¿Es el mismo club? Compara palabras importantes ("U.N.A.M. - Pumas" ~ "UNAM Pumas", "Strasbourg" ~ "RC Strasbourg Alsace")
+const STOP = new Set(['fc', 'cf', 'sc', 'ac', 'cd', 'cs', 'club', 'de', 'fk', 'sk', 'rc', 'ud', 'afc', 'the', 'da', 'del', 'ii']);
+const words = x => norm(String(x || '').replace(/\./g, '')).split(' ').filter(w => w.length >= 3 && !STOP.has(w));
+function sameClub(a, b) {
+  const A = words(a), B = words(b);
+  if (/\bii\b|\bu\d\d\b|\bb$/i.test(norm(a)) !== /\bii\b|\bu\d\d\b|\bb$/i.test(norm(b))) return false; // filial ≠ primer equipo
+  if (!A.length || !B.length) return false;
+  const [small, big] = A.length <= B.length ? [A, B] : [B, A];
+  return small.every(w => big.includes(w) || big.some(v => Math.min(v.length, w.length) >= 5 && (v.startsWith(w) || w.startsWith(v))));
+}
+// Temporada como número: "2026" → 2026, "26/27" → 2026
+const seasonKey = x => { const s = String(x || ''); let m; if ((m = s.match(/^(\d{4})/))) return +m[1]; if ((m = s.match(/^(\d{2})\/(\d{2})/))) return 2000 + +m[1]; return 0; };
 const RAW = {};
-function summarize(s0, clubName, season) {
-  RAW[clubName] = (s0?.perCompetition || []).slice(0, 12).map(c => `${c.season} | ${c.league} | ${c.club} | PJ ${c.gamesPlayed}`);
-  const rows = (s0?.perCompetition || []).filter(c => String(c.season || '').includes(String(season)) || String(c.season || '').includes(String(season - 1) + '/' + String(season).slice(2)));
-  const mine = rows.filter(c => !clubName || norm(c.club).includes(clubName) || clubName.includes(norm(c.club)));
-  const use = mine.length ? mine : rows;
+// Suma las competencias de la temporada más reciente con su club actual
+function summarize(s0, club) {
+  const all = s0?.perCompetition || [];
+  RAW[club] = all.slice(0, 12).map(c => `${c.season} | ${c.league} | ${c.club} | PJ ${c.gamesPlayed}`);
+  const mine = all.filter(c => sameClub(c.club, club));
+  const last = Math.max(0, ...mine.map(c => seasonKey(c.season)));
+  const use = mine.filter(c => seasonKey(c.season) === last);
   const sum = k => use.reduce((a, c) => a + (Number(c[k]) || 0), 0);
-  return { games: sum('gamesPlayed'), goals: sum('goals'), assists: sum('assists'), minutes: sum('minutesPlayed'), yc: sum('yellowCards'), rc: sum('redCards'),
+  return { season: use[0]?.season || null, games: sum('gamesPlayed'), goals: sum('goals'), assists: sum('assists'), minutes: sum('minutesPlayed'), yc: sum('yellowCards'), rc: sum('redCards'),
     cleanSheets: sum('cleanSheets'), conceded: sum('goalsConceded'), comps: use.map(c => ({ league: c.league, season: c.season, games: c.gamesPlayed, goals: c.goals })) };
 }
 

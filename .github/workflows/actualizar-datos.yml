@@ -25,8 +25,8 @@ jobs:
       - name: Descargar datos de Highlightly
         env:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
-          # consultas extra por corrida para completar partidos (plan gratis: 6; plan pagado: 40)
-          MAX_NEW_PER_RUN: ${{ vars.MAX_NEW_PER_RUN || '6' }}
+          # consultas extra por corrida para completar partidos (plan pagado: 40; si se vuelve al gratis, poner la variable MAX_NEW_PER_RUN en 6)
+          MAX_NEW_PER_RUN: ${{ vars.MAX_NEW_PER_RUN || '40' }}
           SMART: ${{ github.event_name == 'schedule' && '1' || '0' }}
         run: node scripts/update.mjs
       - name: Guardar cambios
