@@ -532,7 +532,8 @@ function renderLegio(v) {
     return `<button type="button" class="pc" data-lp="${esc(p.nombre)}" aria-expanded="${LGsel === p.nombre}">
       <span class="row1">${p.foto ? `<img class="av" src="${esc(p.foto)}" alt="" loading="lazy">` : `<span class="av" aria-hidden="true">${esc(ini(p.nombre))}</span>`}<span class="nm"><b>${esc(p.nombre)}</b><span>${esc(p.pos)}</span></span></span>
       <span class="club">${club?.logo ? `<img class="crest" src="${esc(club.logo)}" alt="" loading="lazy">` : `<span class="flag" aria-hidden="true">${p.bandera || ''}</span>`}${esc(p.club)}${p.nota ? ` <small>(${esc(p.nota)})</small>` : ''} <small>· ${esc(p.pais)}</small></span>
-      <span class="stats"><span><b>${n('games')}</b><i>PJ</i></span>${gk ? `<span><b>${n('cleanSheets')}</b><i>Valla inv.</i></span><span><b>${n('conceded')}</b><i>Recibidos</i></span>` : `<span><b>${n('goals')}</b><i>Goles</i></span><span><b>${n('assists')}</b><i>Asist.</i></span>`}<span><b>${n('minutes')}</b><i>Min</i></span></span>
+      ${!s ? '<span class="nostats">La API todavía no trae sus números de temporada. Abajo, los resultados de su club.</span>' : ''}
+      <span class="stats"${!s ? ' hidden' : ''}><span><b>${n('games')}</b><i>PJ</i></span>${gk ? `<span><b>${n('cleanSheets')}</b><i>Valla inv.</i></span><span><b>${n('conceded')}</b><i>Recibidos</i></span>` : `<span><b>${n('goals')}</b><i>Goles</i></span><span><b>${n('assists')}</b><i>Asist.</i></span>`}<span><b>${n('minutes')}</b><i>Min</i></span></span>
       <span class="last">${f.length ? `Club, últimos ${f.length}: ${f.map(r => `<i class="dot ${r}" title="${RES[r]}"></i>`).join('')}` : 'Club: sin partidos cargados todavía'}</span>
     </button>`;
   };
@@ -542,8 +543,8 @@ function renderLegio(v) {
     const s = sel.stats, past = fx(sel).filter(m => new Date(m.d) < now).slice(-8).reverse(), next = fx(sel).filter(m => new Date(m.d) >= now).slice(0, 3);
     return `<section class="panel lpd" id="lpdetail"><div class="ph2"><h2>${esc(sel.nombre)}</h2><button class="more" data-lpclose>Cerrar ✕</button></div>
       <p class="lead">${esc(sel.pos)} · ${esc(sel.club)}${sel.nota ? ` (${esc(sel.nota)})` : ''} · ${esc(sel.pais)} ${sel.bandera || ''}</p>
-      ${s ? `<div class="kv">${[['Partidos', s.games], ['Minutos', s.minutes], ...(sel.pos === 'Portero' ? [['Vallas invictas', s.cleanSheets], ['Goles recibidos', s.conceded]] : [['Goles', s.goals], ['Asistencias', s.assists]]), ['Amarillas', s.yc], ['Rojas', s.rc]].map(([k, x]) => `<span><b>${x ?? 0}</b><i>${k}</i></span>`).join('')}</div>
-        ${(s.comps || []).length > 1 ? `<p class="foot">Por torneo: ${s.comps.map(c => `${esc(c.league)} ${c.games ?? 0} PJ${c.goals ? ', ' + c.goals + (c.goals === 1 ? ' gol' : ' goles') : ''}`).join(' · ')}</p>` : ''}` : '<p class="hint">Sus números de la temporada aparecen en la próxima actualización.</p>'}
+      ${s ? `${s.season ? `<p class="lead" style="margin:0 0 8px">Temporada ${esc(s.season)} con ${esc(sel.club)}</p>` : ''}<div class="kv">${[['Partidos', s.games], ['Minutos', s.minutes], ...(sel.pos === 'Portero' ? [['Vallas invictas', s.cleanSheets], ['Goles recibidos', s.conceded]] : [['Goles', s.goals], ['Asistencias', s.assists]]), ['Amarillas', s.yc], ['Rojas', s.rc]].map(([k, x]) => `<span><b>${x ?? 0}</b><i>${k}</i></span>`).join('')}</div>
+        ${(s.comps || []).length > 1 ? `<p class="foot">Por torneo: ${s.comps.map(c => `${esc(c.league)} ${c.games ?? 0} PJ${c.goals ? ', ' + c.goals + (c.goals === 1 ? ' gol' : ' goles') : ''}`).join(' · ')}</p>` : ''}` : '<p class="hint">La API todavía no trae sus números de temporada para esta liga.</p>'}
       ${next.length ? `<h3>Próximos partidos</h3><ul class="lms">${next.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
       ${past.length ? `<h3>Últimos partidos de su club</h3><ul class="lms">${past.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
       <p class="foot">Goles, tarjetas y cambios salen del minuto a minuto del partido; si no aparece nada, puede que no haya jugado o que la API no tenga ese detalle para esa liga.</p></section>`;

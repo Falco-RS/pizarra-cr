@@ -281,3 +281,5 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .snums b{font-family:var(--display);font-size:24px;font-weight:800;line-height:1}
 .snums i{font-style:normal;font-size:11px;color:var(--muted);letter-spacing:.5px}
 .staff li .x{text-align:left}
+.lg .nostats{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:8px;padding:8px 10px}
+.lg [hidden]{display:none!important}
