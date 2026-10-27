@@ -203,7 +203,8 @@ async function main() {
   const soonTeams = new Set(intl.filter(x => x.hs === undefined && new Date(x.d) > nowMs - 3 * 3600e3 && new Date(x.d) < nowMs + 10 * 864e5).flatMap(x => [x.hId, x.aId]));
   for (const tid of soonTeams) {
     if (limited) break;
-    if (form[tid] && nowMs - Date.parse(form[tid].at) < 6 * 3600e3) continue;
+    const fresh = form[tid] && nowMs - Date.parse(form[tid].at) < 6 * 3600e3;
+    if (fresh && (form[tid].lineup || form[tid].deep)) continue;
     try {
       const got = new Map();
       for (const side of ['homeTeamId', 'awayTeamId']) for (const season of [SEASON, SEASON - 1]) {
@@ -214,7 +215,7 @@ async function main() {
       const recent = fin.slice(0, 30).map(x => { const [hs, as] = x.state.score.current.split(' - ').map(Number);
         return { id: x.id, d: x.date, comp: x.league?.name, h: fixText(x.homeTeam?.name), hId: x.homeTeam?.id, a: fixText(x.awayTeam?.name), aId: x.awayTeam?.id, hs, as }; });
       let lineup = null;
-      for (const x of fin.slice(0, 3)) {
+      for (const x of fin.slice(0, 10)) {
         const lu = await api(`/lineups/${x.id}`);
         const t = lu && (lu.homeTeam?.id === tid ? lu.homeTeam : lu.awayTeam?.id === tid ? lu.awayTeam : (x.homeTeam?.id === tid ? lu.homeTeam : lu.awayTeam));
         if (t?.initialLineup?.length) {
@@ -223,7 +224,7 @@ async function main() {
           break;
         }
       }
-      form[tid] = { at: new Date().toISOString(), recent, lineup: lineup || form[tid]?.lineup || null };
+      form[tid] = { at: new Date().toISOString(), recent, lineup: lineup || form[tid]?.lineup || null, deep: true };
       console.log(`Forma de ${tid}: ${recent.length} partidos, alineación ${lineup ? 'sí' : 'no'}`);
     } catch (e) { if (!(e instanceof LimitError)) console.warn(`Sin forma para ${tid}: ${e.message}`); }
   }
