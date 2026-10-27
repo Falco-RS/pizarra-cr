@@ -130,6 +130,7 @@ async function main() {
         const st = await api(`/players/${cand.id}/statistics`);
         const s0 = Array.isArray(st) ? st[0] : st;
         const clubsOf = [...(s0?.perClub || []).map(c => c.club || c.name), ...(s0?.perCompetition || []).map(c => c.club)].map(norm);
+        if (process.env.LEGIO_DEBUG) say(`  ${p.nombre}? ${cand.name} (${cand.id}): ${[...new Set(clubsOf)].slice(0, 6).join(', ')} · claves: ${Object.keys(s0 || {}).join(',')}`);
         if (clubsOf.some(c => c && (c.includes(clubName) || clubName.includes(c)))) { pick = cand; p.stats = summarize(s0, clubName, season); p.statsAt = new Date().toISOString(); break; }
       }
       if (pick) { p.playerId = pick.id; p.foto = pick.logo || null; }
@@ -151,14 +152,16 @@ async function main() {
   }
 
   // Los ids nuevos se guardan en el archivo de salida (la lista que editás no se toca)
-  const out = { updated: new Date().toISOString(), season, players: players.map(({ buscar, paisApi, ...p }) => p), clubs, skipTeams: [...skip], log };
+  const out = { updated: new Date().toISOString(), season, players: players.map(({ buscar, paisApi, ...p }) => p), clubs, skipTeams: [...skip], log, ...(process.env.LEGIO_DEBUG ? { raw: RAW } : {}) };
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));
   console.log(`Listo. Consultas de la API restantes hoy: ${remaining}.`);
 }
 
 // Suma las competencias de la temporada actual con su club actual
+const RAW = {};
 function summarize(s0, clubName, season) {
+  RAW[clubName] = (s0?.perCompetition || []).slice(0, 12).map(c => `${c.season} | ${c.league} | ${c.club} | PJ ${c.gamesPlayed}`);
   const rows = (s0?.perCompetition || []).filter(c => String(c.season || '').includes(String(season)) || String(c.season || '').includes(String(season - 1) + '/' + String(season).slice(2)));
   const mine = rows.filter(c => !clubName || norm(c.club).includes(clubName) || clubName.includes(norm(c.club)));
   const use = mine.length ? mine : rows;

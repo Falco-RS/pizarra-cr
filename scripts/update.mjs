@@ -159,7 +159,10 @@ async function main() {
     try {
       const list = await allMatches(`leagueName=${encodeURIComponent(name)}&season=${SEASON}`);
       for (const m of list) {
-        if (!ids.has(m.homeTeam.id) && !ids.has(m.awayTeam.id)) continue;
+        // Equipos ticos siempre; en la Copa Centroamericana también el resto de la fase final (sin la fase de grupos)
+        const tico = ids.has(m.homeTeam.id) || ids.has(m.awayTeam.id);
+        const knockout = /central american/i.test(name) && !/group/i.test(m.round || '');
+        if (!tico && !knockout) continue;
         const sc = m.state?.score?.current;
         const rec = { id: m.id, comp: m.league?.name || name, leagueId: m.league?.id, round: m.round, d: m.date, s: m.state?.description, h: team(m.homeTeam), a: team(m.awayTeam), hId: m.homeTeam.id, aId: m.awayTeam.id };
         if (sc) [rec.hs, rec.as] = sc.split(' - ').map(Number);
@@ -170,10 +173,33 @@ async function main() {
   if (limited && !intl.length) intl = old.intl || [];
   intl.sort((a, b) => new Date(a.d) - new Date(b.d));
 
+  // Estadios que se ponen a mano (la API no los trae para estos torneos)
+  let estadios = {};
+  try { estadios = JSON.parse(await fs.readFile('data/estadios.json', 'utf8')); } catch { /* sin archivo */ }
+  const plain = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  for (const m of intl) {
+    const k = Object.keys(estadios).find(k => k !== '_nota' && [m.h.name, m.h.full].some(n => plain(n).includes(plain(k))));
+    if (k) m.venue = estadios[k];
+  }
+
+  // Historial de enfrentamientos para los partidos internacionales que vienen (se guarda; una consulta por pareja)
+  const h2h = { ...(old.h2h || {}) };
+  for (const m of intl.filter(x => x.hs === undefined && new Date(x.d) > Date.now() - 3 * 3600e3)) {
+    const key = [m.hId, m.aId].sort((a, b) => a - b).join('-');
+    if (h2h[key] || limited) continue;
+    try {
+      const res = await api(`/head-2-head?teamIdOne=${m.hId}&teamIdTwo=${m.aId}`);
+      const list = (Array.isArray(res) ? res : res?.data || []).filter(x => x.state?.score?.current);
+      h2h[key] = list.map(x => { const [hs, as] = x.state.score.current.split(' - ').map(Number); return { d: x.date, comp: x.league?.name, h: x.homeTeam?.name, hId: x.homeTeam?.id, a: x.awayTeam?.name, aId: x.awayTeam?.id, hs, as }; })
+        .sort((a, b) => new Date(b.d) - new Date(a.d)).slice(0, 10);
+      console.log(`Historial ${m.h.name} vs ${m.a.name}: ${h2h[key].length} partidos`);
+    } catch (e) { if (!(e instanceof LimitError)) console.warn(`Sin historial para ${m.h.name} vs ${m.a.name}: ${e.message}`); }
+  }
+
   const out = fixDeep({
     updated: new Date().toISOString(),
     league: { id: LEAGUE_ID, name: 'Primera División', season: SEASON },
-    teams, matches, standings, detail, intl, mesa,
+    teams, matches, standings, detail, intl, mesa, h2h,
   });
   await fs.mkdir('public/data', { recursive: true });
   await fs.writeFile(OUT, JSON.stringify(out));

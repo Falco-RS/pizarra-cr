@@ -1,0 +1,7 @@
+{
+  "_nota": "Estadio de cada equipo cuando juega de local en partidos internacionales (la API no lo trae). La clave es el nombre del equipo local.",
+  "Olimpia": "Estadio Nacional Chelato Uclés, Tegucigalpa",
+  "Alajuelense": "Estadio Alejandro Morera Soto, Alajuela",
+  "Saprissa": "Estadio Ricardo Saprissa, Tibás",
+  "Alianza": "Estadio Jorge \"Mágico\" González, San Salvador"
+}

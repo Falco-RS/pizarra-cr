@@ -11,6 +11,10 @@ on:
         description: 'Máximo de consultas a la API en esta corrida'
         required: false
         default: '45'
+      depurar:
+        description: 'Escribir detalles de depuración (1 = sí)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -32,6 +36,7 @@ jobs:
           HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
           # máximo de consultas por corrida (plan gratis: 45 de las 100 diarias, dos días por semana)
           LEGIO_BUDGET: ${{ github.event.inputs.presupuesto || vars.LEGIO_BUDGET || '45' }}
+          LEGIO_DEBUG: ${{ github.event.inputs.depurar }}
         run: node scripts/legionarios.mjs
       - name: Guardar cambios
         run: |

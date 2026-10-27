@@ -409,7 +409,7 @@ function copaHtml() {
     }).join('')}</div></section>`;
   };
   const sel = withLive.find(m => m.id === S.cid);
-  return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · los equipos ticos · tocá un partido para ver el en vivo o la previa</span></div>
+  return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · fase final y los partidos de los ticos · tocá un partido para ver el en vivo o la previa</span></div>
     <div id="cdetail">${sel ? intlDetailHtml(sel) : ''}</div>${order.map(section).join('')}
     <p class="foot">En vivo con la misma franja de arriba. Los ticos van resaltados.</p></div>`;
 }
@@ -446,19 +446,25 @@ function intlDetailHtml(m) {
   const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
     return `<div class="pred"><div class="bar"><i style="flex:${h};background:var(--accent)"></i><i style="flex:${d};background:var(--draw)"></i><i style="flex:${a};background:var(--away)"></i></div>
       <div class="lab"><span>${esc(H.name)} <b>${Math.round(h)}%</b></span><span>Empate <b>${Math.round(d)}%</b></span><span>${esc(A.name)} <b>${Math.round(a)}%</b></span></div></div>`; })() : '';
+  const hist = (D.h2h || {})[[m.hId, m.aId].sort((a, b) => a - b).join('-')] || [];
   const ida = (D.intl || []).filter(x => x.id !== m.id && x.hs != null && [x.hId, x.aId].sort().join() === [m.hId, m.aId].sort().join());
-  const recent = tid => TICOS.has(tid) ? `<div><h3>${esc(T[tid].name)} · últimos 5</h3><ul class="plist">${[...M.filter(x => played(x) && (x.h === tid || x.a === tid)).map(x => ({ d: x.d, h: x.h, a: x.a, hs: off(x).hs, as: off(x).as, hn: T[x.h].name, an: T[x.a].name, c: 'Liga' })),
+  const recentIntl = tid => { const t = tid === m.hId ? H : A; const xs = (D.intl || []).filter(x => x.hs != null && x.id !== m.id && (x.hId === tid || x.aId === tid)).slice(-5).reverse();
+    return xs.length ? `<div><h3>${esc(t.name)} · en la Copa</h3><ul class="plist">${xs.map(x => { const home = x.hId === tid, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+      return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.a.name : x.h.name)}<span class="x">${gf}–${ga}</span></li>`; }).join('')}</ul></div>` : ''; };
+  const recent = tid => !TICOS.has(tid) ? recentIntl(tid) : `<div><h3>${esc(T[tid].name)} · últimos 5</h3><ul class="plist">${[...M.filter(x => played(x) && (x.h === tid || x.a === tid)).map(x => ({ d: x.d, h: x.h, a: x.a, hs: off(x).hs, as: off(x).as, hn: T[x.h].name, an: T[x.a].name, c: 'Liga' })),
       ...(D.intl || []).filter(x => x.hs != null && (x.hId === tid || x.aId === tid)).map(x => ({ d: x.d, h: x.hId, a: x.aId, hs: x.hs, as: x.as, hn: x.h.name, an: x.a.name, c: 'Copa' }))]
       .sort((a, b) => new Date(a.d) - new Date(b.d)).slice(-5).reverse().map(x => { const home = x.h === tid, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
-        return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.an : x.hn)}<span class="x">${gf}–${ga} · ${x.c}</span></li>`; }).join('')}</ul></div>` : '';
+        return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.an : x.hn)}<span class="x">${gf}–${ga} · ${x.c}</span></li>`; }).join('')}</ul></div>`;
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
-    <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
+    <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
     <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la del equipo tico en su último partido con alineación. La oficial sale cerca del pitazo.'}</p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
       <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div></section>
     <div class="pv-data">
       ${ida.length ? `<section><h3>Partido de ida</h3><ul class="plist">${ida.map(x => `<li>${esc(fmtDay(x.d))} · ${esc(x.h.name)} <b>${x.hs}–${x.as}</b> ${esc(x.a.name)}</li>`).join('')}</ul></section>` : ''}
       <section><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
+      ${hist.length ? `<section><h3>Historial entre ellos</h3><ul class="plist">${hist.map(x => `<li><span class="x" style="margin:0;min-width:84px;text-align:left">${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }))}</span>${esc(x.hId === m.hId ? H.name : x.hId === m.aId ? A.name : x.h)} <b>${x.hs}–${x.as}</b> ${esc(x.aId === m.aId ? A.name : x.aId === m.hId ? H.name : x.a)}<span class="x">${esc(COMP[x.comp] || x.comp || '')}</span></li>`).join('')}</ul>
+        <p class="foot">${(() => { let w1 = 0, w2 = 0, d = 0; hist.forEach(x => { const g1 = x.hId === m.hId ? x.hs : x.as, g2 = x.hId === m.hId ? x.as : x.hs; g1 > g2 ? w1++ : g1 < g2 ? w2++ : d++; }); return `Últimos ${hist.length}: ${esc(H.name)} ganó ${w1}, ${esc(A.name)} ganó ${w2}, ${d} empates.`; })()}</p></section>` : ''}
       <p class="foot">Las suspensiones de la Copa se rigen por su propio reglamento y no se calculan aquí.</p>
     </div></div></div>`;
 }
