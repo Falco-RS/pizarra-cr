@@ -434,8 +434,13 @@ function intlDetailHtml(m) {
       ${bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : ''}</div></div>`;
   }
   if (m.hs != null) {
-    return `<div class="detail cd">${head(`<div class="dnum">${m.hs} – ${m.as}</div>`)}<div class="dmeta">Final · ${esc(roundName)} · ${esc(fmtDay(m.d))}</div>
-      <p class="hint" style="margin-top:12px">En la Copa, el minuto a minuto se muestra durante el partido.</p></div>`;
+    const ev = sortEvents({ events: reconcile(m.ev || [], m.hs, m.as) }).events;
+    const sts = m.stats && m.stats.length === 2 ? m.stats : null, hi = sts && sts[0].t === m.hId ? 0 : 1;
+    const bars = sts ? STATS.map(([k, lab, f = v => v]) => { const h = sts[hi].s[k], a = sts[1 - hi].s[k]; if (h === undefined || h === null) return ''; const tot = (h + a) || 1;
+      return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div><div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`; }).join('') : '';
+    return `<div class="detail cd">${head(`<div class="dnum">${m.hs} – ${m.as}</div>`)}<div class="dmeta">Final · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : ''}</div>
+      ${m.ev ? `<div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Sin goles, tarjetas ni cambios registrados.</p>'}</div>
+      ${bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : ''}</div>` : '<p class="hint" style="margin-top:12px">El minuto a minuto de este partido se carga en unos minutos.</p>'}</div>`;
   }
   // previa
   const P = PREVIA[m.id];

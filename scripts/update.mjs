@@ -173,6 +173,22 @@ async function main() {
   if (limited && !intl.length) intl = old.intl || [];
   intl.sort((a, b) => new Date(a.d) - new Date(b.d));
 
+  // Minuto a minuto y estadísticas de los partidos internacionales terminados (se guardan una vez)
+  const oldIntl = new Map((old.intl || []).map(m => [m.id, m]));
+  for (const m of intl) {
+    const o = oldIntl.get(m.id);
+    if (o?.ev) { m.ev = o.ev; m.stats = o.stats; continue; }
+    if (m.hs === undefined || !isFinal(m.s) || limited) continue;
+    try {
+      const raw = await api(`/matches/${m.id}`);
+      const x = Array.isArray(raw) ? raw[0] : raw;
+      if (!x) continue;
+      m.ev = compactEvents(x.events, m.hId);
+      const st = (x.statistics || []).map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(v => [v.displayName, v.value])) }));
+      if (st.length === 2) m.stats = st;
+    } catch (e) { if (!(e instanceof LimitError)) console.warn(`Sin minuto a minuto para ${m.id}: ${e.message}`); }
+  }
+
   // Estadios que se ponen a mano (la API no los trae para estos torneos)
   let estadios = {};
   try { estadios = JSON.parse(await fs.readFile('data/estadios.json', 'utf8')); } catch { /* sin archivo */ }
