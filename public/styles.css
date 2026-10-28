@@ -190,7 +190,7 @@ td.pts{font-weight:700}
 .pl.h b{background:#F4F6F2;color:#141A16}.pl.a b{background:var(--away);color:#fff}
 .pl span{font-size:11px;font-weight:600;line-height:1.15;text-shadow:0 1px 2px #000a;overflow-wrap:anywhere}
 .pempty{position:absolute;left:0;right:0;text-align:center;font-size:13px;color:#fffc;margin:0}
-.pempty.top{top:22%}.pempty.bot{bottom:22%}
+.pempty.top{top:22%;background:none;padding:0}.pempty.bot{bottom:22%}
 @media (max-width:480px){.two{grid-template-columns:1fr}.pl b{width:24px;height:24px;font-size:11px}.pl span{font-size:10px}}
 .dteam span{min-width:0;overflow-wrap:anywhere}
 @media (max-width:480px){.dscore{gap:8px}.dnum{font-size:32px!important}.pred .lab{font-size:12px}}
@@ -287,3 +287,6 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .lg .agh:first-of-type{margin-top:4px}
 .lg .ag{display:grid;align-content:start;grid-auto-rows:min-content;height:auto}
 .lg .ag .agres{display:flex;flex-wrap:wrap;gap:6px}
+.detail{position:relative}
+.detail>.dx{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:16px;line-height:1;display:grid;place-items:center;z-index:2}
+.detail>.dx:hover{color:var(--ink);border-color:var(--muted)}

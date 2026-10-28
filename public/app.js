@@ -749,6 +749,21 @@ async function pollLive() {
   // la tabla y los goleadores también usan los resultados recién terminados
   if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa') renderView();
 }
+/* Botón ✕ en cualquier detalle de partido (liga, Copa, Sele) para cerrarlo sin tener que buscar el partido otra vez */
+function addCloseButtons() {
+  document.querySelectorAll('.detail').forEach(d => {
+    if (d.querySelector(':scope > .dx')) return;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'dx'; b.setAttribute('aria-label', 'Cerrar'); b.textContent = '✕';
+    b.onclick = () => {
+      if (d.closest('#cdetail')) { S.cid = null; renderView(); }
+      else if (d.closest('#sdetail')) { SEsel = null; renderView(); }
+      else { S.sel = null; renderBoard(); }
+    };
+    d.prepend(b);
+  });
+}
+new MutationObserver(addCloseButtons).observe(document.body, { childList: true, subtree: true });
 renderLive(); renderBoard(); renderView();
 pollLive(); setInterval(pollLive, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pollLive(); });
