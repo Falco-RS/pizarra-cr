@@ -106,7 +106,7 @@ function statusLine(m) {
   if (m.s === 'Awarded') return 'Por reglamento';
   if (MESA[m.id]) return 'Final · ganado en la mesa';
   if (played(m)) return 'Final';
-  return `${fmtDay(m.d)} · ${fmtTime(m.d)}`;
+  return fmtTime(m.d);
 }
 function renderBoard() {
   const list = M.filter(m => m.r === S.j);
@@ -258,7 +258,7 @@ function renderDetail() {
         <div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`;
     }).join('');
     const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
-    extra = `<div class="dcols"><div><h3>Estadísticas</h3>${bars}</div>
+    extra = `<div class="dcols"><div><h3>Estadísticas</h3>${bars || `<p class="hint">${lv ? 'La API todavía no publica estadísticas de este partido. Si las publica, aparecen aquí solas.' : 'Sin estadísticas para este partido.'}</p>`}</div>
       ${det.lineups ? `<div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div>` : ''}</div>`;
   } else if (!lv) {
     extra = `<p class="hint" style="margin-top:14px">Las estadísticas y alineaciones de este partido se completan en las próximas actualizaciones.</p>`;
