@@ -9,6 +9,15 @@
           "value": "public, max-age=0, s-maxage=300, stale-while-revalidate=600"
         }
       ]
+    },
+    {
+      "source": "/data/alineaciones.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, s-maxage=20, stale-while-revalidate=20"
+        }
+      ]
     }
   ],
   "rewrites": [

@@ -172,10 +172,10 @@ function renderPrevia(m, box) {
     PREVIA[m.id] = null;
     fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.sel === m.id) renderDetail(); });
   }
-  const off_ = P && P.lineups;
-  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : lastLineup(tid);
+  const OL = (P && P.lineups) || MANUAL[m.id], off_ = !!OL;
+  const side = (tid, key) => off_ ? { formation: OL[key].formation, rows: OL[key].rows } : lastLineup(tid);
   const H = side(m.h, 'home'), A = side(m.a, 'away');
-  const lineNote = off_ ? '<span class="chip ok">Alineación oficial</span>'
+  const lineNote = off_ ? `<span class="chip ok">Alineación oficial</span>${!(P && P.lineups) ? ' publicada por los clubes' : ''}`
     : `<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale entre 30 y 60 min antes del pitazo.`;
 
   const rows = tableRows('total'), pos = t => rows.findIndex(r => r.t === t) + 1, row = t => rows.find(r => r.t === t);
@@ -445,10 +445,10 @@ function intlDetailHtml(m) {
   // previa
   const P = PREVIA[m.id];
   if (P === undefined) { PREVIA[m.id] = null; fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.view === 'copa' && S.cid === m.id) renderView(); }); }
-  const off_ = P && P.lineups;
+  const OL = (P && P.lineups) || MANUAL[m.id], off_ = !!OL;
   const F = D.form || {};
   // Oficial si ya salió; si no, la última alineación del equipo (de cualquier torneo); para ticos, también la de la liga
-  const side = (tid, key) => off_ ? { formation: P.lineups[key].formation, rows: P.lineups[key].rows } : (F[tid]?.lineup || (TICOS.has(tid) ? lastLineup(tid) : null));
+  const side = (tid, key) => off_ ? { formation: OL[key].formation, rows: OL[key].rows } : (F[tid]?.lineup || (TICOS.has(tid) ? lastLineup(tid) : null));
   const HL = side(m.hId, 'home'), AL = side(m.aId, 'away');
   const pr = P && P.predictions?.prematch?.length ? P.predictions.prematch[P.predictions.prematch.length - 1].probabilities : null;
   const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
@@ -774,6 +774,10 @@ pollLive(); setInterval(pollLive, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pollLive(); });
 }
 let LIVE = [];
-fetch('/data/season.json', { cache: 'no-cache' }).then(r => r.json()).then(start).catch(() => {
+/* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
+let MANUAL = {};
+const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
+setInterval(() => loadManual(), 60000);
+loadManual().then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
