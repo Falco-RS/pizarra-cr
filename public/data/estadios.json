@@ -1,0 +1,15 @@
+{
+  "_nota": "Estadio de cada equipo cuando juega de local (la API no lo trae). La clave es el nombre del equipo local tal como sale en la página. Se edita a mano si un equipo cambia de estadio.",
+  "Olimpia": "Estadio Nacional Chelato Uclés, Tegucigalpa",
+  "Alajuelense": "Estadio Alejandro Morera Soto, Alajuela",
+  "Saprissa": "Estadio Ricardo Saprissa, Tibás",
+  "Alianza": "Estadio Jorge \"Mágico\" González, San Salvador",
+  "Cartaginés": "Estadio José Rafael \"Fello\" Meza, Cartago",
+  "Herediano": "Estadio Carlos Alvarado, Santa Bárbara de Heredia",
+  "Sporting": "Estadio Ernesto Rohrmoser, Pavas",
+  "San Carlos": "Estadio Carlos Ugalde Álvarez, Ciudad Quesada",
+  "Inter San Carlos": "Estadio Carlos Ugalde Álvarez, Ciudad Quesada",
+  "Puntarenas": "Estadio Lito Pérez, Puntarenas",
+  "Pérez Zeledón": "Estadio Municipal de Pérez Zeledón, San Isidro",
+  "Escorpiones Belén": "Estadio Rafael Bolaños"
+}

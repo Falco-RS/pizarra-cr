@@ -9,6 +9,9 @@ const played = m => m.hs !== undefined;
 /* Resultados que cambió el tribunal: el marcador de cancha se muestra, la tabla usa el oficial */
 const MESA = D.mesa || {};
 const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
+/* Estadio del equipo local, con enlace al mapa */
+const venueOf = m => ESTADIOS[T[m.h]?.name] || '';
+const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">📍 ${esc(v)}</a>` : '';
 const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
 const rounds = [...new Set(M.map(m => m.r))].sort((a,b) => a-b);
 const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
@@ -209,7 +212,7 @@ function renderPrevia(m, box) {
       <div><div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div></div>
       <div class="dteam">${crest(m.a)}<span>${esc(T[m.a].name)}</span></div>
     </div>
-    <div class="dmeta">Previa · ${esc(fmtDay(m.d))} · Jornada ${m.r}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>
+    <div class="dmeta">Previa · ${esc(fmtDay(m.d))} · Jornada ${m.r}${venueHtml(venueOf(m) || (P && P.venue?.name) || '')}</div>
     ${prob}
     <div class="pv">
       <section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${lineNote}</p>
@@ -269,7 +272,7 @@ function renderDetail() {
       <div><div class="dnum">${m.hs} – ${m.as}</div></div>
       <div class="dteam">${crest(m.a)}<span>${esc(T[m.a].name)}</span></div>
     </div>
-    <div class="dmeta">${esc(statusLine(m))} · ${esc(fmtDay(m.d))}, ${esc(fmtTime(m.d))} · Jornada ${m.r}</div>
+    <div class="dmeta">${esc(statusLine(m))} · ${esc(fmtDay(m.d))}, ${esc(fmtTime(m.d))} · Jornada ${m.r}${venueHtml(venueOf(m))}</div>
     ${MESA[m.id] ? `<p class="hint" style="margin:12px auto 0;max-width:620px;text-align:center">${esc(MESA[m.id].note)}</p>` : ''}
     <div class="dcols"><div><h3>Minuto a minuto</h3>
       ${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Sin eventos registrados.</p>'}
@@ -438,7 +441,7 @@ function intlDetailHtml(m) {
     const sts = m.stats && m.stats.length === 2 ? m.stats : null, hi = sts && sts[0].t === m.hId ? 0 : 1;
     const bars = sts ? STATS.map(([k, lab, f = v => v]) => { const h = sts[hi].s[k], a = sts[1 - hi].s[k]; if (h === undefined || h === null) return ''; const tot = (h + a) || 1;
       return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div><div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`; }).join('') : '';
-    return `<div class="detail cd">${head(`<div class="dnum">${m.hs} – ${m.as}</div>`)}<div class="dmeta">Final · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : ''}</div>
+    return `<div class="detail cd">${head(`<div class="dnum">${m.hs} – ${m.as}</div>`)}<div class="dmeta">Final · ${esc(roundName)} · ${esc(fmtDay(m.d))}${venueHtml(m.venue || '')}</div>
       ${m.ev ? `<div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Sin goles, tarjetas ni cambios registrados.</p>'}</div>
       ${bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : ''}</div>` : '<p class="hint" style="margin-top:12px">El minuto a minuto de este partido se carga en unos minutos.</p>'}</div>`;
   }
@@ -474,7 +477,7 @@ function intlDetailHtml(m) {
   const cfSeg = `<div class="seg" role="group" aria-label="Últimos resultados">${[['copa', 'Copa'], ['liga', 'Liga local']].map(([k, l]) => `<button type="button" data-cf="${k}" aria-pressed="${(S.cf || 'copa') === k}">${l}</button>`).join('')}</div>`;
   const luFrom = L => L && L.vs ? `vs ${esc(clean(L.vs))}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
-    <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${m.venue ? ' · ' + esc(m.venue) : P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
+    <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${venueHtml(m.venue || (P && P.venue?.name) || '')}</div>${prob}
     <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
       <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div>
@@ -775,7 +778,8 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {};
+let MANUAL = {}, ESTADIOS = {};
+fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
 loadManual().then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {

@@ -191,7 +191,7 @@ async function main() {
 
   // Estadios que se ponen a mano (la API no los trae para estos torneos)
   let estadios = {};
-  try { estadios = JSON.parse(await fs.readFile('data/estadios.json', 'utf8')); } catch { /* sin archivo */ }
+  try { estadios = JSON.parse(await fs.readFile('public/data/estadios.json', 'utf8')); } catch { /* sin archivo */ }
   const plain = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   for (const m of intl) {
     const k = Object.keys(estadios).find(k => k !== '_nota' && [m.h.name, m.h.full].some(n => plain(n).includes(plain(k))));
