@@ -174,7 +174,7 @@ function xiListHtml(name, L) {
   if (!L?.list) return '';
   return `<div class="xil"><p class="lead"><b>${esc(name)}</b> · XI inicial confirmado${L.fuente ? ` <span class="x">(${esc(L.fuente)})</span>` : ''}</p>
     <ol>${L.list.map(p => `<li><b>${esc(p.n ?? '')}</b>${esc(p.name)}${p.c ? ' <span class="chip">C</span>' : ''}</li>`).join('')}</ol>
-    ${L.subs?.length ? `<p class="foot">Suplentes: ${L.subs.map(p => `${p.n} ${esc(p.name)}`).join(' · ')}</p>` : ''}${L.dt ? `<p class="foot">DT: ${esc(L.dt)}</p>` : ''}</div>`;
+    ${L.subs?.length ? `<p class="foot">Suplentes: ${L.subs.map(p => `${p.n ?? ''} ${esc(p.name)}`.trim()).join(' · ')}</p>` : ''}${L.aprox ? '<p class="foot">En la cancha, cada jugador va en su posición habitual; el club no publicó el dibujo exacto.</p>' : ''}${L.dt ? `<p class="foot">DT: ${esc(L.dt)}</p>` : ''}</div>`;
 }
 function renderPrevia(m, box) {
   const P = PREVIA[m.id];

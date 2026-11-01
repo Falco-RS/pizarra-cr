@@ -1,20 +1,304 @@
 {
-  "1320510249": {
-    "away": {
-      "fuente": "redes de Herediano",
-      "list": [
-        {"n": 1, "name": "D. Carvajal"}, {"n": 5, "name": "H. Quirós"}, {"n": 8, "name": "A. Cruz"},
-        {"n": 10, "name": "E. Aguilar", "c": true}, {"n": 16, "name": "D. Araya"}, {"n": 21, "name": "E. Rubio"},
-        {"n": 22, "name": "A. Murillo"}, {"n": 24, "name": "S. Rodríguez"}, {"n": 38, "name": "G. Montes"},
-        {"n": 42, "name": "D. González"}, {"n": 99, "name": "K. Brown"}
-      ],
-      "subs": [
-        {"n": 31, "name": "A. Lezcano"}, {"n": 11, "name": "R. Araya"}, {"n": 26, "name": "E. Juárez"},
-        {"n": 25, "name": "E. Bravo"}, {"n": 27, "name": "A. Suárez"}, {"n": 34, "name": "J. Henestrosa"},
-        {"n": 37, "name": "K. Fuller"}, {"n": 45, "name": "N. Bennette"}, {"n": 55, "name": "Y. Román"},
-        {"n": 97, "name": "R. Leal"}
-      ],
-      "dt": "Jafet Soto Molina"
+ "1320510249": {
+  "away": {
+   "fuente": "redes de Herediano",
+   "list": [
+    {
+     "n": 1,
+     "name": "D. Carvajal"
+    },
+    {
+     "n": 5,
+     "name": "H. Quirós"
+    },
+    {
+     "n": 8,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 10,
+     "name": "E. Aguilar",
+     "c": true
+    },
+    {
+     "n": 16,
+     "name": "D. Araya"
+    },
+    {
+     "n": 21,
+     "name": "E. Rubio"
+    },
+    {
+     "n": 22,
+     "name": "A. Murillo"
+    },
+    {
+     "n": 24,
+     "name": "S. Rodríguez"
+    },
+    {
+     "n": 38,
+     "name": "G. Montes"
+    },
+    {
+     "n": 42,
+     "name": "D. González"
+    },
+    {
+     "n": 99,
+     "name": "K. Brown"
     }
+   ],
+   "subs": [
+    {
+     "n": 31,
+     "name": "A. Lezcano"
+    },
+    {
+     "n": 11,
+     "name": "R. Araya"
+    },
+    {
+     "n": 26,
+     "name": "E. Juárez"
+    },
+    {
+     "n": 25,
+     "name": "E. Bravo"
+    },
+    {
+     "n": 27,
+     "name": "A. Suárez"
+    },
+    {
+     "n": 34,
+     "name": "J. Henestrosa"
+    },
+    {
+     "n": 37,
+     "name": "K. Fuller"
+    },
+    {
+     "n": 45,
+     "name": "N. Bennette"
+    },
+    {
+     "n": 55,
+     "name": "Y. Román"
+    },
+    {
+     "n": 97,
+     "name": "R. Leal"
+    }
+   ],
+   "dt": "Jafet Soto Molina",
+   "formation": "5-4-1",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "D. Carvajal"
+     }
+    ],
+    [
+     {
+      "n": 21,
+      "name": "E. Rubio"
+     },
+     {
+      "n": 5,
+      "name": "H. Quirós"
+     },
+     {
+      "n": 38,
+      "name": "G. Montes"
+     },
+     {
+      "n": 99,
+      "name": "K. Brown"
+     },
+     {
+      "n": 16,
+      "name": "D. Araya"
+     }
+    ],
+    [
+     {
+      "n": 22,
+      "name": "A. Murillo"
+     },
+     {
+      "n": 8,
+      "name": "A. Cruz"
+     },
+     {
+      "n": 24,
+      "name": "S. Rodríguez"
+     },
+     {
+      "n": 42,
+      "name": "D. González"
+     }
+    ],
+    [
+     {
+      "n": 10,
+      "name": "E. Aguilar",
+      "c": true
+     }
+    ]
+   ],
+   "aprox": true
+  },
+  "home": {
+   "fuente": "redes de Sporting",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "L. Moreira"
+     }
+    ],
+    [
+     {
+      "n": 35,
+      "name": "J. C. Batista"
+     },
+     {
+      "n": 3,
+      "name": "K. Espinoza"
+     },
+     {
+      "n": 5,
+      "name": "A. Soto"
+     },
+     {
+      "n": 27,
+      "name": "A. Chévez"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "C. Pineda"
+     },
+     {
+      "n": 10,
+      "name": "A. López"
+     }
+    ],
+    [
+     {
+      "n": 28,
+      "name": "J. Navarro"
+     },
+     {
+      "n": 6,
+      "name": "G. Leiva"
+     },
+     {
+      "n": 7,
+      "name": "J. M. Pinto"
+     }
+    ],
+    [
+     {
+      "n": 9,
+      "name": "M. George"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "L. Moreira"
+    },
+    {
+     "n": 35,
+     "name": "J. C. Batista"
+    },
+    {
+     "n": 3,
+     "name": "K. Espinoza"
+    },
+    {
+     "n": 5,
+     "name": "A. Soto"
+    },
+    {
+     "n": 27,
+     "name": "A. Chévez"
+    },
+    {
+     "n": 8,
+     "name": "C. Pineda"
+    },
+    {
+     "n": 10,
+     "name": "A. López"
+    },
+    {
+     "n": 28,
+     "name": "J. Navarro"
+    },
+    {
+     "n": 6,
+     "name": "G. Leiva"
+    },
+    {
+     "n": 7,
+     "name": "J. M. Pinto"
+    },
+    {
+     "n": 9,
+     "name": "M. George"
+    }
+   ],
+   "subs": [
+    {
+     "n": "",
+     "name": "Rodiney Leal"
+    },
+    {
+     "n": "",
+     "name": "Delfín Salas"
+    },
+    {
+     "n": "",
+     "name": "Ignacio Gómez"
+    },
+    {
+     "n": "",
+     "name": "Jeremy Hernández"
+    },
+    {
+     "n": "",
+     "name": "Marco Ureña"
+    },
+    {
+     "n": "",
+     "name": "Eduardo Pastrana"
+    },
+    {
+     "n": "",
+     "name": "Daniel Colindres"
+    },
+    {
+     "n": "",
+     "name": "Randy Ramírez"
+    },
+    {
+     "n": "",
+     "name": "Josimar Méndez"
+    },
+    {
+     "n": "",
+     "name": "Renzo Carballo"
+    }
+   ],
+   "dt": "Andrés Carevic"
   }
+ }
 }
