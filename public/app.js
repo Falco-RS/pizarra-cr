@@ -166,8 +166,15 @@ function pitchHtml(home, away) {
   }).join('');
   return `<div class="pitch" role="img" aria-label="Alineaciones en la cancha">
     <div class="ln out"></div><div class="ln mid"></div><div class="ln circle"></div><div class="ln box1"></div><div class="ln box2"></div>
-    ${home ? place('h', home.rows, true) : '<p class="pempty top">Sin alineación disponible</p>'}
-    ${away ? place('a', away.rows, false) : '<p class="pempty bot">Sin alineación disponible</p>'}</div>`;
+    ${home?.rows ? place('h', home.rows, true) : `<p class="pempty top">${home?.list ? 'XI inicial confirmado abajo' : 'Sin alineación disponible'}</p>`}
+    ${away?.rows ? place('a', away.rows, false) : `<p class="pempty bot">${away?.list ? 'XI inicial confirmado abajo' : 'Sin alineación disponible'}</p>`}</div>`;
+}
+/* XI publicado por el club como lista (sin posiciones) */
+function xiListHtml(name, L) {
+  if (!L?.list) return '';
+  return `<div class="xil"><p class="lead"><b>${esc(name)}</b> · XI inicial confirmado${L.fuente ? ` <span class="x">(${esc(L.fuente)})</span>` : ''}</p>
+    <ol>${L.list.map(p => `<li><b>${esc(p.n ?? '')}</b>${esc(p.name)}${p.c ? ' <span class="chip">C</span>' : ''}</li>`).join('')}</ol>
+    ${L.subs?.length ? `<p class="foot">Suplentes: ${L.subs.map(p => `${p.n} ${esc(p.name)}`).join(' · ')}</p>` : ''}${L.dt ? `<p class="foot">DT: ${esc(L.dt)}</p>` : ''}</div>`;
 }
 function renderPrevia(m, box) {
   const P = PREVIA[m.id];
@@ -175,10 +182,12 @@ function renderPrevia(m, box) {
     PREVIA[m.id] = null;
     fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.sel === m.id) renderDetail(); });
   }
-  const OL = (P && P.lineups) || MANUAL[m.id], off_ = !!OL;
-  const side = (tid, key) => off_ ? { formation: OL[key].formation, rows: OL[key].rows } : lastLineup(tid);
+  const OLs = key => (P && P.lineups && P.lineups[key]) || (MANUAL[m.id] || {})[key] || null;
+  const off_ = !!(OLs('home') || OLs('away'));
+  const side = (tid, key) => OLs(key) ? OLs(key) : lastLineup(tid);
   const H = side(m.h, 'home'), A = side(m.a, 'away');
-  const lineNote = off_ ? `<span class="chip ok">Alineación oficial</span>${!(P && P.lineups) ? ' publicada por los clubes' : ''}`
+  const lineNote = off_ && !(OLs('home') && OLs('away')) ? `<span class="chip ok">Oficial</span> ${esc(T[OLs('home') ? m.h : m.a].name)} (publicada por el club) · <span class="chip">Probable</span> ${esc(T[OLs('home') ? m.a : m.h].name)}, la última que usó`
+    : off_ ? `<span class="chip ok">Alineación oficial</span>${!(P && P.lineups) ? ' publicada por los clubes' : ''}`
     : `<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale entre 30 y 60 min antes del pitazo.`;
 
   const rows = tableRows('total'), pos = t => rows.findIndex(r => r.t === t) + 1, row = t => rows.find(r => r.t === t);
@@ -219,6 +228,7 @@ function renderPrevia(m, box) {
         <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(H?.formation || '')}</span></div>
         ${pitchHtml(H, A)}
         <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(A?.formation || '')}</span></div>
+        ${xiListHtml(T[m.h].name, H)}${xiListHtml(T[m.a].name, A)}
         ${!off_ && (H?.from || A?.from) ? `<p class="foot">Probable según su último partido con alineación registrada.</p>` : ''}
       </section>
       <div class="pv-data">

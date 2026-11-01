@@ -1,1 +1,20 @@
-{}
+{
+  "1320510249": {
+    "away": {
+      "fuente": "redes de Herediano",
+      "list": [
+        {"n": 1, "name": "D. Carvajal"}, {"n": 5, "name": "H. Quirós"}, {"n": 8, "name": "A. Cruz"},
+        {"n": 10, "name": "E. Aguilar", "c": true}, {"n": 16, "name": "D. Araya"}, {"n": 21, "name": "E. Rubio"},
+        {"n": 22, "name": "A. Murillo"}, {"n": 24, "name": "S. Rodríguez"}, {"n": 38, "name": "G. Montes"},
+        {"n": 42, "name": "D. González"}, {"n": 99, "name": "K. Brown"}
+      ],
+      "subs": [
+        {"n": 31, "name": "A. Lezcano"}, {"n": 11, "name": "R. Araya"}, {"n": 26, "name": "E. Juárez"},
+        {"n": 25, "name": "E. Bravo"}, {"n": 27, "name": "A. Suárez"}, {"n": 34, "name": "J. Henestrosa"},
+        {"n": 37, "name": "K. Fuller"}, {"n": 45, "name": "N. Bennette"}, {"n": 55, "name": "Y. Román"},
+        {"n": 97, "name": "R. Leal"}
+      ],
+      "dt": "Jafet Soto Molina"
+    }
+  }
+}
