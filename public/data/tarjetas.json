@@ -1,0 +1,7 @@
+{
+  "_nota": "Amarillas (o rojas) que la API no registró. Se agregan a mano según UNAFUT. r = jornada en que la recibió (si no se sabe, una jornada anterior a la última amarilla registrada). El nombre del jugador debe ser igual al que sale en la página.",
+  "extra": [
+    { "jugador": "A. Sinclair", "equipo": "Puntarenas", "r": 7, "fuente": "UNAFUT: 4 amarillas entre J1 y J7, la 5.ª en J8" },
+    { "jugador": "K. Brown", "equipo": "Herediano", "r": 13, "fuente": "UNAFUT: 5 amarillas al cierre de J14" }
+  ]
+}

@@ -23,10 +23,17 @@ try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disc
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
 
+/* Tarjetas que la API no registró, corregidas a mano con los datos oficiales de UNAFUT (public/data/tarjetas.json).
+   Solo cuentan para disciplina; no se muestran en el minuto a minuto. */
+const cardEv = m => {
+  const extra = (TARJETAS.extra || []).filter(x => x.r === m.r && (T[m.h].name === x.equipo || T[m.a].name === x.equipo))
+    .map(x => ['', x.tipo || 'yc', T[m.h].name === x.equipo ? 1 : 0, x.jugador]);
+  return extra.length ? [...(m.ev || []), ...extra] : (m.ev || []);
+};
 /* ---------- aggregates from events ---------- */
 const scorers = {}, yellows = {}, reds = [], teamCards = {};
 for (const m of M.filter(played)) {
-  for (const [time, type, isHome, player, subIn] of (m.ev || [])) {
+  for (const [time, type, isHome, player, subIn] of cardEv(m)) {
     const tid = isHome ? m.h : m.a, opp = isHome ? m.a : m.h;
     if (!player) continue;
     const key = player + '|' + tid;
@@ -49,7 +56,7 @@ const lastMatchOf = {}; M.filter(played).forEach(m => { lastMatchOf[m.h] = m; la
 const nextMatchOf = t => M.find(m => !played(m) && (m.h === t || m.a === t));
 const cycle = {}, suspensions = [];
 for (const m of M.filter(played)) {
-  for (const [time, type, isHome, player] of (m.ev || [])) {
+  for (const [time, type, isHome, player] of cardEv(m)) {
     if (!player || (type !== 'yc' && type !== 'rc')) continue;
     const tid = isHome ? m.h : m.a, key = player + '|' + tid;
     if (type === 'yc') {
@@ -789,10 +796,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {}, ESTADIOS = {};
+let MANUAL = {}, ESTADIOS = {}, TARJETAS = {};
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
