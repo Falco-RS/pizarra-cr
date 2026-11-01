@@ -171,6 +171,18 @@ function lastLineup(tid) {
   return null;
 }
 const surname = n => { const parts = String(n || '').split(' '); return /^[A-ZÁÉÍÓÚÑ]\.$/.test(parts[0]) ? parts.slice(1).join(' ') : String(n || ''); };
+/* Colores de cada equipo en la cancha (si los dos se parecen, la visita usa el azul de siempre) */
+const KIT = { 'Saprissa': ['#7B1E57', '#fff'], 'Alajuelense': ['#D7263D', '#fff'], 'Herediano': ['#F2C200', '#141A16'], 'Cartaginés': ['#1F3B8A', '#fff'],
+  'San Carlos': ['#1F3B8A', '#fff'], 'Puntarenas': ['#F37021', '#141A16'], 'Pérez Zeledón': ['#3D5FBF', '#fff'], 'Escorpiones Belén': ['#F5D300', '#141A16'],
+  'Inter San Carlos': ['#2E8B57', '#fff'], 'Sporting': ['#F4F6F2', '#141A16'] };
+function kitVars(hName, aName) {
+  const nn = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const find = n => Object.entries(KIT).find(([k]) => nn(n).includes(nn(k)))?.[1];
+  const h = find(hName) || ['#F4F6F2', '#141A16'];
+  let a = find(aName) || ['#2F62D8', '#fff'];
+  if (a[0] === h[0]) a = h[0] === '#2F62D8' ? ['#F4F6F2', '#141A16'] : ['#2F62D8', '#fff'];
+  return `--kh:${h[0]};--kht:${h[1]};--ka:${a[0]};--kat:${a[1]}`;
+}
 function pitchHtml(home, away) {
   const place = (side, rows, top) => rows.map((row, i) => {
     const t = rows.length === 1 ? 0.5 : i / (rows.length - 1), y = top ? 7 + t * 36 : 93 - t * 36;
@@ -236,7 +248,7 @@ function renderPrevia(m, box) {
     <div class="dmeta">Previa · ${esc(fmtDay(m.d))} · Jornada ${m.r}${venueHtml(venueOf(m) || (P && P.venue?.name) || '')}</div>
     ${prob}
     <div class="pv">
-      <section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${lineNote}</p>
+      <section class="pv-lu" style="${kitVars(T[m.h].name, T[m.a].name)}"><h3>Alineaciones</h3><p class="lead">${lineNote}</p>
         <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(H?.formation || '')}</span></div>
         ${pitchHtml(H, A)}
         <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(A?.formation || '')}</span></div>
@@ -288,7 +300,7 @@ function renderDetail() {
   const man = MANUAL[m.id];
   const lineBlock = det?.lineups?.h?.xi?.length
     ? `<div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div>`
-    : man ? `<div class="pv-lu"><h3>Alineaciones</h3>
+    : man ? `<div class="pv-lu" style="${kitVars(T[m.h].name, T[m.a].name)}"><h3>Alineaciones</h3>
         <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(man.home?.formation || '')}</span></div>
         ${pitchHtml(man.home, man.away)}
         <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(man.away?.formation || '')}</span></div>
@@ -508,7 +520,7 @@ function intlDetailHtml(m) {
   const luFrom = L => L && L.vs ? `vs ${esc(clean(L.vs))}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${venueHtml(m.venue || (P && P.venue?.name) || '')}</div>${prob}
-    <div class="pv"><section class="pv-lu"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
+    <div class="pv"><section class="pv-lu" style="${kitVars(H.name, A.name)}"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
       <div class="fbar"><span><i class="dot a"></i> ${esc(A.name)}</span><span class="f">${esc(AL?.formation || '')}</span></div>
       ${!off_ && (HL?.vs || AL?.vs) ? `<p class="foot">${HL?.vs ? `${esc(H.name)}: ${luFrom(HL)}. ` : ''}${AL?.vs ? `${esc(A.name)}: ${luFrom(AL)}.` : ''}</p>` : ''}</section>
@@ -716,7 +728,7 @@ function seleDetailHtml(m, CR, compName) {
     return `<li><span class="res ${r}">${({ W: 'G', D: 'E', L: 'P' })[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.a.name : x.h.name)}<span class="x">${gf}–${ga} · ${esc(fmtDay(x.d))}</span></li>`; };
   return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${meta}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
-    <div class="pv">${lu ? `<section class="pv-lu"><h3>Alineaciones</h3><p class="lead"><span class="chip ok">Alineación oficial</span></p>
+    <div class="pv">${lu ? `<section class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><p class="lead"><span class="chip ok">Alineación oficial</span></p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(lu.home.formation || '')}</span></div>${pitchHtml(lu.home, lu.away)}
       <div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(lu.away.formation || '')}</span></div></section>`
       : `<section class="pv-lu"><h3>Alineaciones</h3><p class="hint">La alineación oficial aparece aquí cerca del pitazo.</p></section>`}
