@@ -1,0 +1,7 @@
+{
+  "_nota": "Nombres que la API dejó vacíos en el minuto a minuto. Clave: id del partido. t = minuto como sale en la página, tipo = goal, pen, og, yc, rc.",
+  "1320507696": [
+    { "t": "86", "tipo": "goal", "jugador": "D. López" },
+    { "t": "90+1", "tipo": "rc", "jugador": "J. Gaete" }
+  ]
+}

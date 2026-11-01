@@ -12,6 +12,11 @@ const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
 /* Estadio del equipo local, con enlace al mapa */
 const venueOf = m => ESTADIOS[T[m.h]?.name] || '';
 const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">📍 ${esc(v)}</a>` : '';
+/* Nombres que la API dejó vacíos en el minuto a minuto, completados a mano (public/data/eventos.json) */
+for (const m of D.matches) for (const fx of (EVENTOS[m.id] || [])) {
+  const e = (m.ev || []).find(e => String(e[0]) === String(fx.t) && e[1] === fx.tipo && !e[3]);
+  if (e) e[3] = fx.jugador;
+}
 const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
 const rounds = [...new Set(M.map(m => m.r))].sort((a,b) => a-b);
 const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
@@ -270,20 +275,27 @@ function renderDetail() {
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
   const det = lv && lv.stats && lv.stats.length === 2 ? { stats: lv.stats.map(t => t.s), statsTeams: lv.stats.map(t => t.t), lineups: null } : D.detail[String(m.id)];
   let extra = '';
-  if (det) {
-    const hi = det.statsTeams[0] === m.h ? 0 : 1, ai = 1 - hi;
-    const bars = STATS.map(([k, lab, f = v => v]) => {
-      const h = det.stats[hi][k], a = det.stats[ai][k]; if (h === undefined) return '';
+  const bars = det && det.stats && det.stats.length === 2 ? (() => { const hi = det.statsTeams[0] === m.h ? 0 : 1, ai = 1 - hi;
+    return STATS.map(([k, lab, f = v => v]) => {
+      const h = det.stats[hi][k], a = det.stats[ai][k]; if (h === undefined || h === null) return '';
       const tot = (h + a) || 1;
       return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div>
         <div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`;
-    }).join('');
-    const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
-    extra = `<div class="dcols"><div><h3>Estadísticas</h3>${bars || `<p class="hint">${lv ? 'La API todavía no publica estadísticas de este partido. Si las publica, aparecen aquí solas.' : 'Sin estadísticas para este partido.'}</p>`}</div>
-      ${det.lineups ? `<div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div>` : ''}</div>`;
-  } else if (!lv) {
-    extra = `<p class="hint" style="margin-top:14px">Las estadísticas y alineaciones de este partido se completan en las próximas actualizaciones.</p>`;
-  }
+    }).join(''); })() : '';
+  const statsBlock = bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : lv ? `<div><h3>Estadísticas</h3><p class="hint">La API todavía no publica estadísticas de este partido. Si las publica, aparecen aquí solas.</p></div>` : '';
+  // Alineaciones: las de la API si las trae; si no, las publicadas por los clubes (cargadas a mano)
+  const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
+  const man = MANUAL[m.id];
+  const lineBlock = det?.lineups?.h?.xi?.length
+    ? `<div><h3>Alineaciones</h3><div class="lu"><div><p class="lead">${esc(T[m.h].name)} · ${esc(det.lineups.h.f)}</p>${xi(det.lineups.h)}</div><div><p class="lead">${esc(T[m.a].name)} · ${esc(det.lineups.a.f)}</p>${xi(det.lineups.a)}</div></div></div>`
+    : man ? `<div class="pv-lu"><h3>Alineaciones</h3>
+        <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(man.home?.formation || '')}</span></div>
+        ${pitchHtml(man.home, man.away)}
+        <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(man.away?.formation || '')}</span></div>
+        ${man.home?.dt || man.away?.dt ? `<div class="dts">${man.home?.dt ? `<span><i class="dot h"></i> DT ${esc(man.home.dt)}</span>` : ''}${man.away?.dt ? `<span><i class="dot a"></i> DT ${esc(man.away.dt)}</span>` : ''}</div>` : ''}</div>`
+    : '';
+  if (statsBlock || lineBlock) extra = `<div class="dcols">${lineBlock}${statsBlock}</div>`;
+  else if (!det && !lv) extra = `<p class="hint" style="margin-top:14px">Las estadísticas y alineaciones de este partido se completan en las próximas actualizaciones.</p>`;
   box.innerHTML = `<div class="detail">
     <div class="dscore">
       <div class="dteam r"><span>${esc(T[m.h].name)}</span>${crest(m.h)}</div>
@@ -796,10 +808,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {}, ESTADIOS = {}, TARJETAS = {};
+let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {};
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
