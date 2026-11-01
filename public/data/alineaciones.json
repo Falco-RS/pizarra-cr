@@ -603,5 +603,305 @@
    ],
    "dt": "Walter Centeno"
   }
+ },
+ "1320509398": {
+  "home": {
+   "fuente": "redes de Saprissa",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 40,
+      "name": "A. Madriz"
+     }
+    ],
+    [
+     {
+      "n": 17,
+      "name": "G. Taylor"
+     },
+     {
+      "n": 5,
+      "name": "J. Mora"
+     },
+     {
+      "n": 21,
+      "name": "F. Escobar"
+     },
+     {
+      "n": 15,
+      "name": "D. Sequeira"
+     }
+    ],
+    [
+     {
+      "n": 39,
+      "name": "A. Barahona"
+     },
+     {
+      "n": 20,
+      "name": "M. Torres"
+     },
+     {
+      "n": 26,
+      "name": "A. Soto"
+     }
+    ],
+    [
+     {
+      "n": 23,
+      "name": "L. Paradela"
+     },
+     {
+      "n": 19,
+      "name": "K. Arboine"
+     },
+     {
+      "n": 7,
+      "name": "N. Williams"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 40,
+     "name": "A. Madriz"
+    },
+    {
+     "n": 17,
+     "name": "G. Taylor"
+    },
+    {
+     "n": 5,
+     "name": "J. Mora"
+    },
+    {
+     "n": 21,
+     "name": "F. Escobar"
+    },
+    {
+     "n": 15,
+     "name": "D. Sequeira"
+    },
+    {
+     "n": 39,
+     "name": "A. Barahona"
+    },
+    {
+     "n": 20,
+     "name": "M. Torres"
+    },
+    {
+     "n": 26,
+     "name": "A. Soto"
+    },
+    {
+     "n": 23,
+     "name": "L. Paradela"
+    },
+    {
+     "n": 19,
+     "name": "K. Arboine"
+    },
+    {
+     "n": 7,
+     "name": "N. Williams"
+    }
+   ],
+   "subs": [
+    {
+     "n": "",
+     "name": "M. Álvarez"
+    },
+    {
+     "n": "",
+     "name": "J. Azofeifa"
+    },
+    {
+     "n": "",
+     "name": "J. González"
+    },
+    {
+     "n": "",
+     "name": "D. Guzmán"
+    },
+    {
+     "n": "",
+     "name": "S. Taylor"
+    },
+    {
+     "n": "",
+     "name": "M. Elizondo"
+    },
+    {
+     "n": "",
+     "name": "D. Woodly"
+    },
+    {
+     "n": "",
+     "name": "B. Hernández"
+    },
+    {
+     "n": "",
+     "name": "A. González"
+    },
+    {
+     "n": "",
+     "name": "A. Rodríguez"
+    }
+   ]
+  },
+  "away": {
+   "fuente": "redes de Alajuelense",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "W. Ortega"
+     }
+    ],
+    [
+     {
+      "n": 42,
+      "name": "J. P. Ruiz"
+     },
+     {
+      "n": 3,
+      "name": "G. González",
+      "c": true
+     },
+     {
+      "n": 13,
+      "name": "A. Gamboa"
+     },
+     {
+      "n": 28,
+      "name": "Y. Sosa"
+     }
+    ],
+    [
+     {
+      "n": 34,
+      "name": "C. Pérez"
+     },
+     {
+      "n": 35,
+      "name": "R. Parkins"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "R. Wilson"
+     },
+     {
+      "n": 10,
+      "name": "J. P. Añor"
+     },
+     {
+      "n": 99,
+      "name": "K. Michel"
+     }
+    ],
+    [
+     {
+      "n": 18,
+      "name": "R. Cisneros"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "W. Ortega"
+    },
+    {
+     "n": 42,
+     "name": "J. P. Ruiz"
+    },
+    {
+     "n": 3,
+     "name": "G. González",
+     "c": true
+    },
+    {
+     "n": 13,
+     "name": "A. Gamboa"
+    },
+    {
+     "n": 28,
+     "name": "Y. Sosa"
+    },
+    {
+     "n": 34,
+     "name": "C. Pérez"
+    },
+    {
+     "n": 35,
+     "name": "R. Parkins"
+    },
+    {
+     "n": 14,
+     "name": "R. Wilson"
+    },
+    {
+     "n": 10,
+     "name": "J. P. Añor"
+    },
+    {
+     "n": 99,
+     "name": "K. Michel"
+    },
+    {
+     "n": 18,
+     "name": "R. Cisneros"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "Mora"
+    },
+    {
+     "n": 2,
+     "name": "Paz"
+    },
+    {
+     "n": 5,
+     "name": "Borges"
+    },
+    {
+     "n": 7,
+     "name": "Hernández"
+    },
+    {
+     "n": 9,
+     "name": "Zaldívar"
+    },
+    {
+     "n": 11,
+     "name": "Díaz"
+    },
+    {
+     "n": 21,
+     "name": "Molina"
+    },
+    {
+     "n": 24,
+     "name": "Salazar"
+    },
+    {
+     "n": 26,
+     "name": "Piñar"
+    },
+    {
+     "n": 39,
+     "name": "Cruz"
+    }
+   ]
+  }
  }
 }
