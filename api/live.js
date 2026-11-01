@@ -84,7 +84,9 @@ export default async function handler(req, res) {
     }
     // en juego: el intervalo normal; nada en juego todavía: 10 min; solo terminados esperando guardarse: 1 h
     const anyStarted = live.some(m => m.started && !m.finished);
-    const ttl = anyStarted ? liveTtl : live.some(m => !m.started) ? Math.max(liveTtl, 600) : 3600;
+    // Cerca del pitazo (15 min antes en adelante) se revisa igual de seguido que en vivo, para que el partido arranque a tiempo
+    const nearKickoff = live.some(m => !m.started && Date.now() > new Date(m.d).getTime() - 15 * 60e3);
+    const ttl = anyStarted || nearKickoff ? liveTtl : live.some(m => !m.started) ? Math.max(liveTtl, 600) : 3600;
     send({ updated: new Date().toISOString(), live }, ttl);
   } catch (e) {
     send({ error: e.message, live: [] }, 30);
