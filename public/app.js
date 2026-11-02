@@ -31,9 +31,18 @@ document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).
 /* Tarjetas que la API no registró, corregidas a mano con los datos oficiales de UNAFUT (public/data/tarjetas.json).
    Solo cuentan para disciplina; no se muestran en el minuto a minuto. */
 const cardEv = m => {
-  const extra = (TARJETAS.extra || []).filter(x => x.r === m.r && (T[m.h].name === x.equipo || T[m.a].name === x.equipo))
-    .map(x => ['', x.tipo || 'yc', T[m.h].name === x.equipo ? 1 : 0, x.jugador]);
-  return extra.length ? [...(m.ev || []), ...extra] : (m.ev || []);
+  const side = x => T[m.h].name === x.equipo ? 1 : T[m.a].name === x.equipo ? 0 : -1;
+  const extra = (TARJETAS.extra || []).filter(x => x.r === m.r && side(x) >= 0).map(x => ['', x.tipo || 'yc', side(x), x.jugador]);
+  let ev = [...(m.ev || []), ...extra];
+  // Doble amarilla en el mismo partido = expulsión: esas amarillas NO suman a la acumulación (cuenta la roja).
+  const n = {}; ev.forEach(e => { if (e[1] === 'yc' && e[3]) n[e[2] + '|' + e[3]] = (n[e[2] + '|' + e[3]] || 0) + 1; });
+  ev = ev.filter(e => !(e[1] === 'yc' && n[e[2] + '|' + e[3]] >= 2));
+  // Amarillas que la API puso de más (no están en el conteo oficial)
+  for (const q of (TARJETAS.quitar || []).filter(x => x.r === m.r && side(x) >= 0)) {
+    const i = ev.findIndex(e => e[1] === (q.tipo || 'yc') && e[3] === q.jugador && e[2] === side(q));
+    if (i >= 0) ev.splice(i, 1);
+  }
+  return ev;
 };
 /* ---------- aggregates from events ---------- */
 const scorers = {}, yellows = {}, reds = [], teamCards = {};
@@ -346,7 +355,7 @@ function scorersHtml(n) {
 }
 const cardRow = n => `<span class="cards" aria-label="${n} amarillas">${Array.from({length:n}, () => '<i class="ico yc"></i>').join('')}</span>`;
 function yellowsHtml(n) {
-  return `<ol class="list">${topYellow.slice(0, n).map(y => `<li>${crest(y.t)}<span class="nm"><b>${esc(y.name)}</b><span>${esc(T[y.t].name)} · última en J${y.last}${y.n >= YELLOW_LIMIT ? ' · ya cumplió suspensión' : ''}</span></span>${y.cycle === YELLOW_LIMIT - 1 ? '<span class="chip cap4">En capilla</span>' : ''}${cardRow(y.n)}<span class="big" style="font-size:22px;min-width:22px;text-align:right">${y.n}</span></li>`).join('')}</ol>`;
+  return `<ol class="list">${topYellow.slice(0, n).map(y => `<li>${crest(y.t)}<span class="nm"><b>${esc(y.name)}</b><span>${esc(T[y.t].name)} · última en J${y.last}${suspendedNext.some(x => x.name === y.name && x.t === y.t) ? ' · <b style="color:var(--red,#d33)">suspendido J' + (y.last + 1) + '</b>' : y.n >= YELLOW_LIMIT ? ' · ya cumplió suspensión' : ''}</span></span>${y.cycle === YELLOW_LIMIT - 1 ? '<span class="chip cap4">En capilla</span>' : ''}${cardRow(y.n)}<span class="big" style="font-size:22px;min-width:22px;text-align:right">${y.n}</span></li>`).join('')}</ol>`;
 }
 
 // El bloque de la jornada solo va en Inicio; en las otras pestañas queda solo la franja en vivo (si hay)

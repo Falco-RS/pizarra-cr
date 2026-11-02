@@ -1,7 +1,49 @@
 {
-  "_nota": "Amarillas (o rojas) que la API no registró. Se agregan a mano según UNAFUT. r = jornada en que la recibió (si no se sabe, una jornada anterior a la última amarilla registrada). El nombre del jugador debe ser igual al que sale en la página.",
+  "_nota": "Amarillas (o rojas) que la API no registró. Se agregan a mano según UNAFUT. r = jornada en que la recibió (si no se sabe, una jornada anterior a la última amarilla registrada). El nombre del jugador debe ser igual al que sale en la página. 'quitar' = amarillas que la API registró de más. Las dobles amarillas de un mismo partido no suman (cuentan como roja).",
   "extra": [
-    { "jugador": "A. Sinclair", "equipo": "Puntarenas", "r": 7, "fuente": "UNAFUT: 4 amarillas entre J1 y J7, la 5.ª en J8" },
-    { "jugador": "K. Brown", "equipo": "Herediano", "r": 13, "fuente": "UNAFUT: 5 amarillas al cierre de J14" }
+    {
+      "jugador": "A. Sinclair",
+      "equipo": "Puntarenas",
+      "r": 7,
+      "fuente": "UNAFUT: 4 amarillas entre J1 y J7, la 5.ª en J8"
+    },
+    {
+      "jugador": "K. Brown",
+      "equipo": "Herediano",
+      "r": 13,
+      "fuente": "UNAFUT: 5 amarillas al cierre de J14"
+    },
+    {
+      "jugador": "G. Gonzalez",
+      "equipo": "Alajuelense",
+      "r": 3,
+      "fuente": "UNAFUT: 6 amarillas al cierre de J14 (jornada aproximada)"
+    },
+    {
+      "jugador": "G. Gonzalez",
+      "equipo": "Alajuelense",
+      "r": 6,
+      "fuente": "UNAFUT: 6 amarillas al cierre de J14 (jornada aproximada)"
+    },
+    {
+      "jugador": "G. Gonzalez",
+      "equipo": "Alajuelense",
+      "r": 9,
+      "fuente": "UNAFUT: 6 amarillas al cierre de J14 (jornada aproximada)"
+    },
+    {
+      "jugador": "W. Cortes",
+      "equipo": "Puntarenas",
+      "r": 14,
+      "fuente": "UNAFUT: 5 amarillas; la API registró una amarilla sin nombre de Puntarenas al 89' en J14"
+    }
+  ],
+  "quitar": [
+    {
+      "jugador": "A. Soto",
+      "equipo": "Sporting",
+      "r": 3,
+      "fuente": "UNAFUT: 4 amarillas, la API tiene 5 (jornada aproximada)"
+    }
   ]
 }
