@@ -10,7 +10,7 @@ const played = m => m.hs !== undefined;
 const MESA = D.mesa || {};
 const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
 /* Estadio del equipo local, con enlace al mapa */
-const venueOf = m => ESTADIOS[T[m.h]?.name] || '';
+const venueOf = m => (ESTADIOS.partidos || {})[m.id] || ESTADIOS[T[m.h]?.name] || '';
 const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">📍 ${esc(v)}</a>` : '';
 /* Nombres que la API dejó vacíos en el minuto a minuto, completados a mano (public/data/eventos.json) */
 for (const m of D.matches) for (const fx of (EVENTOS[m.id] || [])) {
@@ -163,9 +163,12 @@ function rowsFrom(formation, xi) {
 }
 // La última alineación conocida de un equipo (la "probable" mientras no sale la oficial)
 function lastLineup(tid) {
-  const ms = M.filter(x => played(x) && (x.h === tid || x.a === tid) && D.detail[String(x.id)]?.lineups).reverse();
+  // Última alineación conocida del equipo: la de la API o la publicada por el club (cargada a mano), la más reciente
+  const ms = M.filter(x => played(x) && (x.h === tid || x.a === tid)).reverse();
   for (const x of ms) {
-    const L = D.detail[String(x.id)].lineups[x.h === tid ? 'h' : 'a'];
+    const man = MANUAL[x.id]?.[x.h === tid ? 'home' : 'away'];
+    if (man?.rows) return { formation: man.formation, rows: man.rows, from: x };
+    const L = D.detail[String(x.id)]?.lineups?.[x.h === tid ? 'h' : 'a'];
     if (L && L.xi && L.xi.length) return { formation: L.f, rows: rowsFrom(L.f, L.xi), from: x };
   }
   return null;
@@ -183,10 +186,12 @@ function kitVars(hName, aName) {
   if (a[0] === h[0]) a = h[0] === '#2F62D8' ? ['#F4F6F2', '#141A16'] : ['#2F62D8', '#fff'];
   return `--kh:${h[0]};--kht:${h[1]};--ka:${a[0]};--kat:${a[1]}`;
 }
-function pitchHtml(home, away) {
+const pkey = n => { const w = String(n || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\./g, '').split(/\s+/).filter(Boolean); return w.length ? w[0][0] + ' ' + w[w.length - 1] : ''; };
+function pitchHtml(home, away, susp = {}) {
+  const isS = (side, n) => (susp[side] || []).some(x => pkey(x) === pkey(n));
   const place = (side, rows, top) => rows.map((row, i) => {
     const t = rows.length === 1 ? 0.5 : i / (rows.length - 1), y = top ? 7 + t * 36 : 93 - t * 36;
-    return row.map((p, j) => `<div class="pl ${side}" style="left:${(j + 1) / (row.length + 1) * 100}%;top:${y}%;width:${row.length >= 5 ? 18 : 22}%"><b>${esc(p.n ?? '')}</b><span>${esc(surname(p.name))}</span></div>`).join('');
+    return row.map((p, j) => `<div class="pl ${side}${isS(side, p.name) ? ' susp' : ''}" style="left:${(j + 1) / (row.length + 1) * 100}%;top:${y}%;width:${row.length >= 5 ? 18 : 22}%"${isS(side, p.name) ? ' title="Suspendido para este partido"' : ''}><b>${esc(p.n ?? '')}</b><span>${esc(surname(p.name))}</span></div>`).join('');
   }).join('');
   return `<div class="pitch" role="img" aria-label="Alineaciones en la cancha">
     <div class="ln out"></div><div class="ln mid"></div><div class="ln circle"></div><div class="ln box1"></div><div class="ln box2"></div>
@@ -210,6 +215,8 @@ function renderPrevia(m, box) {
   const off_ = !!(OLs('home') || OLs('away'));
   const side = (tid, key) => OLs(key) ? OLs(key) : lastLineup(tid);
   const H = side(m.h, 'home'), A = side(m.a, 'away');
+  const suspOf = t => nextMatchOf(t)?.id === m.id ? suspendedNext.filter(x => x.t === t).map(x => x.name) : [];
+  const SUSP = { h: suspOf(m.h), a: suspOf(m.a) };
   const lineNote = off_ && !(OLs('home') && OLs('away')) ? `<span class="chip ok">Oficial</span> ${esc(T[OLs('home') ? m.h : m.a].name)} (publicada por el club) · <span class="chip">Probable</span> ${esc(T[OLs('home') ? m.a : m.h].name)}, la última que usó`
     : off_ ? `<span class="chip ok">Alineación oficial</span>${!(P && P.lineups) ? ' publicada por los clubes' : ''}`
     : `<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale entre 30 y 60 min antes del pitazo.`;
@@ -250,8 +257,9 @@ function renderPrevia(m, box) {
     <div class="pv">
       <section class="pv-lu" style="${kitVars(T[m.h].name, T[m.a].name)}"><h3>Alineaciones</h3><p class="lead">${lineNote}</p>
         <div class="fbar"><span><i class="dot h"></i> ${esc(T[m.h].name)}</span><span class="f">${esc(H?.formation || '')}</span></div>
-        ${pitchHtml(H, A)}
+        ${pitchHtml(H, A, SUSP)}
         <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(A?.formation || '')}</span></div>
+        ${(!OLs('home') && SUSP.h.length && H) || (!OLs('away') && SUSP.a.length && A) ? '<p class="foot"><span style="color:var(--loss);font-weight:700">En rojo:</span> suspendido para este partido (no puede jugar).</p>' : ''}
         ${H?.dt || A?.dt ? `<div class="dts">${H?.dt ? `<span><i class="dot h"></i> DT ${esc(H.dt)}</span>` : ''}${A?.dt ? `<span><i class="dot a"></i> DT ${esc(A.dt)}</span>` : ''}</div>` : ''}
         ${xiListHtml(T[m.h].name, H)}${xiListHtml(T[m.a].name, A)}
         ${!off_ && (H?.from || A?.from) ? `<p class="foot">Probable según su último partido con alineación registrada.</p>` : ''}

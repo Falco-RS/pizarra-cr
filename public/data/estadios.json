@@ -11,5 +11,9 @@
   "Inter San Carlos": "Estadio Carlos Ugalde Álvarez, Ciudad Quesada",
   "Puntarenas": "Estadio Lito Pérez, Puntarenas",
   "Pérez Zeledón": "Estadio Municipal de Pérez Zeledón, San Isidro",
-  "Escorpiones Belén": "Estadio Rafael Bolaños"
+  "Escorpiones Belén": "Estadio Rafael Bolaños",
+  "partidos": {
+    "1360596604": "Estadio Ricardo Saprissa, Tibás"
+  },
+  "_nota_partidos": "'partidos': estadio de un partido puntual (id del partido) cuando se juega fuera de la casa habitual."
 }
