@@ -77,14 +77,21 @@ for (const m of M.filter(played)) {
       cycle[key] = (cycle[key] || 0) + 1;
       if (cycle[key] === YELLOW_LIMIT) { suspensions.push({ name: player, t: tid, after: m, why: '5 amarillas' }); cycle[key] = 0; }
     } else {
-      suspensions.push({ name: player, t: tid, after: m, why: 'Roja' });
+      const san = [...(TARJETAS.sanciones || []), ...(TARJETAS.extra || [])].find(x => x.partidos && x.jugador === player && x.r === m.r && x.equipo === T[tid].name);
+      suspensions.push({ name: player, t: tid, after: m, why: 'Roja', n: san ? san.partidos : 1 });
     }
   }
 }
 for (const y of Object.values(yellows)) y.cycle = cycle[y.name + '|' + y.t] || 0;
 /* suspendidos para el próximo partido de su equipo: la sanción salió de su último partido jugado */
-const suspendedNext = suspensions.filter(s => lastMatchOf[s.t] && lastMatchOf[s.t].id === s.after.id)
-  .map(s => ({ ...s, next: nextMatchOf(s.t) }));
+/* (sanciones de varios partidos: sigue suspendido mientras su equipo no haya jugado esa cantidad de partidos después) */
+const playedAfter = s => M.filter(m => played(m) && (m.h === s.t || m.a === s.t) && new Date(m.d) > new Date(s.after.d)).length;
+const suspendedNext = suspensions.filter(s => playedAfter(s) < (s.n || 1))
+  .map(s => {
+    const left = (s.n || 1) - playedAfter(s);
+    const nexts = M.filter(m => !played(m) && (m.h === s.t || m.a === s.t)).slice(0, left);
+    return { ...s, next: nexts[0], nexts, why: s.n > 1 ? `Roja · ${s.n} partidos` : s.why };
+  });
 const onFour = Object.values(yellows).filter(y => y.cycle === YELLOW_LIMIT - 1).sort((a,b) => a.name.localeCompare(b.name));
 reds.sort((a,b) => b.r - a.r);
 
@@ -404,7 +411,7 @@ function renderView() {
       <div class="wide">
         <section class="panel"><div class="ph2"><h2>Suspendidos para su próximo partido</h2></div>
           <p class="lead">5 amarillas en el torneo dan un partido de suspensión y el conteo vuelve a cero. La roja da al menos un partido; el tribunal puede dar más.</p>
-          ${suspendedNext.length ? `<ol class="list">${suspendedNext.map(s => `<li><span class="chip sus">${esc(s.why)}</span>${crest(s.t)}<span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)} · se pierde ${s.next ? `J${s.next.r} vs ${esc(T[s.next.h === s.t ? s.next.a : s.next.h].name)}` : 'el próximo partido'}</span></span></li>`).join('')}</ol>` : '<p class="hint">Nadie suspendido para la próxima jornada.</p>'}
+          ${suspendedNext.length ? `<ol class="list">${suspendedNext.map(s => `<li><span class="chip sus">${esc(s.why)}</span>${crest(s.t)}<span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)} · se pierde ${s.nexts && s.nexts.length ? s.nexts.map(n => `J${n.r} vs ${esc(T[n.h === s.t ? n.a : n.h].name)}`).join(' y ') : 'el próximo partido'}</span></span></li>`).join('')}</ol>` : '<p class="hint">Nadie suspendido para la próxima jornada.</p>'}
         </section>
         <section class="panel"><div class="ph2"><h2>En capilla</h2></div>
           <p class="lead">Con 4 amarillas en su conteo actual: una más y se pierden un partido.</p>

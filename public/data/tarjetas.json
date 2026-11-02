@@ -1,5 +1,5 @@
 {
-  "_nota": "Amarillas (o rojas) que la API no registró. Se agregan a mano según UNAFUT. r = jornada en que la recibió (si no se sabe, una jornada anterior a la última amarilla registrada). El nombre del jugador debe ser igual al que sale en la página. 'quitar' = amarillas que la API registró de más. Las dobles amarillas de un mismo partido no suman (cuentan como roja).",
+  "_nota": "Amarillas (o rojas) que la API no registró. Se agregan a mano según UNAFUT. r = jornada en que la recibió (si no se sabe, una jornada anterior a la última amarilla registrada). El nombre del jugador debe ser igual al que sale en la página. 'quitar' = amarillas que la API registró de más. Las dobles amarillas de un mismo partido no suman (cuentan como roja). 'sanciones' = rojas que el Tribunal castigó con más de un partido (partidos = cantidad).",
   "extra": [
     {
       "jugador": "A. Sinclair",
@@ -36,6 +36,14 @@
       "equipo": "Puntarenas",
       "r": 9,
       "fuente": "UNAFUT: 5 amarillas, la 5.ª el 25/10 vs Inter SC (J13); cumplió el 30/10 (J14). Jornada de la faltante aproximada"
+    },
+    {
+      "jugador": "M. George Clayton",
+      "equipo": "Sporting",
+      "r": 14,
+      "tipo": "rc",
+      "partidos": 2,
+      "fuente": "Tribunal Disciplinario FCRF tras J14: expulsado, 2 partidos (art. 37 inc. 2)"
     }
   ],
   "quitar": [
@@ -44,6 +52,15 @@
       "equipo": "Sporting",
       "r": 3,
       "fuente": "UNAFUT: 4 amarillas, la API tiene 5 (jornada aproximada)"
+    }
+  ],
+  "sanciones": [
+    {
+      "jugador": "J. Gaete",
+      "equipo": "Cartaginés",
+      "r": 14,
+      "partidos": 2,
+      "fuente": "Tribunal Disciplinario FCRF tras J14: 2 partidos (art. 37 inc. 2)"
     }
   ]
 }
