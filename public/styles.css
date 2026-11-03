@@ -311,10 +311,10 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .srank .pos{min-width:18px;color:var(--muted);font-size:13px;font-weight:600;text-align:right}
 .srank .nm b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sval{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;min-width:34px;text-align:right}
-.sbar{width:54px;height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;flex:none}
-.sbar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.rbar{width:54px;height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;flex:none}
+.rbar i{display:block;height:100%;background:var(--accent);border-radius:3px}
 .sall{background:none;border:0;color:var(--accent);font-weight:600;padding:8px 0 0}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .kpi{background:var(--sunk);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .kpi b{font-family:var(--display);font-weight:800;font-size:34px;line-height:1}
 .kpi span{font-size:12px;color:var(--muted)}

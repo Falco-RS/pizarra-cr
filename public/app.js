@@ -361,9 +361,9 @@ function scorersHtml(n) {
     <span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)} · gol en ${s.matches.size} partido${s.matches.size === 1 ? '' : 's'}${s.pen ? ` · ${s.pen} de penal` : ''}</span></span><span class="big">${s.g}</span></li>`).join('')}</ol>`;
 }
 /* ---------- pestaña Estadísticas ---------- */
-const pname = (name, tid) => (STATS.names || {})[tid + '|' + name] || name;
+const pname = (name, tid) => (XSTATS.names || {})[tid + '|' + name] || name;
 const minN = t => { const [a, b] = String(t || '0').split('+'); return +a + (b ? +b / 100 : 0); };
-const sRows = (rows, fmt = v => v) => `<ol class="list srank">${rows.map((r, i) => `<li><span class="pos">${r.pos ?? i + 1}</span>${crest(r.t)}<span class="nm"><b>${esc(r.name)}</b><span>${esc(r.sub ?? T[r.t]?.name ?? '')}</span></span>${r.bar !== undefined ? `<span class="sbar"><i style="width:${Math.max(3, Math.min(100, r.bar))}%"></i></span>` : ''}<span class="sval">${fmt(r.v)}</span></li>`).join('')}</ol>`;
+const sRows = (rows, fmt = v => v) => `<ol class="list srank">${rows.map((r, i) => `<li><span class="pos">${r.pos ?? i + 1}</span>${crest(r.t)}<span class="nm"><b>${esc(r.name)}</b>${r.sub !== undefined ? `<span>${esc(r.sub)}</span>` : (r.name === T[r.t]?.name ? '' : `<span>${esc(T[r.t]?.name ?? '')}</span>`)}</span>${r.bar !== undefined ? `<span class="rbar"><i style="width:${Math.max(3, Math.min(100, r.bar))}%"></i></span>` : ''}<span class="sval">${fmt(r.v)}</span></li>`).join('')}</ol>`;
 const ranked = (arr, key) => { let last, pos = 0; return arr.map((x, i) => { if (x[key] !== last) { pos = i + 1; last = x[key]; } return { ...x, pos }; }); };
 const sCard = (title, body, note, wide) => `<section class="scard${wide ? ' wide' : ''}"><h3>${title}</h3>${body}${note ? `<p class="foot">${note}</p>` : ''}</section>`;
 function statsHtml() {
@@ -394,14 +394,15 @@ function statsHtml() {
   const banco = ranked(fromKey(bench, v => ({ v })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
   const dobletes = ranked(fromKey(braces, v => ({ v: v.length, sub: undefined, x: v })).map(r => ({ ...r, sub: `${T[r.t].name} · ${r.x.map(n => n === 2 ? 'doblete' : n === 3 ? 'triplete' : n + ' goles').join(', ')}` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
   /* jugadores, de la fuente de datos (asistencias y minutos) */
-  const PL = (STATS.players || []).filter(p => p.pj !== undefined && T[p.t]);
+  const PL = (XSTATS.players || []).filter(p => p.pj !== undefined && T[p.t]);
   const gOf = p => (scorers[p.abbr + '|' + p.t] || {}).g || 0;
   const asis = ranked(PL.filter(p => p.a > 0).map(p => ({ name: p.name || p.abbr, t: p.t, v: p.a, sub: `${T[p.t].name} · ${p.pj} PJ` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
   const ga = ranked(PL.map(p => ({ name: p.name || p.abbr, t: p.t, g: gOf(p), a: p.a || 0 })).map(r => ({ ...r, v: r.g + r.a, sub: `${T[r.t].name} · ${r.g} G + ${r.a} A` })).filter(r => r.v > 0).sort((a, b) => b.v - a.v || b.g - a.g), 'v').slice(0, 5);
   const mins = ranked(PL.filter(p => p.min).map(p => ({ name: p.name || p.abbr, t: p.t, v: p.min, sub: `${T[p.t].name} · ${p.pj} PJ` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
   /* equipos, de las estadísticas de cada partido */
   const acc = {};
-  for (const m of P) { const st = (STATS.matches || {})[m.id]; if (!st) continue;
+  for (const m of P) { const st = (XSTATS.matches || {})[m.id]; if (!st) continue;
+    if (!st.h || !st.a || !Object.keys(st.h).length || !Object.keys(st.a).length) continue;
     for (const [t, x, o] of [[m.h, st.h, st.a], [m.a, st.a, st.h]]) { const a = acc[t] ||= { n: 0, pos: 0, son: 0, sh: 0, cor: 0, off: 0, sonC: 0 }; a.n++; a.pos += x.pos || 0; a.son += x.son || 0; a.sh += (x.son || 0) + (x.soff || 0) + (x.sblk || 0); a.cor += x.cor || 0; a.off += x.off || 0; a.sonC += o.son || 0; } }
   const tAvg = (f, dec = 1, asc) => { const rows = Object.entries(acc).filter(([, a]) => a.n).map(([t, a]) => ({ t: +t, name: T[t].name, v: f(a) })).sort((a, b) => asc ? a.v - b.v : b.v - a.v); const max = Math.max(...rows.map(r => r.v)) || 1; return ranked(rows.map(r => ({ ...r, v: +r.v.toFixed(dec), bar: 100 * r.v / max })), 'v'); };
   const nst = Object.values(acc).reduce((s, a) => s + a.n, 0) / 2;
@@ -448,7 +449,7 @@ function statsHtml() {
     ${sCard('Goles del minuto 76 en adelante', sRows(ranked(tids.map(t => ({ t, name: T[t].name, v: lateG[t] || 0 })).sort((a, b) => b.v - a.v), 'v').map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))))}
     ${sCard('Juego limpio', sRows(ranked(fair, 'v').map(r => ({ ...r, v: r.v }))), 'Puntos: amarilla 1, roja 3. Menos es mejor.')}
   </div>
-  <p class="foot">Estadísticas de equipo calculadas con ${Math.round(nst)} de ${P.length} partidos que tienen datos. ${srcNote}</p>`;
+  <p class="foot">Estadísticas de equipo (posesión, remates, tiros de esquina, fueras de juego) calculadas con ${Math.round(nst)} de ${P.length} partidos que tienen esos datos${tids.filter(t => !acc[t]).length ? `; la fuente no trae esos datos para ${tids.filter(t => !acc[t]).map(t => esc(T[t].name)).join(', ')}` : ''}. ${srcNote}</p>`;
 }
 const cardRow = n => `<span class="cards" aria-label="${n} amarillas">${Array.from({length:n}, () => '<i class="ico yc"></i>').join('')}</span>`;
 function yellowsHtml(n) {
@@ -934,10 +935,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, STATS = {};
+let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, XSTATS = {};
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { STATS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { XSTATS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
