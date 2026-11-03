@@ -750,11 +750,11 @@ function renderLegio(v) {
 /* ---------- La Sele: se actualiza a mano después de cada fecha FIFA (scripts/sele.mjs) ---------- */
 let SE = null, SEsel = null, SEms = [];
 /* ---------- Liga de Ascenso (manual, public/data/ascenso.json) ---------- */
-let ASC = null;
+let ASC = null, ASCX = {};
 function renderAscenso(v) {
   if (!ASC) {
     v.innerHTML = '<section class="panel"><p class="hint">Cargando la Liga de Ascenso…</p></section>';
-    if (ASC === null) { ASC = false; fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { ASC = j || { series: [], grupos: [], equipos: {} }; if (S.view === 'ascenso') renderView(); }); }
+    if (ASC === null) { ASC = false; Promise.all([fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null), fetch('/data/ascenso-api.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]).then(([j, x]) => { ASC = j || { series: [], grupos: [], equipos: {} }; ASCX = x || {}; if (S.view === 'ascenso') renderView(); }); }
     return;
   }
   const E = ASC.equipos || {};
@@ -768,7 +768,7 @@ function renderAscenso(v) {
     const ta = (i.ga ?? 0) + (vu.ga ?? 0), tb = (i.gb ?? 0) + (vu.gb ?? 0);
     const pasa = s.pasa || (both && ta !== tb ? (ta > tb ? 'a' : 'b') : null);
     const row = (side, k, g1, g2, tot) => `<div class="asr${pasa === side ? ' win' : pasa ? ' out' : ''}">${cr(k)}<b>${nm(k)}</b><span class="g">${sc(g1)}</span><span class="g">${sc(g2)}</span><span class="g tot">${i.ga != null ? tot : ''}</span></div>`;
-    return `<article class="aser"><div class="ash"><span>Serie ${s.n}</span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
+    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>ver previa</u></span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
       ${row('a', s.a, i.ga, vu.ga, ta)}${row('b', s.b, i.gb, vu.gb, tb)}
       <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · 📺 ${esc(i.tv)}` : ''}</li>
       <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · 📺 ${esc(vu.tv)}` : ''}</li></ul>
@@ -781,10 +781,54 @@ function renderAscenso(v) {
     <p class="foot">Los ${g.clasifican} primeros clasificaron a cuartos de final.${g.tabla.some(r => /\*/.test(r[0])) ? ' * Así aparece en la tabla oficial de Liasce.' : ''}</p></section>`;
   v.innerHTML = `<section class="panel"><div class="ph2"><h2>Liga de Ascenso · ${esc(ASC.torneo || '')}</h2><span class="chip">${esc(ASC.fase || '')}</span></div>
       <p class="hint" style="margin:0 0 12px">En cada serie, el equipo de arriba abre de local y el de abajo cierra en casa.</p>
-      <div class="agrid">${series}</div></section>
+      <div class="agrid">${series}</div><div id="adetail">${S.asel ? ascPrevia((ASC.series || []).find(x => x.n === S.asel), E, cr, nm, when) : ''}</div></section>
     <h2 class="shead">Fase regular</h2>
     <div class="agrid2">${(ASC.grupos || []).map(tabla).join('')}</div>
     <p class="foot">Datos oficiales de Liasce, actualizados a mano. Última actualización: ${esc(ASC.actualizado || '')}.</p>`;
+  v.querySelectorAll('[data-aser]').forEach(b => { const go_ = () => { const n = +b.dataset.aser; S.asel = S.asel === n ? null : n; renderView(); if (S.asel) document.getElementById('adetail').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    b.onclick = go_; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go_(); } }; });
+}
+function ascPrevia(s, E, cr, nm, when) {
+  if (!s) return '';
+  const i = s.ida || {}, vu = s.vuelta || {};
+  const leg = i.ga == null ? { ...i, cual: 'ida', local: s.a, vis: s.b } : { ...vu, cual: 'vuelta', local: s.b, vis: s.a };
+  const F = ASCX.forms || {};
+  const fo = k => F[k] && F[k].verificado ? F[k].rows : null;
+  const grp = k => { for (const g of ASC.grupos || []) { const ix = g.tabla.findIndex(r => r[0] === E[k]?.nombre); if (ix >= 0) return { g, ix, r: g.tabla[ix] }; } return null; };
+  const rec = (rows, f) => { const x = rows.filter(f); const w = x.filter(r => r.gf > r.ga).length, d = x.filter(r => r.gf === r.ga).length; return `${w}-${d}-${x.length - w - d}`; };
+  const avg = (a, b) => b ? (a / b).toFixed(1) : '—';
+  const L = leg.local, V = leg.vis, gl = grp(L), gv = grp(V), fl = fo(L), fv = fo(V);
+  const cmp = gl && gv ? [
+    ['Fase regular', `${gl.ix + 1}.º ${esc(gl.g.nombre)}`, `${gv.ix + 1}.º ${esc(gv.g.nombre)}`], ['Puntos', gl.r[7], gv.r[7]],
+    ['Récord (G-E-P)', `${gl.r[2]}-${gl.r[3]}-${gl.r[4]}`, `${gv.r[2]}-${gv.r[3]}-${gv.r[4]}`],
+    ['Goles por partido', avg(gl.r[5], gl.r[1]), avg(gv.r[5], gv.r[1])], ['Recibe por partido', avg(gl.r[6], gl.r[1]), avg(gv.r[6], gv.r[1])],
+    ...(fl && fv ? [[`${nm(L)} de local / ${nm(V)} de visita`, rec(fl, r => r.home), rec(fv, r => !r.home)]] : []),
+  ] : [];
+  const ab = k => esc((E[k]?.nombre || k).replace(/^(AD|FC|CS)\s+/, '').split(' ')[0]);
+  const last5 = k => { const rows = fo(k); return `<div><h3>${nm(k)}</h3><ul class="plist">${rows ? rows.slice(-5).reverse().map(x => { const r = x.gf > x.ga ? 'W' : x.gf < x.ga ? 'L' : 'D';
+    return `<li><span class="res ${r}">${({ W: 'G', D: 'E', L: 'P' })[r]}</span>${x.home ? 'vs' : 'en'} ${esc(x.opp)}<span class="x">${x.gf}–${x.ga} · J${x.r}</span></li>`; }).join('') : '<li><span class="x" style="margin:0">Sin datos verificados</span></li>'}</ul></div>`; };
+  const X = (ASCX.series || {})[s.n];
+  const idOf = k => (ASCX.ids || {})[k];
+  const hist = (X && X.h2h) || [];
+  const hn = t => t.id === idOf(s.a) ? nm(s.a) : t.id === idOf(s.b) ? nm(s.b) : esc(t.n);
+  let wa = 0, wb = 0, dr = 0; for (const x of hist) { const ga = x.h.id === idOf(s.a) ? x.hs : x.as, gb = x.h.id === idOf(s.a) ? x.as : x.hs; ga > gb ? wa++ : gb > ga ? wb++ : dr++; }
+  return `<div class="detail">
+    <div class="dscore">
+      <div class="dteam r"><span>${nm(L)}</span>${cr(L)}</div>
+      <div><div class="dnum" style="font-size:40px">${leg.fecha ? esc(fmtTime(leg.fecha)) : '—'}</div></div>
+      <div class="dteam">${cr(V)}<span>${nm(V)}</span></div>
+    </div>
+    <div class="dmeta">Previa · ${leg.fecha ? esc(fmtDay(leg.fecha)) : 'Fecha por confirmar'} · Serie ${s.n} · Cuartos de final (${leg.cual})${leg.estadio ? venueHtml(leg.estadio) : ''}${leg.tv ? ` · 📺 ${esc(leg.tv)}` : ''}</div>
+    <div class="pv"><div class="pv-data" style="flex-basis:100%">
+      <section><h3>La serie</h3><ul class="plist">
+        <li><b>Ida</b>&nbsp;· local ${nm(s.a)}<span class="x">${esc(when(i))}${i.ga != null ? ` · ${i.ga}–${i.gb}` : ''}</span></li>
+        <li><b>Vuelta</b>&nbsp;· local ${nm(s.b)}<span class="x">${esc(when(vu))}${vu.ga != null ? ` · ${vu.gb}–${vu.ga}` : ''}</span></li>
+      </ul><p class="foot">${nm(s.b)} cierra la serie en casa.</p></section>
+      ${cmp.length ? `<section><h3>Cómo llegan</h3><table class="cmp"><tr><td>${ab(L)}</td><td></td><td>${ab(V)}</td></tr>${cmp.map(c => `<tr><td>${c[1]}</td><td>${c[0]}</td><td>${c[2]}</td></tr>`).join('')}</table></section>` : ''}
+      <section><h3>Últimos 5 de la fase regular</h3><div class="two">${last5(L)}${last5(V)}</div></section>
+      <section><h3>Historial entre ellos</h3>${hist.length ? `<p class="foot" style="margin:0 0 6px">Últimos ${hist.length}: ${nm(s.a)} ${wa} · empates ${dr} · ${nm(s.b)} ${wb}</p><ul class="plist">${hist.map(x => `<li><span class="x" style="margin:0;min-width:84px;text-align:left">${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }))}</span>${hn(x.h)} <b>${x.hs}–${x.as}</b> ${hn(x.a)}<span class="x">${esc(x.lg || '')}</span></li>`).join('')}</ul>` : '<ul class="plist"><li><span class="x" style="margin:0">No hay partidos previos registrados entre ellos</span></li></ul>'}</section>
+      <p class="foot">Resultados de la fase regular verificados contra la tabla oficial de Liasce.</p>
+    </div></div></div>`;
 }
 function renderSele(v) {
   if (!SE) {
@@ -956,6 +1000,7 @@ function addCloseButtons() {
     b.onclick = () => {
       if (d.closest('#cdetail')) { S.cid = null; renderView(); }
       else if (d.closest('#sdetail')) { SEsel = null; renderView(); }
+      else if (d.closest('#adetail')) { S.asel = null; renderView(); }
       else { S.sel = null; renderBoard(); }
     };
     d.prepend(b);

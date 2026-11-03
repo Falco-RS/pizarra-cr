@@ -341,3 +341,9 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .apasa{margin:8px 0 0;font-size:13px}
 tr.aq td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 @media (max-width:520px){.asr{grid-template-columns:26px 1fr repeat(3,32px);gap:6px}.ash .cols{grid-template-columns:repeat(3,32px);font-size:10px}.asr .crest{width:24px;height:24px}.asr .g{font-size:18px}.aser{padding:10px 10px}}
+
+.aser{cursor:pointer;transition:border-color .15s}
+.aser:hover{border-color:var(--muted)}
+.aser.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.ash u{text-decoration:none;color:var(--accent);text-transform:none;letter-spacing:0;font-weight:600}
+#adetail:not(:empty){margin-top:14px}
