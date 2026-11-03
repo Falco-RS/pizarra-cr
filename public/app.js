@@ -11,7 +11,7 @@ const MESA = D.mesa || {};
 const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
 /* Estadio del equipo local, con enlace al mapa */
 const venueOf = m => (ESTADIOS.partidos || {})[m.id] || ESTADIOS[T[m.h]?.name] || '';
-const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">📍 ${esc(v)}</a>` : '';
+const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">${esc(v)}</a>` : '';
 /* Nombres que la API dejó vacíos en el minuto a minuto, completados a mano (public/data/eventos.json) */
 for (const m of D.matches) for (const fx of (EVENTOS[m.id] || [])) {
   const e = (m.ev || []).find(e => String(e[0]) === String(fx.t) && e[1] === fx.tipo && !e[3]);
@@ -217,9 +217,9 @@ function pitchHtml(home, away, susp = {}) {
 /* XI publicado por el club como lista (sin posiciones) */
 function xiListHtml(name, L) {
   if (!L?.list) return '';
-  return `<div class="xil"><p class="lead"><b>${esc(name)}</b> · XI inicial confirmado${L.fuente ? ` <span class="x">(${esc(L.fuente)})</span>` : ''}</p>
+  return `<div class="xil"><p class="lead"><b>${esc(name)}</b> · XI inicial confirmado${L.fuente ? `` : ''}</p>
     <ol>${L.list.map(p => `<li><b>${esc(p.n ?? '')}</b>${esc(p.name)}${p.c ? ' <span class="chip">C</span>' : ''}</li>`).join('')}</ol>
-    ${L.subs?.length ? `<p class="foot">Suplentes: ${L.subs.map(p => `${p.n ?? ''} ${esc(p.name)}`.trim()).join(' · ')}</p>` : ''}${L.aprox ? '<p class="foot">En la cancha, cada jugador va en su posición habitual; el club no publicó el dibujo exacto.</p>' : ''}</div>`;
+    ${L.subs?.length ? `<p class="foot">Suplentes: ${L.subs.map(p => `${p.n ?? ''} ${esc(p.name)}`.trim()).join(' · ')}</p>` : ''}</div>`;
 }
 function renderPrevia(m, box) {
   const P = PREVIA[m.id];
@@ -235,7 +235,7 @@ function renderPrevia(m, box) {
   const SUSP = { h: suspOf(m.h), a: suspOf(m.a) };
   const lineNote = off_ && !(OLs('home') && OLs('away')) ? `<span class="chip ok">Oficial</span> ${esc(T[OLs('home') ? m.h : m.a].name)} (publicada por el club) · <span class="chip">Probable</span> ${esc(T[OLs('home') ? m.a : m.h].name)}, la última que usó`
     : off_ ? `<span class="chip ok">Alineación oficial</span>${!(P && P.lineups) ? ' publicada por los clubes' : ''}`
-    : `<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale entre 30 y 60 min antes del pitazo.`;
+    : `<span class="chip">Probable</span> última alineación de cada equipo`;
 
   const rows = tableRows('total'), pos = t => rows.findIndex(r => r.t === t) + 1, row = t => rows.find(r => r.t === t);
   const hr = row(m.h), ar = row(m.a);
@@ -278,7 +278,7 @@ function renderPrevia(m, box) {
         ${(!OLs('home') && SUSP.h.length && H) || (!OLs('away') && SUSP.a.length && A) ? '<p class="foot"><span style="color:var(--loss);font-weight:700">En rojo:</span> suspendido para este partido (no puede jugar).</p>' : ''}
         ${H?.dt || A?.dt ? `<div class="dts">${H?.dt ? `<span><i class="dot h"></i> DT ${esc(H.dt)}</span>` : ''}${A?.dt ? `<span><i class="dot a"></i> DT ${esc(A.dt)}</span>` : ''}</div>` : ''}
         ${xiListHtml(T[m.h].name, H)}${xiListHtml(T[m.a].name, A)}
-        ${!off_ && (H?.from || A?.from) ? `<p class="foot">Probable según su último partido con alineación registrada.</p>` : ''}
+        
       </section>
       <div class="pv-data">
         <section><h3>Bajas y alertas</h3><div class="two">${bajas(m.h)}${bajas(m.a)}</div></section>
@@ -306,7 +306,7 @@ function renderDetail() {
   const base = M.find(x => x.id === S.sel);
   const lv = base && LIVE.find(x => x.id === base.id && x.started);
   const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(lv.events, +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
-  if (!m) { box.innerHTML = `<p class="hint" style="background:transparent;color:var(--board-muted);padding:0;margin:0">Tocá un partido: los jugados muestran el minuto a minuto; los que vienen, la previa con alineaciones.</p>`; return; }
+  if (!m) { box.innerHTML = ''; return; }
   if (!played(m) && !lv) { renderPrevia(m, box); return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
   const det = lv && lv.stats && lv.stats.length === 2 ? { stats: lv.stats.map(t => t.s), statsTeams: lv.stats.map(t => t.t), lineups: null } : D.detail[String(m.id)];
@@ -318,7 +318,7 @@ function renderDetail() {
       return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div>
         <div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`;
     }).join(''); })() : '';
-  const statsBlock = bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : lv ? `<div><h3>Estadísticas</h3><p class="hint">La API todavía no publica estadísticas de este partido. Si las publica, aparecen aquí solas.</p></div>` : '';
+  const statsBlock = bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : lv ? '' : '';
   // Alineaciones: las de la API si las trae; si no, las publicadas por los clubes (cargadas a mano)
   const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
   const man = MANUAL[m.id];
@@ -331,7 +331,7 @@ function renderDetail() {
         ${man.home?.dt || man.away?.dt ? `<div class="dts">${man.home?.dt ? `<span><i class="dot h"></i> DT ${esc(man.home.dt)}</span>` : ''}${man.away?.dt ? `<span><i class="dot a"></i> DT ${esc(man.away.dt)}</span>` : ''}</div>` : ''}</div>`
     : '';
   if (statsBlock || lineBlock) extra = `<div class="dcols">${lineBlock}${statsBlock}</div>`;
-  else if (!det && !lv) extra = `<p class="hint" style="margin-top:14px">Las estadísticas y alineaciones de este partido se completan en las próximas actualizaciones.</p>`;
+  else if (!det && !lv) extra = '';
   box.innerHTML = `<div class="detail">
     <div class="dscore">
       <div class="dteam r"><span>${esc(T[m.h].name)}</span>${crest(m.h)}</div>
@@ -416,7 +416,7 @@ function statsHtml() {
   const pct = n => Math.round(100 * n / (P.length || 1)) + '%';
   const fair = tids.map(t => ({ t, name: T[t].name, y: (teamCards[t] || {}).y || 0, r: (teamCards[t] || {}).r || 0 })).map(r => ({ ...r, v: r.y + 3 * r.r, sub: `${r.y} amarillas · ${r.r} rojas` })).sort((a, b) => a.v - b.v);
   const sinEv = P.filter(m => off(m).hs + off(m).as > 0 && !(m.ev || []).some(e => ['goal', 'pen', 'og'].includes(e[1])));
-  const noEv = sinEv.length ? `Sin contar ${sinEv.map(m => `${esc(T[m.h].name)} ${off(m).hs}-${off(m).as} ${esc(T[m.a].name)} (J${m.r})`).join(', ')}: la fuente no registró el minuto de esos goles.` : '';
+  const noEv = sinEv.length ? `No incluye ${sinEv.map(m => `${esc(T[m.h].name)} ${off(m).hs}-${off(m).as} ${esc(T[m.a].name)} (J${m.r})`).join(', ')}.` : '';
   const kpi = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
   const srcNote = 'Fuente: datos de cada partido; se actualiza solo.';
   const noApi = '<p class="hint">Todavía no hay datos. Se cargan automáticamente en las próximas horas.</p>';
@@ -429,20 +429,19 @@ function statsHtml() {
     </div></section>
   <h2 class="shead">Jugadores</h2>
   <div class="sgrid">
-    ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''), 'Los autogoles no cuentan para el jugador.')}
+    ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''))}
     ${(() => { const tid = n => +Object.keys(T).find(k => T[k].name === n); const L = (ASIS.lista || []).filter(x => tid(x.equipo)).sort((a, b) => b.a - a.a);
       const R = ranked(L.map(x => ({ name: x.jugador, t: tid(x.equipo), v: x.a })), 'v');
       return L.length ? sCard('Asistidores', sRows(S.alla ? R : R.slice(0, 5)) + (R.length > 5 ? `<button class="more sall" data-alla>${S.alla ? 'Ver menos' : `Ver los ${R.length}`}</button>` : ''), `Los asistidores se actualizan al final de cada jornada · Última actualización: ${esc(ASIS.actualizado || '')}`) : ''; })()}
-    ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>', 'Partidos con 2 o más goles.')}
+    ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>')}
   </div>
   <h2 class="shead">Equipos</h2>
   <div class="sgrid">
-    ${sCard('Vallas invictas', sRows(tRes(r => r.cs)), 'Partidos sin recibir gol.')}
+    ${sCard('Vallas invictas', sRows(tRes(r => r.cs)))}
     ${sCard('Partidos sin anotar', sRows(tRes(r => r.ns)))}
     ${sCard('Goles en el segundo tiempo', sRows(tids.map(t => ({ t, name: T[t].name, v: (half[t] || {}).b || 0, sub: `${(half[t] || {}).a || 0} en el 1.º · ${(half[t] || {}).b || 0} en el 2.º` })).sort((a, b) => b.v - a.v).map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))), noEv)}
     ${sCard('Goles del minuto 76 en adelante', sRows(ranked(tids.map(t => ({ t, name: T[t].name, v: lateG[t] || 0 })).sort((a, b) => b.v - a.v), 'v').map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))), noEv)}
-  </div>
-  <p class="foot">Todo sale de los resultados y del minuto a minuto de cada partido, y se actualiza solo.</p>`;
+  </div>`;
 }
 const cardRow = n => `<span class="cards" aria-label="${n} amarillas">${Array.from({length:n}, () => '<i class="ico yc"></i>').join('')}</span>`;
 function yellowsHtml(n) {
@@ -473,8 +472,7 @@ function renderView() {
         </section>
       </div></div>`;
   } else if (S.view === 'tabla') {
-    v.innerHTML = `<section class="panel"><div class="ph2"><h2>Tabla de posiciones</h2>${seg}</div>${tableHtml(S.tmode)}
-      <p class="foot">Local y Visita cuentan solo los partidos en esa condición. Últimos 5: G ganó, E empató, P perdió.</p></section>`;
+    v.innerHTML = `<section class="panel"><div class="ph2"><h2>Tabla de posiciones</h2>${seg}</div>${tableHtml(S.tmode)}</section>`;
   } else if (S.view === 'estadisticas') {
     v.innerHTML = statsHtml();
     v.querySelectorAll('[data-allg]').forEach(b => b.onclick = () => { S.allg = !S.allg; renderView(); });
@@ -497,15 +495,15 @@ function renderView() {
     v.innerHTML = `<div class="cols">
       <div class="wide">
         <section class="panel"><div class="ph2"><h2>Suspendidos para su próximo partido</h2></div>
-          <p class="lead">5 amarillas en el torneo dan un partido de suspensión y el conteo vuelve a cero. La roja da al menos un partido; el tribunal puede dar más.</p>
+          
           ${suspendedNext.length ? `<ol class="list">${suspendedNext.map(s => `<li><span class="chip sus">${esc(s.why)}</span>${crest(s.t)}<span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)} · se pierde ${s.nexts && s.nexts.length ? s.nexts.map(n => `J${n.r} vs ${esc(T[n.h === s.t ? n.a : n.h].name)}`).join(' y ') : 'el próximo partido'}</span></span></li>`).join('')}</ol>` : '<p class="hint">Nadie suspendido para la próxima jornada.</p>'}
         </section>
         <section class="panel"><div class="ph2"><h2>En capilla</h2></div>
-          <p class="lead">Con 4 amarillas en su conteo actual: una más y se pierden un partido.</p>
+          
           ${onFour.length ? `<ol class="list">${onFour.map(y => `<li>${crest(y.t)}<span class="nm"><b>${esc(y.name)}</b><span>${esc(T[y.t].name)}</span></span>${cardRow(4)}</li>`).join('')}</ol>` : '<p class="hint">Nadie con 4 amarillas.</p>'}
         </section>
         <section class="panel"><div class="ph2"><h2>Amarillas en el torneo</h2></div>
-          <p class="lead">Jugadores con 3 o más.</p>
+          
           ${yellowsHtml(topYellow.filter(y => y.n >= 3).length)}</section></div>
       <div class="side">
         <section class="panel"><div class="ph2"><h2>Expulsados</h2></div>
@@ -552,7 +550,7 @@ function copaHtml() {
   const order = Object.keys(byRound).sort((a, b) => (ROUND_ORDER.indexOf(a) + 1 || 99) - (ROUND_ORDER.indexOf(b) + 1 || 99));
   const section = r => {
     const ms = byRound[r].sort((a, b) => new Date(a.d) - new Date(b.d));
-    if (/group/i.test(r)) return `<section class="panel"><h2 class="ch">${esc(ROUND_ES[r] || r)}</h2><p class="lead">Partidos de los equipos ticos.</p><div class="cgrid">${ms.map(card).join('')}</div></section>`;
+    if (/group/i.test(r)) return `<section class="panel"><h2 class="ch">${esc(ROUND_ES[r] || r)}</h2><div class="cgrid">${ms.map(card).join('')}</div></section>`;
     // eliminatorias: agrupar ida y vuelta por pareja y sacar el global
     const ties = {};
     for (const m of ms) (ties[[m.hId, m.aId].sort().join('-')] ||= []).push(m);
@@ -568,7 +566,7 @@ function copaHtml() {
   const sel = withLive.find(m => m.id === S.cid);
   return `<div class="copa"><div class="chead"><h1>Copa Centroamericana</h1><span>Concacaf ${esc(String(D.league?.season || ''))} · fase final y los partidos de los ticos · tocá un partido para ver el en vivo o la previa</span></div>
     <div id="cdetail">${sel ? intlDetailHtml(sel) : ''}</div>${order.map(section).join('')}
-    <p class="foot">En vivo con la misma franja de arriba. Los ticos van resaltados.</p></div>`;
+    </div>`;
 }
 function intlDetailHtml(m) {
   const lv = LIVE.find(x => x.id === m.id && x.started);
@@ -640,7 +638,7 @@ function intlDetailHtml(m) {
       <section><div class="ph2" style="margin-bottom:6px"><h3 style="margin:0">Últimos resultados</h3>${cfSeg}</div><div class="two">${recent(m.hId)}${recent(m.aId)}</div></section>
       ${hist.length ? `<section><h3>Historial entre ellos</h3><ul class="plist">${hist.map(x => `<li><span class="x" style="margin:0;min-width:84px;text-align:left">${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }))}</span>${esc(x.hId === m.hId ? H.name : x.hId === m.aId ? A.name : x.h)} <b>${x.hs}–${x.as}</b> ${esc(x.aId === m.aId ? A.name : x.aId === m.hId ? H.name : x.a)}<span class="x">${esc(COMP[x.comp] || x.comp || '')}</span></li>`).join('')}</ul>
         <p class="foot">${(() => { let w1 = 0, w2 = 0, d = 0; hist.forEach(x => { const g1 = x.hId === m.hId ? x.hs : x.as, g2 = x.hId === m.hId ? x.as : x.hs; g1 > g2 ? w1++ : g1 < g2 ? w2++ : d++; }); return `Últimos ${hist.length}: ${esc(H.name)} ganó ${w1}, ${esc(A.name)} ganó ${w2}, ${d} empates.`; })()}</p></section>` : ''}
-      <p class="foot">Las suspensiones de la Copa se rigen por su propio reglamento y no se calculan aquí.</p>
+      
     </div></div></div>`;
 }
 /* ---------- Legionarios: se actualiza una vez al día (scripts/legionarios.mjs) ---------- */
@@ -704,7 +702,7 @@ function renderLegio(v) {
   };
   const group = (list, key, title) => list.length ? `<h3 class="agh">${title}</h3><div class="agenda">${list.slice(0, LGall[key] ? list.length : AGMAX).map(agCard).join('')}</div>${list.length > AGMAX ? `<button type="button" class="more lgmore" data-lgall="${key}">${LGall[key] ? 'Ver menos' : `Ver los ${list.length}`}</button>` : ''}` : '';
   const agHtml = ag.length ? group(played_, 'res', 'Últimos resultados') + group(coming, 'next', 'Próximos partidos')
-    : '<p class="hint">Sin partidos de sus clubes en estos días' + (P.some(p => p.teamId) ? '.' : ' (los calendarios se están cargando; se completan en los próximos días).') + '</p>';
+    : '<p class="hint">Sin partidos de sus clubes en estos días' + '.</p>';
   const ini = n => n.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('');
   const form = p => fx(p).filter(m => isFin(m.s) && new Date(m.d) < now).slice(-5).map(m => resFor(m, p.teamId)).filter(Boolean);
   const card = p => {
@@ -725,7 +723,7 @@ function renderLegio(v) {
     return `<section class="panel lpd" id="lpdetail"><div class="ph2"><h2>${esc(sel.nombre)}</h2><button class="more" data-lpclose>Cerrar ✕</button></div>
       <p class="lead">${esc(sel.pos)} · ${esc(sel.club)}${sel.nota ? ` (${esc(sel.nota)})` : ''} · ${esc(sel.pais)} ${sel.bandera || ''}</p>
       ${s ? `${s.season ? `<p class="lead" style="margin:0 0 8px">Temporada ${esc(s.season)} con ${esc(sel.club)}</p>` : ''}<div class="kv">${[['Partidos', s.games], ['Minutos', s.minutes], ...(sel.pos === 'Portero' ? [['Vallas invictas', s.cleanSheets], ['Goles recibidos', s.conceded]] : [['Goles', s.goals], ['Asistencias', s.assists]]), ['Amarillas', s.yc], ['Rojas', s.rc]].map(([k, x]) => `<span><b>${x ?? 0}</b><i>${k}</i></span>`).join('')}</div>
-        ${(s.comps || []).length > 1 ? `<p class="foot">Por torneo: ${s.comps.map(c => `${esc(c.league)} ${c.games ?? 0} PJ${c.goals ? ', ' + c.goals + (c.goals === 1 ? ' gol' : ' goles') : ''}`).join(' · ')}</p>` : ''}` : '<p class="hint">La API todavía no trae sus números de temporada para esta liga.</p>'}
+        ${(s.comps || []).length > 1 ? `<p class="foot">Por torneo: ${s.comps.map(c => `${esc(c.league)} ${c.games ?? 0} PJ${c.goals ? ', ' + c.goals + (c.goals === 1 ? ' gol' : ' goles') : ''}`).join(' · ')}</p>` : ''}` : '<p class="hint">Sin estadísticas de temporada.</p>'}
       ${next.length ? `<h3>Próximos partidos</h3><ul class="lms">${next.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
       ${past.length ? `<h3>Últimos partidos de su club</h3><ul class="lms">${past.map(m => lgMatchLine(m, sel)).join('')}</ul>` : ''}
       <p class="foot">Goles, tarjetas y cambios salen del minuto a minuto del partido; si no aparece nada, puede que no haya jugado o que la API no tenga ese detalle para esa liga.</p></section>`;
@@ -768,27 +766,25 @@ function renderAscenso(v) {
     const ta = (i.ga ?? 0) + (vu.ga ?? 0), tb = (i.gb ?? 0) + (vu.gb ?? 0);
     const pasa = s.pasa || (both && ta !== tb ? (ta > tb ? 'a' : 'b') : null);
     const row = (side, k, g1, g2, tot) => `<div class="asr${pasa === side ? ' win' : pasa ? ' out' : ''}">${cr(k)}<b>${nm(k)}</b><span class="g">${sc(g1)}</span><span class="g">${sc(g2)}</span><span class="g tot">${i.ga != null ? tot : ''}</span></div>`;
-    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>ver previa</u></span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
+    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>previa</u></span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
       ${row('a', s.a, i.ga, vu.ga, ta)}${row('b', s.b, i.gb, vu.gb, tb)}
-      <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · 📺 ${esc(i.tv)}` : ''}</li>
-      <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · 📺 ${esc(vu.tv)}` : ''}</li></ul>
+      <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · ${esc(i.tv)}` : ''}</li>
+      <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · ${esc(vu.tv)}` : ''}</li></ul>
       ${pasa ? `<p class="apasa">Avanza: <b>${nm(pasa === 'a' ? s.a : s.b)}</b></p>` : ''}</article>`;
   }).join('');
   const tabla = g => `<section class="panel"><div class="ph2"><h2>${esc(g.nombre)}</h2></div><div class="tw"><table>
     <thead><tr><th class="l">#</th><th class="l">Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
     <tbody>${g.tabla.map((r, i) => { const [n, pj, gg, e, p, gf, gc, pts] = r, dg = gf - gc, k = Object.keys(E).find(k => E[k].nombre === n.replace(/\s*\*$/, ''));
-      return `<tr class="${i < (g.clasifican || 0) ? 'aq' : ''}"><td class="l"><span class="pos">${i + 1}</span></td><td class="l"><span class="tn">${k ? cr(k) : ''}${esc(n)}</span></td><td>${pj}</td><td>${gg}</td><td>${e}</td><td>${p}</td><td>${gf}</td><td>${gc}</td><td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${pts}</td></tr>`; }).join('')}</tbody></table></div>
-    <p class="foot">Los ${g.clasifican} primeros clasificaron a cuartos de final.${g.tabla.some(r => /\*/.test(r[0])) ? ' * Así aparece en la tabla oficial de Liasce.' : ''}</p></section>`;
+      return `<tr class="${i < (g.clasifican || 0) ? 'aq' : ''}"><td class="l"><span class="pos">${i + 1}</span></td><td class="l"><span class="tn">${k ? cr(k) : ''}${esc(n)}</span></td><td>${pj}</td><td>${gg}</td><td>${e}</td><td>${p}</td><td>${gf}</td><td>${gc}</td><td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${pts}</td></tr>`; }).join('')}</tbody></table></div></section>`;
   v.innerHTML = `<section class="panel"><div class="ph2"><h2>Liga de Ascenso · ${esc(ASC.torneo || '')}</h2><span class="chip">${esc(ASC.fase || '')}</span></div>
-      <p class="hint" style="margin:0 0 12px">En cada serie, el equipo de arriba abre de local y el de abajo cierra en casa.</p>
       <div class="agrid">${series}</div><div id="adetail">${S.asel ? ascPrevia((ASC.series || []).find(x => x.n === S.asel), E, cr, nm, when) : ''}</div></section>
     <h2 class="shead">Fase regular</h2>
     <div class="agrid2">${(ASC.grupos || []).map(tabla).join('')}</div>
     ${(ASC.goleadores?.lista || []).length ? (() => { let last, pos = 0; const G = ASC.goleadores.lista.slice().sort((a, b) => b.g - a.g);
       return `<h2 class="shead">Goleadores</h2><div class="sgrid"><section class="scard"><h3>Goleadores del torneo</h3><ol class="list srank">${G.map((x, i) => { if (x.g !== last) { pos = i + 1; last = x.g; }
         return `<li><span class="pos">${pos}</span>${cr(x.equipo)}<span class="nm"><b>${esc(x.jugador)}</b><span>${nm(x.equipo)}</span></span><span class="sval">${x.g}</span></li>`; }).join('')}</ol>
-        <p class="foot">Datos de Liasce · Última actualización: ${esc(ASC.goleadores.actualizado || '')}</p></section></div>`; })() : ''}
-    <p class="foot">Datos oficiales de Liasce, actualizados a mano. Última actualización: ${esc(ASC.actualizado || '')}.</p>`;
+        <p class="foot">Última actualización: ${esc(ASC.goleadores.actualizado || '')}</p></section></div>`; })() : ''}
+    `;
   v.querySelectorAll('[data-aser]').forEach(b => { const go_ = () => { const n = +b.dataset.aser; S.asel = S.asel === n ? null : n; renderView(); if (S.asel) document.getElementById('adetail').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     b.onclick = go_; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go_(); } }; });
 }
@@ -822,16 +818,15 @@ function ascPrevia(s, E, cr, nm, when) {
       <div><div class="dnum" style="font-size:40px">${leg.fecha ? esc(fmtTime(leg.fecha)) : '—'}</div></div>
       <div class="dteam">${cr(V)}<span>${nm(V)}</span></div>
     </div>
-    <div class="dmeta">Previa · ${leg.fecha ? esc(fmtDay(leg.fecha)) : 'Fecha por confirmar'} · Serie ${s.n} · Cuartos de final (${leg.cual})${leg.estadio ? venueHtml(leg.estadio) : ''}${leg.tv ? ` · 📺 ${esc(leg.tv)}` : ''}</div>
+    <div class="dmeta">Previa · ${leg.fecha ? esc(fmtDay(leg.fecha)) : 'Fecha por confirmar'} · Serie ${s.n} · Cuartos de final (${leg.cual})${leg.estadio ? venueHtml(leg.estadio) : ''}${leg.tv ? ` · ${esc(leg.tv)}` : ''}</div>
     <div class="pv"><div class="pv-data" style="flex-basis:100%">
       <section><h3>La serie</h3><ul class="plist">
         <li><b>Ida</b>&nbsp;· local ${nm(s.a)}<span class="x">${esc(when(i))}${i.ga != null ? ` · ${i.ga}–${i.gb}` : ''}</span></li>
         <li><b>Vuelta</b>&nbsp;· local ${nm(s.b)}<span class="x">${esc(when(vu))}${vu.ga != null ? ` · ${vu.gb}–${vu.ga}` : ''}</span></li>
-      </ul><p class="foot">${nm(s.b)} cierra la serie en casa.</p></section>
+      </ul></section>
       ${cmp.length ? `<section><h3>Cómo llegan</h3><table class="cmp"><tr><td>${ab(L)}</td><td></td><td>${ab(V)}</td></tr>${cmp.map(c => `<tr><td>${c[1]}</td><td>${c[0]}</td><td>${c[2]}</td></tr>`).join('')}</table></section>` : ''}
       <section><h3>Últimos 5 de la fase regular</h3><div class="two">${last5(L)}${last5(V)}</div></section>
       <section><h3>Historial entre ellos</h3>${hist.length ? `<p class="foot" style="margin:0 0 6px">Últimos ${hist.length}: ${nm(s.a)} ${wa} · empates ${dr} · ${nm(s.b)} ${wb}</p><ul class="plist">${hist.map(x => `<li><span class="x" style="margin:0;min-width:84px;text-align:left">${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short', year: 'numeric' }))}</span>${hn(x.h)} <b>${x.hs}–${x.as}</b> ${hn(x.a)}<span class="x">${esc(x.lg || '')}</span></li>`).join('')}</ul>` : '<ul class="plist"><li><span class="x" style="margin:0">No hay partidos previos registrados entre ellos</span></li></ul>'}</section>
-      <p class="foot">Resultados de la fase regular verificados contra la tabla oficial de Liasce.</p>
     </div></div></div>`;
 }
 function renderSele(v) {
@@ -887,7 +882,7 @@ function renderSele(v) {
           ${topG.length ? `<p class="lead" style="margin:14px 0 6px">Goleadores</p><ol class="list">${topG.map(([n, g]) => `<li><span class="nm"><b>${esc(n)}</b></span><span class="big" style="font-size:22px">${g}</span></li>`).join('')}</ol>` : ''}` : '<p class="hint">Todavía no ha jugado este año.</p>'}</section>
       </div>
     </div>
-    <p class="foot">La Sele se actualiza a mano después de cada fecha FIFA, porque juega pocas veces al año.</p></div>`;
+    </div>`;
   v.querySelectorAll('[data-sele]').forEach(b => b.onclick = () => {
     SEsel = SEsel === +b.dataset.sele ? null : +b.dataset.sele; renderView();
     const el = document.getElementById('sdetail');
@@ -898,8 +893,7 @@ function seleDetailHtml(m, CR, compName) {
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc((t.name || '?').slice(0, 3).toUpperCase())}</span>`;
   const head = mid => `<div class="dscore"><div class="dteam r"><span>${esc(m.h.name)}</span>${cr(m.h)}</div><div>${mid}</div><div class="dteam">${cr(m.a)}<span>${esc(m.a.name)}</span></div></div>`;
   const meta = `${esc(compName(m.comp))} · ${esc(fmtDay(m.d))}`;
-  if (m.manual) return `<div class="detail cd">${head('<div class="dnum" style="font-size:20px;white-space:nowrap">Por definir</div>')}<div class="dmeta">Previa · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div>
-    <p class="hint" style="margin-top:12px">Partido anunciado. La hora, el pronóstico y las alineaciones aparecen cuando el partido esté publicado en nuestros datos.</p></div>`;
+  if (m.manual) return `<div class="detail cd">${head('<div class="dnum" style="font-size:20px;white-space:nowrap">Por definir</div>')}<div class="dmeta">Previa · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div></div>`;
   if (m.hs != null) {
     const ev = sortEvents({ events: m.ev || [] }).events;
     const sts = m.stats && m.stats.length === 2 ? m.stats : null, hi = sts && sts[0].t === m.h.id ? 0 : 1;
