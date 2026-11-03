@@ -1,0 +1,77 @@
+{
+ "_nota": "Asistidores oficiales de UNAFUT. Se actualiza A MANO al final de cada jornada. Solo jugadores con 3 o más. equipo = nombre como sale en la página.",
+ "jornada": 14,
+ "minimo": 3,
+ "lista": [
+  {
+   "jugador": "Luis Paradela",
+   "equipo": "Saprissa",
+   "a": 7
+  },
+  {
+   "jugador": "Manuel Morán",
+   "equipo": "Cartaginés",
+   "a": 6
+  },
+  {
+   "jugador": "José González",
+   "equipo": "Cartaginés",
+   "a": 4
+  },
+  {
+   "jugador": "Mariano Torres",
+   "equipo": "Saprissa",
+   "a": 3
+  },
+  {
+   "jugador": "Dominic Chévez",
+   "equipo": "Sporting",
+   "a": 3
+  },
+  {
+   "jugador": "Geancarlo Castro",
+   "equipo": "Cartaginés",
+   "a": 3
+  },
+  {
+   "jugador": "Kenneth Cerdas",
+   "equipo": "San Carlos",
+   "a": 3
+  },
+  {
+   "jugador": "Jefry Valverde",
+   "equipo": "San Carlos",
+   "a": 3
+  },
+  {
+   "jugador": "Marcos Ureña",
+   "equipo": "Sporting",
+   "a": 3
+  },
+  {
+   "jugador": "Joel Campbell",
+   "equipo": "Inter San Carlos",
+   "a": 3
+  },
+  {
+   "jugador": "Creichel Pérez",
+   "equipo": "Alajuelense",
+   "a": 3
+  },
+  {
+   "jugador": "Newton Williams",
+   "equipo": "Saprissa",
+   "a": 3
+  },
+  {
+   "jugador": "Mayron George",
+   "equipo": "Sporting",
+   "a": 3
+  },
+  {
+   "jugador": "Juan Pablo Añor",
+   "equipo": "Alajuelense",
+   "a": 3
+  }
+ ]
+}

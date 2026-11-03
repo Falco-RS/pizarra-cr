@@ -430,6 +430,8 @@ function statsHtml() {
   <h2 class="shead">Jugadores</h2>
   <div class="sgrid">
     ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''), 'Los autogoles no cuentan para el jugador.')}
+    ${(() => { const tid = n => +Object.keys(T).find(k => T[k].name === n); const L = (ASIS.lista || []).filter(x => tid(x.equipo)).sort((a, b) => b.a - a.a);
+      return L.length ? sCard('Asistidores', `<p class="hint" style="margin:0 0 6px">Datos oficiales de UNAFUT, actualizados <b>al final de cada jornada</b> (no en vivo). Corte: Jornada ${ASIS.jornada}. Se muestran los jugadores con ${ASIS.minimo || 3} asistencias o más.</p>` + sRows(ranked(L.map(x => ({ name: x.jugador, t: tid(x.equipo), v: x.a })), 'v'))) : ''; })()}
     ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>', 'Partidos con 2 o más goles.')}
   </div>
   <h2 class="shead">Equipos</h2>
@@ -925,10 +927,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, XSTATS = {};
+let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, XSTATS = {}, ASIS = {};
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { XSTATS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { XSTATS = j || {}; }).then(() => fetch('/data/asistencias.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { ASIS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
