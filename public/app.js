@@ -431,7 +431,8 @@ function statsHtml() {
   <div class="sgrid">
     ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''), 'Los autogoles no cuentan para el jugador.')}
     ${(() => { const tid = n => +Object.keys(T).find(k => T[k].name === n); const L = (ASIS.lista || []).filter(x => tid(x.equipo)).sort((a, b) => b.a - a.a);
-      return L.length ? sCard('Asistidores', `<p class="hint" style="margin:0 0 6px">Datos oficiales de UNAFUT, actualizados <b>al final de cada jornada</b> (no en vivo). Corte: Jornada ${ASIS.jornada}. Se muestran los jugadores con ${ASIS.minimo || 3} asistencias o más.</p>` + sRows(ranked(L.map(x => ({ name: x.jugador, t: tid(x.equipo), v: x.a })), 'v'))) : ''; })()}
+      const R = ranked(L.map(x => ({ name: x.jugador, t: tid(x.equipo), v: x.a })), 'v');
+      return L.length ? sCard('Asistidores', sRows(S.alla ? R : R.slice(0, 5)) + (R.length > 5 ? `<button class="more sall" data-alla>${S.alla ? 'Ver menos' : `Ver los ${R.length}`}</button>` : ''), `Los asistidores se actualizan al final de cada jornada · Última actualización: ${esc(ASIS.actualizado || '')}`) : ''; })()}
     ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>', 'Partidos con 2 o más goles.')}
   </div>
   <h2 class="shead">Equipos</h2>
@@ -477,6 +478,7 @@ function renderView() {
   } else if (S.view === 'estadisticas') {
     v.innerHTML = statsHtml();
     v.querySelectorAll('[data-allg]').forEach(b => b.onclick = () => { S.allg = !S.allg; renderView(); });
+    v.querySelectorAll('[data-alla]').forEach(b => b.onclick = () => { S.alla = !S.alla; renderView(); });
   } else if (S.view === 'sele') {
     renderSele(v);
   } else if (S.view === 'legionarios') {
