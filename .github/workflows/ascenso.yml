@@ -1,0 +1,36 @@
+name: Liga de Ascenso
+
+on:
+  schedule:
+    # cada 2 horas: partidos, historial y resultados de los playoffs
+    - cron: '27 */2 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ascenso
+  cancel-in-progress: false
+
+jobs:
+  ascenso:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Descargar datos de la Liga de Ascenso
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+        run: node scripts/ascenso.mjs
+      - name: Guardar cambios
+        run: |
+          git add public/data/ascenso-api.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git config user.name "pizarra-bot"
+          git config user.email "pizarra-bot@users.noreply.github.com"
+          git commit -m "Actualizar Liga de Ascenso"
+          git pull --rebase origin main
+          git push
