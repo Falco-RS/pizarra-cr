@@ -24,7 +24,7 @@ const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
 const soonRound = M.filter(m => !played(m) && new Date(m.d) - Date.now() < 3 * 864e5).map(m => m.r);
 const currentRound = soonRound.length && M.filter(m => m.r === lastPlayed).every(played) ? Math.min(...soonRound) : lastPlayed;
 let S = { view:'inicio', j:currentRound, sel:null, tmode:'total', moved:false };
-try { const v = location.hash.slice(1); if (['inicio','tabla','goleadores','disciplina','copa','legionarios','sele'].includes(v)) S.view = v; } catch(e){}
+try { const v = location.hash.slice(1) === 'goleadores' ? 'estadisticas' : location.hash.slice(1); if (['inicio','tabla','estadisticas','disciplina','copa','legionarios','sele'].includes(v)) S.view = v; } catch(e){}
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
 
@@ -360,6 +360,97 @@ function scorersHtml(n) {
   return `<ol class="list">${topScorers.slice(0, n).map((s,i) => `<li><span class="pos">${i+1}</span>${crest(s.t)}
     <span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)} · gol en ${s.matches.size} partido${s.matches.size === 1 ? '' : 's'}${s.pen ? ` · ${s.pen} de penal` : ''}</span></span><span class="big">${s.g}</span></li>`).join('')}</ol>`;
 }
+/* ---------- pestaña Estadísticas ---------- */
+const pname = (name, tid) => (XSTATS.names || {})[tid + '|' + name] || name;
+const minN = t => { const [a, b] = String(t || '0').split('+'); return +a + (b ? +b / 100 : 0); };
+const sRows = (rows, fmt = v => v) => `<ol class="list srank">${rows.map((r, i) => `<li><span class="pos">${r.pos ?? i + 1}</span>${crest(r.t)}<span class="nm"><b>${esc(r.name)}</b>${r.sub !== undefined ? `<span>${esc(r.sub)}</span>` : (r.name === T[r.t]?.name ? '' : `<span>${esc(T[r.t]?.name ?? '')}</span>`)}</span>${r.bar !== undefined ? `<span class="rbar"><i style="width:${Math.max(3, Math.min(100, r.bar))}%"></i></span>` : ''}<span class="sval">${fmt(r.v)}</span></li>`).join('')}</ol>`;
+const ranked = (arr, key) => { let last, pos = 0; return arr.map((x, i) => { if (x[key] !== last) { pos = i + 1; last = x[key]; } return { ...x, pos }; }); };
+const sCard = (title, body, note, wide) => `<section class="scard${wide ? ' wide' : ''}"><h3>${title}</h3>${body}${note ? `<p class="foot">${note}</p>` : ''}</section>`;
+function statsHtml() {
+  const P = M.filter(played);
+  const tids = Object.keys(T).map(Number).filter(t => P.some(m => m.h === t || m.a === t));
+  /* jugadores, del minuto a minuto */
+  const bench = {}, lateG = {}, half = {}, braces = {};
+  for (const m of P) {
+    const ev = m.ev || [], cameIn = {}, gm = {};
+    for (const e of ev) if (e[1] === 'sub' && e[4]) cameIn[e[2] + '|' + e[4]] = minN(e[0]);
+    for (const e of ev) {
+      if (!['goal', 'pen', 'og'].includes(e[1])) continue;
+      const scorerTeam = e[1] === 'og' ? (e[2] ? m.a : m.h) : (e[2] ? m.h : m.a);
+      const mn = minN(e[0]);
+      const h = half[scorerTeam] ||= { a: 0, b: 0 }; (String(e[0]).startsWith('45+') || mn <= 45) ? h.a++ : h.b++;
+      if (mn >= 76) lateG[scorerTeam] = (lateG[scorerTeam] || 0) + 1;
+      if (e[1] === 'og' || !e[3]) continue;
+      const k = e[3] + '|' + scorerTeam;
+      if (cameIn[e[2] + '|' + e[3]] !== undefined && cameIn[e[2] + '|' + e[3]] <= mn) bench[k] = (bench[k] || 0) + 1;
+      gm[k] = (gm[k] || 0) + 1;
+    }
+    for (const [k, n] of Object.entries(gm)) if (n >= 2) (braces[k] ||= []).push(n);
+  }
+  const fromKey = (obj, f) => Object.entries(obj).map(([k, v]) => { const [n, t] = k.split('|'); return { name: pname(n, +t), t: +t, ...f(v) }; });
+  const goles = ranked(topScorers.map(s => ({ name: pname(s.name, s.t), t: s.t, v: s.g, sub: `${T[s.t].name}${s.pen ? ` · ${s.pen} de penal` : ''}` })), 'v');
+  const nG = S.allg ? goles.length : 5;
+  const penal = ranked(topScorers.filter(s => s.pen).map(s => ({ name: pname(s.name, s.t), t: s.t, v: s.pen })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
+  const banco = ranked(fromKey(bench, v => ({ v })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
+  const dobletes = ranked(fromKey(braces, v => ({ v: v.length, sub: undefined, x: v })).map(r => ({ ...r, sub: `${T[r.t].name} · ${r.x.map(n => n === 2 ? 'doblete' : n === 3 ? 'triplete' : n + ' goles').join(', ')}` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
+  /* jugadores, de la fuente de datos (asistencias y minutos) */
+  const PL = (XSTATS.players || []).filter(p => p.pj !== undefined && T[p.t]);
+  const gOf = p => (scorers[p.abbr + '|' + p.t] || {}).g || 0;
+  const asis = ranked(PL.filter(p => p.a > 0).map(p => ({ name: p.name || p.abbr, t: p.t, v: p.a, sub: `${T[p.t].name} · ${p.pj} PJ` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
+  const ga = ranked(PL.map(p => ({ name: p.name || p.abbr, t: p.t, g: gOf(p), a: p.a || 0 })).map(r => ({ ...r, v: r.g + r.a, sub: `${T[r.t].name} · ${r.g} G + ${r.a} A` })).filter(r => r.v > 0).sort((a, b) => b.v - a.v || b.g - a.g), 'v').slice(0, 5);
+  const mins = ranked(PL.filter(p => p.min).map(p => ({ name: p.name || p.abbr, t: p.t, v: p.min, sub: `${T[p.t].name} · ${p.pj} PJ` })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
+  /* equipos, de las estadísticas de cada partido */
+  const acc = {};
+  for (const m of P) { const st = (XSTATS.matches || {})[m.id]; if (!st) continue;
+    if (!st.h || !st.a || !Object.keys(st.h).length || !Object.keys(st.a).length) continue;
+    for (const [t, x, o] of [[m.h, st.h, st.a], [m.a, st.a, st.h]]) { const a = acc[t] ||= { n: 0, pos: 0, son: 0, sh: 0, cor: 0, off: 0, sonC: 0 }; a.n++; a.pos += x.pos || 0; a.son += x.son || 0; a.sh += (x.son || 0) + (x.soff || 0) + (x.sblk || 0); a.cor += x.cor || 0; a.off += x.off || 0; a.sonC += o.son || 0; } }
+  const tAvg = (f, dec = 1, asc) => { const rows = Object.entries(acc).filter(([, a]) => a.n).map(([t, a]) => ({ t: +t, name: T[t].name, v: f(a) })).sort((a, b) => asc ? a.v - b.v : b.v - a.v); const max = Math.max(...rows.map(r => r.v)) || 1; return ranked(rows.map(r => ({ ...r, v: +r.v.toFixed(dec), bar: 100 * r.v / max })), 'v'); };
+  const nst = Object.values(acc).reduce((s, a) => s + a.n, 0) / 2;
+  /* equipos, de los resultados */
+  const res = {}; for (const t of tids) res[t] = { cs: 0, ns: 0, gf: 0, gc: 0 };
+  let hw = 0, dw = 0, aw = 0, goals = 0, big = null;
+  for (const m0 of P) { const m = off(m0); goals += m.hs + m.as; m.hs > m.as ? hw++ : m.hs < m.as ? aw++ : dw++;
+    if (!big || Math.abs(m.hs - m.as) > Math.abs(big.hs - big.as) || (Math.abs(m.hs - m.as) === Math.abs(big.hs - big.as) && m.hs + m.as > big.hs + big.as)) big = m;
+    for (const [t, gf, gc] of [[m.h, m.hs, m.as], [m.a, m.as, m.hs]]) { const r = res[t]; if (!r) continue; r.gf += gf; r.gc += gc; if (!gc) r.cs++; if (!gf) r.ns++; } }
+  const tRes = (f, asc) => { const rows = tids.map(t => ({ t, name: T[t].name, v: f(res[t], t) })).sort((a, b) => asc ? a.v - b.v : b.v - a.v); const max = Math.max(...rows.map(r => r.v)) || 1; return ranked(rows.map(r => ({ ...r, bar: 100 * r.v / max })), 'v'); };
+  const pct = n => Math.round(100 * n / (P.length || 1)) + '%';
+  const fair = tids.map(t => ({ t, name: T[t].name, y: (teamCards[t] || {}).y || 0, r: (teamCards[t] || {}).r || 0 })).map(r => ({ ...r, v: r.y + 3 * r.r, sub: `${r.y} amarillas · ${r.r} rojas` })).sort((a, b) => a.v - b.v);
+  const kpi = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
+  const srcNote = 'Fuente: datos de cada partido; se actualiza solo.';
+  const noApi = '<p class="hint">Todavía no hay datos. Se cargan automáticamente en las próximas horas.</p>';
+  return `
+  <section class="panel"><div class="ph2"><h2>Estadísticas · Apertura 2026</h2></div>
+    <div class="kpis">
+      ${kpi(goals, 'goles en ' + P.length + ' partidos')}${kpi((goals / (P.length || 1)).toFixed(2), 'goles por partido')}
+      ${kpi(pct(hw), 'ganó el local')}${kpi(pct(dw), 'empates')}${kpi(pct(aw), 'ganó la visita')}
+      ${big ? kpi(`${big.hs}-${big.as}`, `mayor goleada: ${esc(T[big.h].name)} vs ${esc(T[big.a].name)}, J${big.r}`) : ''}
+    </div></section>
+  <h2 class="shead">Jugadores</h2>
+  <div class="sgrid">
+    ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''), 'Los autogoles no cuentan para el jugador.')}
+    ${sCard('Asistidores', asis.length ? sRows(asis) : noApi, 'Fuente: datos de la API por jugador (Highlightly). Puede faltar algún jugador.')}
+    ${sCard('Goles + asistencias', ga.length ? sRows(ga) : noApi)}
+    ${sCard('Goles saliendo del banco', banco.length ? sRows(banco) : '<p class="hint">Nadie todavía.</p>', 'Goles de jugadores que entraron de cambio.')}
+    ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>', 'Partidos con 2 o más goles.')}
+    ${sCard('Goles de penal', penal.length ? sRows(penal) : '<p class="hint">Nadie todavía.</p>')}
+    ${sCard('Más minutos jugados', mins.length ? sRows(mins, v => v.toLocaleString('es-CR') + "'") : noApi)}
+  </div>
+  <h2 class="shead">Equipos</h2>
+  <div class="sgrid">
+    ${sCard('Posesión promedio', nst ? sRows(tAvg(a => 100 * a.pos / a.n, 0), v => v + '%') : noApi)}
+    ${sCard('Remates al arco por partido', nst ? sRows(tAvg(a => a.son / a.n)) : noApi)}
+    ${sCard('Remates totales por partido', nst ? sRows(tAvg(a => a.sh / a.n)) : noApi)}
+    ${sCard('Tiros de esquina por partido', nst ? sRows(tAvg(a => a.cor / a.n)) : noApi)}
+    ${sCard('Remates al arco recibidos', nst ? sRows(tAvg(a => a.sonC / a.n, 1, true)) : noApi, 'Por partido; de menos a más.')}
+    ${sCard('Fueras de juego por partido', nst ? sRows(tAvg(a => a.off / a.n)) : noApi)}
+    ${sCard('Vallas invictas', sRows(tRes(r => r.cs)), 'Partidos sin recibir gol.')}
+    ${sCard('Partidos sin anotar', sRows(tRes(r => r.ns)))}
+    ${sCard('Goles en el segundo tiempo', sRows(tids.map(t => ({ t, name: T[t].name, v: (half[t] || {}).b || 0, sub: `${(half[t] || {}).a || 0} en el 1.º · ${(half[t] || {}).b || 0} en el 2.º` })).sort((a, b) => b.v - a.v).map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))))}
+    ${sCard('Goles del minuto 76 en adelante', sRows(ranked(tids.map(t => ({ t, name: T[t].name, v: lateG[t] || 0 })).sort((a, b) => b.v - a.v), 'v').map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))))}
+    ${sCard('Juego limpio', sRows(ranked(fair, 'v').map(r => ({ ...r, v: r.v }))), 'Puntos: amarilla 1, roja 3. Menos es mejor.')}
+  </div>
+  <p class="foot">Estadísticas de equipo (posesión, remates, tiros de esquina, fueras de juego) calculadas con ${Math.round(nst)} de ${P.length} partidos que tienen esos datos${tids.filter(t => !acc[t]).length ? `; la fuente no trae esos datos para ${tids.filter(t => !acc[t]).map(t => esc(T[t].name)).join(', ')}` : ''}. ${srcNote}</p>`;
+}
 const cardRow = n => `<span class="cards" aria-label="${n} amarillas">${Array.from({length:n}, () => '<i class="ico yc"></i>').join('')}</span>`;
 function yellowsHtml(n) {
   return `<ol class="list">${topYellow.slice(0, n).map(y => `<li>${crest(y.t)}<span class="nm"><b>${esc(y.name)}</b><span>${esc(T[y.t].name)} · última en J${y.last}${suspendedNext.some(x => x.name === y.name && x.t === y.t) ? ' · <b style="color:var(--red,#d33)">suspendido J' + (y.last + 1) + '</b>' : y.n >= YELLOW_LIMIT ? ' · ya cumplió suspensión' : ''}</span></span>${y.cycle === YELLOW_LIMIT - 1 ? '<span class="chip cap4">En capilla</span>' : ''}${cardRow(y.n)}<span class="big" style="font-size:22px;min-width:22px;text-align:right">${y.n}</span></li>`).join('')}</ol>`;
@@ -380,7 +471,7 @@ function renderView() {
     v.innerHTML = `<div class="cols">
       <div class="wide"><section class="panel"><div class="ph2"><h2>Tabla de posiciones</h2>${seg}</div>${tableHtml(S.tmode)}</section></div>
       <div class="side">
-        <section class="panel"><div class="ph2"><h2>Goleadores</h2><button class="more" data-go="goleadores">Ver todos →</button></div>${scorersHtml(5)}</section>
+        <section class="panel"><div class="ph2"><h2>Goleadores</h2><button class="more" data-go="estadisticas">Ver todos →</button></div>${scorersHtml(5)}</section>
         <section class="panel"><div class="ph2"><h2>Disciplina</h2><button class="more" data-go="disciplina">Ver todo →</button></div>
           <p class="lead">Suspendidos para su próximo partido</p>
           ${suspendedNext.length ? `<ol class="list">${suspendedNext.map(s => `<li>${crest(s.t)}<span class="nm"><b>${esc(s.name)}</b><span>${esc(T[s.t].name)}</span></span><span class="chip sus">${esc(s.why)}</span></li>`).join('')}</ol>` : '<p class="hint">Nadie.</p>'}
@@ -391,9 +482,9 @@ function renderView() {
   } else if (S.view === 'tabla') {
     v.innerHTML = `<section class="panel"><div class="ph2"><h2>Tabla de posiciones</h2>${seg}</div>${tableHtml(S.tmode)}
       <p class="foot">Local y Visita cuentan solo los partidos en esa condición. Últimos 5: G ganó, E empató, P perdió.</p></section>`;
-  } else if (S.view === 'goleadores') {
-    v.innerHTML = `<section class="panel"><div class="ph2"><h2>Goleadores · Apertura 2026</h2></div>${scorersHtml(30)}
-      <p class="foot">Calculado a partir del minuto a minuto de los ${M.filter(played).length} partidos jugados. Los autogoles no cuentan para el jugador. La API no trae asistencias para esta liga.</p></section>`;
+  } else if (S.view === 'estadisticas') {
+    v.innerHTML = statsHtml();
+    v.querySelectorAll('[data-allg]').forEach(b => b.onclick = () => { S.allg = !S.allg; renderView(); });
   } else if (S.view === 'sele') {
     renderSele(v);
   } else if (S.view === 'legionarios') {
@@ -844,10 +935,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 }
 let LIVE = [];
 /* Alineaciones oficiales que se escriben a mano desde las redes de los clubes (cuando la API no las trae) */
-let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {};
+let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, XSTATS = {};
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { XSTATS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
