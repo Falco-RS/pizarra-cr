@@ -300,3 +300,22 @@ button.cc[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px v
 .dcols .pv-lu{max-width:420px}
 .pl.susp span{color:#FF5A6E!important;font-weight:800;text-shadow:0 1px 2px #000a}
 .pl.susp b{box-shadow:0 0 0 2px #FF5A6E}
+
+/* pestaña Estadísticas */
+.shead{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;letter-spacing:.5px;margin:22px 0 10px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.scard h3{font-family:var(--display);font-weight:700;font-size:21px;margin:0 0 6px;line-height:1.1}
+.srank li{padding:7px 0;gap:9px}
+.srank li:first-child{border-top:0}
+.srank .pos{min-width:18px;color:var(--muted);font-size:13px;font-weight:600;text-align:right}
+.srank .nm b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sval{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;min-width:34px;text-align:right}
+.sbar{width:54px;height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;flex:none}
+.sbar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.sall{background:none;border:0;color:var(--accent);font-weight:600;padding:8px 0 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--sunk);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:var(--display);font-weight:800;font-size:34px;line-height:1}
+.kpi span{font-size:12px;color:var(--muted)}
+@media (max-width:420px){.sgrid{grid-template-columns:1fr}}
