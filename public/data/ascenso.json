@@ -1,0 +1,286 @@
+{
+ "_nota": "Liga de Ascenso (Liasce). Se actualiza A MANO con lo que publica Liasce. En cada serie, 'a' es el de arriba (abre de local) y 'b' el de abajo (cierra de local). Marcadores: null = por jugar. 'pasa' = 'a' o 'b' cuando la serie se define (si hace falta penales u otro criterio, se pone a mano).",
+ "torneo": "Apertura 2026",
+ "actualizado": "3/11/26",
+ "fase": "Cuartos de final",
+ "equipos": {
+  "guadalupe": {
+   "nombre": "Guadalupe FC",
+   "escudo": "/escudos/ascenso/guadalupe.png"
+  },
+  "jicaral": {
+   "nombre": "Jicaral Sercoba",
+   "escudo": "/escudos/ascenso/jicaral.png"
+  },
+  "cariari": {
+   "nombre": "Cariari Pococí",
+   "escudo": "/escudos/ascenso/cariari-pococi.png"
+  },
+  "grecia": {
+   "nombre": "Municipal Grecia",
+   "escudo": "/escudos/ascenso/municipal-grecia.png"
+  },
+  "rosario": {
+   "nombre": "AD Rosario",
+   "escudo": "/escudos/ascenso/rosario.png"
+  },
+  "pitbulls": {
+   "nombre": "Pitbulls SB",
+   "escudo": "/escudos/ascenso/pitbulls.png"
+  },
+  "sarchi": {
+   "nombre": "Sarchí FC",
+   "escudo": "/escudos/ascenso/sarchi.png"
+  },
+  "santaana": {
+   "nombre": "Santa Ana FC",
+   "escudo": "/escudos/ascenso/santa-ana.png"
+  }
+ },
+ "series": [
+  {
+   "n": 1,
+   "a": "guadalupe",
+   "b": "jicaral",
+   "ida": {
+    "fecha": "2026-11-06T20:00:00-06:00",
+    "estadio": "Estadio “Colleya” Fonseca",
+    "tv": "Liasce TV",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  },
+  {
+   "n": 2,
+   "a": "cariari",
+   "b": "grecia",
+   "ida": {
+    "fecha": "2026-11-07T19:00:00-06:00",
+    "estadio": "Estadio Bernardo Veach",
+    "tv": "TD+",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  },
+  {
+   "n": 3,
+   "a": "rosario",
+   "b": "pitbulls",
+   "ida": {
+    "fecha": "2026-11-09T19:00:00-06:00",
+    "estadio": "Estadio Rafael Bolaños",
+    "tv": "TD+",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  },
+  {
+   "n": 4,
+   "a": "sarchi",
+   "b": "santaana",
+   "ida": {
+    "fecha": "2026-11-08T11:00:00-06:00",
+    "estadio": "Estadio Eliécer Pérez C.",
+    "tv": "Liasce TV",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  }
+ ],
+ "grupos": [
+  {
+   "nombre": "Grupo A",
+   "clasifican": 4,
+   "tabla": [
+    [
+     "Jicaral Sercoba",
+     12,
+     8,
+     3,
+     1,
+     21,
+     7,
+     27
+    ],
+    [
+     "Municipal Grecia",
+     12,
+     6,
+     3,
+     3,
+     15,
+     12,
+     21
+    ],
+    [
+     "AD Rosario",
+     12,
+     6,
+     2,
+     4,
+     21,
+     17,
+     20
+    ],
+    [
+     "Sarchí FC",
+     12,
+     6,
+     2,
+     4,
+     16,
+     15,
+     20
+    ],
+    [
+     "Quepos FC",
+     12,
+     6,
+     1,
+     5,
+     15,
+     11,
+     19
+    ],
+    [
+     "Cofutpa U. SJ",
+     12,
+     2,
+     1,
+     9,
+     11,
+     24,
+     7
+    ],
+    [
+     "Santa Cruz PFA",
+     12,
+     2,
+     0,
+     10,
+     13,
+     26,
+     6
+    ]
+   ]
+  },
+  {
+   "nombre": "Grupo B",
+   "clasifican": 4,
+   "tabla": [
+    [
+     "Santa Ana FC",
+     14,
+     9,
+     0,
+     5,
+     22,
+     15,
+     27
+    ],
+    [
+     "Pitbulls SB",
+     14,
+     6,
+     5,
+     3,
+     23,
+     22,
+     23
+    ],
+    [
+     "Cariari Pococí",
+     14,
+     6,
+     4,
+     4,
+     17,
+     13,
+     22
+    ],
+    [
+     "Guadalupe FC",
+     14,
+     6,
+     3,
+     5,
+     19,
+     20,
+     21
+    ],
+    [
+     "FC Moravia",
+     14,
+     6,
+     1,
+     7,
+     21,
+     15,
+     19
+    ],
+    [
+     "Aserrí FC *",
+     14,
+     5,
+     4,
+     5,
+     17,
+     18,
+     19
+    ],
+    [
+     "AD Carmelita",
+     14,
+     4,
+     4,
+     6,
+     21,
+     19,
+     16
+    ],
+    [
+     "CS Uruguay",
+     14,
+     2,
+     3,
+     9,
+     12,
+     30,
+     9
+    ]
+   ]
+  }
+ ]
+}

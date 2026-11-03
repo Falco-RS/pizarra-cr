@@ -24,7 +24,7 @@ const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
 const soonRound = M.filter(m => !played(m) && new Date(m.d) - Date.now() < 3 * 864e5).map(m => m.r);
 const currentRound = soonRound.length && M.filter(m => m.r === lastPlayed).every(played) ? Math.min(...soonRound) : lastPlayed;
 let S = { view:'inicio', j:currentRound, sel:null, tmode:'total', moved:false };
-try { const v = location.hash.slice(1) === 'goleadores' ? 'estadisticas' : location.hash.slice(1); if (['inicio','tabla','estadisticas','disciplina','copa','legionarios','sele'].includes(v)) S.view = v; } catch(e){}
+try { const v = location.hash.slice(1) === 'goleadores' ? 'estadisticas' : location.hash.slice(1); if (['inicio','tabla','estadisticas','disciplina','ascenso','copa','legionarios','sele'].includes(v)) S.view = v; } catch(e){}
 
 document.getElementById('src').textContent = `Actualizado ${new Date(D.updated).toLocaleString('es-CR',{ ...tz, day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}`;
 
@@ -481,6 +481,8 @@ function renderView() {
     v.querySelectorAll('[data-alla]').forEach(b => b.onclick = () => { S.alla = !S.alla; renderView(); });
   } else if (S.view === 'sele') {
     renderSele(v);
+  } else if (S.view === 'ascenso') {
+    renderAscenso(v);
   } else if (S.view === 'legionarios') {
     renderLegio(v);
   } else if (S.view === 'copa') {
@@ -747,6 +749,43 @@ function renderLegio(v) {
 }
 /* ---------- La Sele: se actualiza a mano después de cada fecha FIFA (scripts/sele.mjs) ---------- */
 let SE = null, SEsel = null, SEms = [];
+/* ---------- Liga de Ascenso (manual, public/data/ascenso.json) ---------- */
+let ASC = null;
+function renderAscenso(v) {
+  if (!ASC) {
+    v.innerHTML = '<section class="panel"><p class="hint">Cargando la Liga de Ascenso…</p></section>';
+    if (ASC === null) { ASC = false; fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { ASC = j || { series: [], grupos: [], equipos: {} }; if (S.view === 'ascenso') renderView(); }); }
+    return;
+  }
+  const E = ASC.equipos || {};
+  const cr = (k, cls = 'crest') => E[k]?.escudo ? `<img class="${cls}" src="${esc(E[k].escudo)}" alt="" loading="lazy">` : `<span class="${cls} ph" aria-hidden="true">${esc((E[k]?.nombre || k).slice(0, 3).toUpperCase())}</span>`;
+  const nm = k => esc(E[k]?.nombre || k);
+  const when = l => l.fecha ? `${fmtDay(l.fecha)} · ${fmtTime(l.fecha)}` : 'Fecha por confirmar';
+  const sc = x => x == null ? '' : x;
+  const series = (ASC.series || []).map(s => {
+    const i = s.ida || {}, vu = s.vuelta || {};
+    const both = i.ga != null && vu.ga != null;
+    const ta = (i.ga ?? 0) + (vu.ga ?? 0), tb = (i.gb ?? 0) + (vu.gb ?? 0);
+    const pasa = s.pasa || (both && ta !== tb ? (ta > tb ? 'a' : 'b') : null);
+    const row = (side, k, g1, g2, tot) => `<div class="asr${pasa === side ? ' win' : pasa ? ' out' : ''}">${cr(k)}<b>${nm(k)}</b><span class="g">${sc(g1)}</span><span class="g">${sc(g2)}</span><span class="g tot">${i.ga != null ? tot : ''}</span></div>`;
+    return `<article class="aser"><div class="ash"><span>Serie ${s.n}</span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
+      ${row('a', s.a, i.ga, vu.ga, ta)}${row('b', s.b, i.gb, vu.gb, tb)}
+      <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · 📺 ${esc(i.tv)}` : ''}</li>
+      <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · 📺 ${esc(vu.tv)}` : ''}</li></ul>
+      ${pasa ? `<p class="apasa">Avanza: <b>${nm(pasa === 'a' ? s.a : s.b)}</b></p>` : ''}</article>`;
+  }).join('');
+  const tabla = g => `<section class="panel"><div class="ph2"><h2>${esc(g.nombre)}</h2></div><div class="tw"><table>
+    <thead><tr><th class="l">#</th><th class="l">Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
+    <tbody>${g.tabla.map((r, i) => { const [n, pj, gg, e, p, gf, gc, pts] = r, dg = gf - gc, k = Object.keys(E).find(k => E[k].nombre === n);
+      return `<tr class="${i < (g.clasifican || 0) ? 'aq' : ''}"><td class="l"><span class="pos">${i + 1}</span></td><td class="l"><span class="tn">${k ? cr(k) : ''}${esc(n)}</span></td><td>${pj}</td><td>${gg}</td><td>${e}</td><td>${p}</td><td>${gf}</td><td>${gc}</td><td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${pts}</td></tr>`; }).join('')}</tbody></table></div>
+    <p class="foot">Los ${g.clasifican} primeros clasificaron a cuartos de final.${g.tabla.some(r => /\*/.test(r[0])) ? ' * Así aparece en la tabla oficial de Liasce.' : ''}</p></section>`;
+  v.innerHTML = `<section class="panel"><div class="ph2"><h2>Liga de Ascenso · ${esc(ASC.torneo || '')}</h2><span class="chip">${esc(ASC.fase || '')}</span></div>
+      <p class="hint" style="margin:0 0 12px">En cada serie, el equipo de arriba abre de local y el de abajo cierra en casa.</p>
+      <div class="agrid">${series}</div></section>
+    <h2 class="shead">Fase regular</h2>
+    <div class="agrid2">${(ASC.grupos || []).map(tabla).join('')}</div>
+    <p class="foot">Datos oficiales de Liasce, actualizados a mano. Última actualización: ${esc(ASC.actualizado || '')}.</p>`;
+}
 function renderSele(v) {
   if (!SE) {
     v.innerHTML = '<section class="panel"><p class="hint">Cargando la Sele…</p></section>';
