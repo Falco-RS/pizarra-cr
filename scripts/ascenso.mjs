@@ -36,6 +36,9 @@ const slim = x => {
 };
 
 const cfg = JSON.parse(await fs.readFile('public/data/ascenso.json', 'utf8'));
+// solo los equipos que están en una serie de playoffs
+const EN_SERIE = new Set((cfg.series || []).flatMap(s => [s.a, s.b]));
+const EQ = Object.entries(cfg.equipos || {}).filter(([k]) => EN_SERIE.has(k));
 
 // 1) todos los partidos del torneo (con paginación)
 const all = new Map();
@@ -56,7 +59,7 @@ console.log('Rondas:', [...new Set(matches.map(m => m.r))].join(' | '));
 const PISTAS = { guadalupe: ['guadalupe'], jicaral: ['jicaral'], cariari: ['cariari', 'pococi'], grecia: ['grecia'], rosario: ['rosario'],
   pitbulls: ['pitbull', 'santa barbara'], sarchi: ['sarchi'], santaana: ['santa ana'] };
 const ids = {};
-for (const [k, e] of Object.entries(cfg.equipos || {})) {
+for (const [k, e] of EQ) {
   if (e.apiId) { ids[k] = e.apiId; continue; }
   const pistas = PISTAS[k] || [norm(e.nombre)];
   const hit = [...teams.entries()].find(([, n]) => pistas.some(p => norm(n).includes(p)));
@@ -75,7 +78,7 @@ const regular = matches.filter(m => /regular/i.test(m.r || '') && m.hs !== undef
 const aserriId = [...teams.entries()].find(([, n]) => norm(n).includes('aserri'))?.[0];
 const ourName = (t, ctxGrupo) => nameOfId[t.id] || (t.id === aserriId && ctxGrupo === 'Grupo A' ? 'AD Rosario' : OPP[norm(t.n)] || t.n);
 const forms = {};
-for (const [k, e] of Object.entries(cfg.equipos || {})) {
+for (const [k, e] of EQ) {
   const g = grupoDe(e.nombre);
   let list;
   if (ids[k]) list = regular.filter(m => m.h.id === ids[k] || m.a.id === ids[k]).map(m => ({ m, home: m.h.id === ids[k] }));

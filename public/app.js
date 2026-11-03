@@ -776,7 +776,7 @@ function renderAscenso(v) {
   }).join('');
   const tabla = g => `<section class="panel"><div class="ph2"><h2>${esc(g.nombre)}</h2></div><div class="tw"><table>
     <thead><tr><th class="l">#</th><th class="l">Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead>
-    <tbody>${g.tabla.map((r, i) => { const [n, pj, gg, e, p, gf, gc, pts] = r, dg = gf - gc, k = Object.keys(E).find(k => E[k].nombre === n);
+    <tbody>${g.tabla.map((r, i) => { const [n, pj, gg, e, p, gf, gc, pts] = r, dg = gf - gc, k = Object.keys(E).find(k => E[k].nombre === n.replace(/\s*\*$/, ''));
       return `<tr class="${i < (g.clasifican || 0) ? 'aq' : ''}"><td class="l"><span class="pos">${i + 1}</span></td><td class="l"><span class="tn">${k ? cr(k) : ''}${esc(n)}</span></td><td>${pj}</td><td>${gg}</td><td>${e}</td><td>${p}</td><td>${gf}</td><td>${gc}</td><td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${pts}</td></tr>`; }).join('')}</tbody></table></div>
     <p class="foot">Los ${g.clasifican} primeros clasificaron a cuartos de final.${g.tabla.some(r => /\*/.test(r[0])) ? ' * Así aparece en la tabla oficial de Liasce.' : ''}</p></section>`;
   v.innerHTML = `<section class="panel"><div class="ph2"><h2>Liga de Ascenso · ${esc(ASC.torneo || '')}</h2><span class="chip">${esc(ASC.fase || '')}</span></div>
@@ -784,6 +784,10 @@ function renderAscenso(v) {
       <div class="agrid">${series}</div><div id="adetail">${S.asel ? ascPrevia((ASC.series || []).find(x => x.n === S.asel), E, cr, nm, when) : ''}</div></section>
     <h2 class="shead">Fase regular</h2>
     <div class="agrid2">${(ASC.grupos || []).map(tabla).join('')}</div>
+    ${(ASC.goleadores?.lista || []).length ? (() => { let last, pos = 0; const G = ASC.goleadores.lista.slice().sort((a, b) => b.g - a.g);
+      return `<h2 class="shead">Goleadores</h2><div class="sgrid"><section class="scard"><h3>Goleadores del torneo</h3><ol class="list srank">${G.map((x, i) => { if (x.g !== last) { pos = i + 1; last = x.g; }
+        return `<li><span class="pos">${pos}</span>${cr(x.equipo)}<span class="nm"><b>${esc(x.jugador)}</b><span>${nm(x.equipo)}</span></span><span class="sval">${x.g}</span></li>`; }).join('')}</ol>
+        <p class="foot">Datos de Liasce · Última actualización: ${esc(ASC.goleadores.actualizado || '')}</p></section></div>`; })() : ''}
     <p class="foot">Datos oficiales de Liasce, actualizados a mano. Última actualización: ${esc(ASC.actualizado || '')}.</p>`;
   v.querySelectorAll('[data-aser]').forEach(b => { const go_ = () => { const n = +b.dataset.aser; S.asel = S.asel === n ? null : n; renderView(); if (S.asel) document.getElementById('adetail').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     b.onclick = go_; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go_(); } }; });

@@ -35,6 +35,34 @@
   "santaana": {
    "nombre": "Santa Ana FC",
    "escudo": "/escudos/ascenso/santa-ana.png"
+  },
+  "quepos": {
+   "nombre": "Quepos FC",
+   "escudo": "/escudos/ascenso/quepos.png"
+  },
+  "cofutpa": {
+   "nombre": "Cofutpa U. SJ",
+   "escudo": "/escudos/ascenso/cofutpa.png"
+  },
+  "santacruz": {
+   "nombre": "Santa Cruz PFA",
+   "escudo": "/escudos/ascenso/santa-cruz.png"
+  },
+  "moravia": {
+   "nombre": "FC Moravia",
+   "escudo": "/escudos/ascenso/moravia.png"
+  },
+  "aserri": {
+   "nombre": "Aserrí FC",
+   "escudo": "/escudos/ascenso/aserri.png"
+  },
+  "carmelita": {
+   "nombre": "AD Carmelita",
+   "escudo": "/escudos/ascenso/carmelita.png"
+  },
+  "uruguay": {
+   "nombre": "CS Uruguay",
+   "escudo": "/escudos/ascenso/uruguay.png"
   }
  },
  "series": [
@@ -282,5 +310,30 @@
     ]
    ]
   }
- ]
+ ],
+ "goleadores": {
+  "actualizado": "3/11/26",
+  "lista": [
+   {
+    "jugador": "Brayton Lewis",
+    "equipo": "jicaral",
+    "g": 7
+   },
+   {
+    "jugador": "Andrés Jiménez",
+    "equipo": "quepos",
+    "g": 6
+   },
+   {
+    "jugador": "Davis Paniagua",
+    "equipo": "cariari",
+    "g": 6
+   },
+   {
+    "jugador": "Francisco Rodríguez",
+    "equipo": "guadalupe",
+    "g": 6
+   }
+  ]
+ }
 }
