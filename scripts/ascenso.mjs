@@ -64,6 +64,36 @@ for (const [k, e] of Object.entries(cfg.equipos || {})) {
   console.log(`  ${e.nombre} -> ${hit ? hit[1] + ' (' + hit[0] + ')' : 'NO ENCONTRADO'}`);
 }
 
+// AD Rosario no existe en la API: sus partidos salen con el nombre de "Aserri FC" (que es del otro grupo).
+// Se separan así: partidos de "Aserri FC" contra rivales del Grupo A = partidos de Rosario.
+const ALIAS = { rosario: { apiName: 'aserri', grupo: 'Grupo A' } };
+const OPP = { 'quepos cambute': 'Quepos FC', 'ad cofutpa': 'Cofutpa U. SJ', 'santa cruz fc': 'Santa Cruz PFA', 'futbol consultants moravia': 'FC Moravia',
+  'aserri fc': 'Aserrí FC', 'cs uruguay': 'CS Uruguay', 'ad carmelita': 'AD Carmelita' };
+const nameOfId = {}; for (const [k, id] of Object.entries(ids)) nameOfId[id] = cfg.equipos[k].nombre;
+const grupoDe = n => (cfg.grupos || []).find(g => g.tabla.some(r => norm(r[0]) === norm(n)))?.nombre;
+const regular = matches.filter(m => /regular/i.test(m.r || '') && m.hs !== undefined);
+const aserriId = [...teams.entries()].find(([, n]) => norm(n).includes('aserri'))?.[0];
+const ourName = (t, ctxGrupo) => nameOfId[t.id] || (t.id === aserriId && ctxGrupo === 'Grupo A' ? 'AD Rosario' : OPP[norm(t.n)] || t.n);
+const forms = {};
+for (const [k, e] of Object.entries(cfg.equipos || {})) {
+  const g = grupoDe(e.nombre);
+  let list;
+  if (ids[k]) list = regular.filter(m => m.h.id === ids[k] || m.a.id === ids[k]).map(m => ({ m, home: m.h.id === ids[k] }));
+  else if (ALIAS[k] && aserriId) {
+    const rivals = new Set((cfg.grupos.find(x => x.nombre === ALIAS[k].grupo)?.tabla || []).map(r => norm(r[0])));
+    const isRival = t => rivals.has(norm(ourName(t, 'Grupo A')));
+    list = regular.filter(m => (m.h.id === aserriId && isRival(m.a)) || (m.a.id === aserriId && isRival(m.h))).map(m => ({ m, home: m.h.id === aserriId }));
+  } else continue;
+  const rows = list.map(({ m, home }) => ({ id: m.id, d: m.d, r: +String(m.r).replace(/\D+/g, ''), home, opp: ourName(home ? m.a : m.h, g), gf: home ? m.hs : m.as, ga: home ? m.as : m.hs }))
+    .sort((a, b) => new Date(a.d) - new Date(b.d));
+  // verificación contra la tabla oficial de Liasce
+  const t = (cfg.grupos || []).flatMap(x => x.tabla).find(r => norm(r[0]) === norm(e.nombre));
+  const pj = rows.length, pts = rows.reduce((s, r) => s + (r.gf > r.ga ? 3 : r.gf === r.ga ? 1 : 0), 0), gf = rows.reduce((s, r) => s + r.gf, 0), ga = rows.reduce((s, r) => s + r.ga, 0);
+  const ok = !!t && t[1] === pj && t[7] === pts && t[5] === gf && t[6] === ga;
+  forms[k] = { verificado: ok, rows };
+  console.log(`  ${e.nombre}: ${pj} PJ ${pts} pts ${gf}-${ga} · tabla oficial: ${t ? `${t[1]} PJ ${t[7]} pts ${t[5]}-${t[6]}` : '—'} · ${ok ? 'VERIFICADO' : 'NO CUADRA'}`);
+}
+
 // 3) por serie: historial entre los dos y partidos de la serie si ya existen
 const series = {};
 for (const s of cfg.series || []) {
@@ -77,5 +107,5 @@ for (const s of cfg.series || []) {
   console.log(`Serie ${s.n}: historial ${h2h.length} partidos · partidos de la serie en la API: ${legs.length}`);
 }
 
-await fs.writeFile('public/data/ascenso-api.json', JSON.stringify({ updated: new Date().toISOString(), ids, series, matches }));
+await fs.writeFile('public/data/ascenso-api.json', JSON.stringify({ updated: new Date().toISOString(), ids, forms, series }));
 console.log(`Listo. Consultas: ${used} · restantes hoy: ${remaining}`);
