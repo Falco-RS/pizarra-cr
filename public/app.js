@@ -376,7 +376,7 @@ function statsHtml() {
     for (const e of ev) if (e[1] === 'sub' && e[4]) cameIn[e[2] + '|' + e[4]] = minN(e[0]);
     for (const e of ev) {
       if (!['goal', 'pen', 'og'].includes(e[1])) continue;
-      const scorerTeam = e[1] === 'og' ? (e[2] ? m.a : m.h) : (e[2] ? m.h : m.a);
+      const scorerTeam = e[2] ? m.h : m.a;   // en la API el autogol viene del lado del equipo beneficiado
       const mn = minN(e[0]);
       const h = half[scorerTeam] ||= { a: 0, b: 0 }; (String(e[0]).startsWith('45+') || mn <= 45) ? h.a++ : h.b++;
       if (mn >= 76) lateG[scorerTeam] = (lateG[scorerTeam] || 0) + 1;
@@ -388,7 +388,7 @@ function statsHtml() {
     for (const [k, n] of Object.entries(gm)) if (n >= 2) (braces[k] ||= []).push(n);
   }
   const fromKey = (obj, f) => Object.entries(obj).map(([k, v]) => { const [n, t] = k.split('|'); return { name: pname(n, +t), t: +t, ...f(v) }; });
-  const goles = ranked(topScorers.map(s => ({ name: pname(s.name, s.t), t: s.t, v: s.g, sub: `${T[s.t].name}${s.pen ? ` · ${s.pen} de penal` : ''}` })), 'v');
+  const goles = ranked(topScorers.map(s => ({ name: pname(s.name, s.t), t: s.t, v: s.g, sub: T[s.t].name })), 'v');
   const nG = S.allg ? goles.length : 5;
   const penal = ranked(topScorers.filter(s => s.pen).map(s => ({ name: pname(s.name, s.t), t: s.t, v: s.pen })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
   const banco = ranked(fromKey(bench, v => ({ v })).sort((a, b) => b.v - a.v), 'v').slice(0, 5);
@@ -415,6 +415,8 @@ function statsHtml() {
   const tRes = (f, asc) => { const rows = tids.map(t => ({ t, name: T[t].name, v: f(res[t], t) })).sort((a, b) => asc ? a.v - b.v : b.v - a.v); const max = Math.max(...rows.map(r => r.v)) || 1; return ranked(rows.map(r => ({ ...r, bar: 100 * r.v / max })), 'v'); };
   const pct = n => Math.round(100 * n / (P.length || 1)) + '%';
   const fair = tids.map(t => ({ t, name: T[t].name, y: (teamCards[t] || {}).y || 0, r: (teamCards[t] || {}).r || 0 })).map(r => ({ ...r, v: r.y + 3 * r.r, sub: `${r.y} amarillas · ${r.r} rojas` })).sort((a, b) => a.v - b.v);
+  const sinEv = P.filter(m => off(m).hs + off(m).as > 0 && !(m.ev || []).some(e => ['goal', 'pen', 'og'].includes(e[1])));
+  const noEv = sinEv.length ? `Sin contar ${sinEv.map(m => `${esc(T[m.h].name)} ${off(m).hs}-${off(m).as} ${esc(T[m.a].name)} (J${m.r})`).join(', ')}: la fuente no registró el minuto de esos goles.` : '';
   const kpi = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
   const srcNote = 'Fuente: datos de cada partido; se actualiza solo.';
   const noApi = '<p class="hint">Todavía no hay datos. Se cargan automáticamente en las próximas horas.</p>';
@@ -428,28 +430,16 @@ function statsHtml() {
   <h2 class="shead">Jugadores</h2>
   <div class="sgrid">
     ${sCard('Goleadores', sRows(goles.slice(0, nG)) + (goles.length > 5 ? `<button class="more sall" data-allg>${S.allg ? 'Ver menos' : `Ver los ${goles.length}`}</button>` : ''), 'Los autogoles no cuentan para el jugador.')}
-    ${sCard('Asistidores', asis.length ? sRows(asis) : noApi, 'Fuente: datos de la API por jugador (Highlightly). Puede faltar algún jugador.')}
-    ${sCard('Goles + asistencias', ga.length ? sRows(ga) : noApi)}
-    ${sCard('Goles saliendo del banco', banco.length ? sRows(banco) : '<p class="hint">Nadie todavía.</p>', 'Goles de jugadores que entraron de cambio.')}
     ${sCard('Dobletes y tripletes', dobletes.length ? sRows(dobletes) : '<p class="hint">Nadie todavía.</p>', 'Partidos con 2 o más goles.')}
-    ${sCard('Goles de penal', penal.length ? sRows(penal) : '<p class="hint">Nadie todavía.</p>')}
-    ${sCard('Más minutos jugados', mins.length ? sRows(mins, v => v.toLocaleString('es-CR') + "'") : noApi)}
   </div>
   <h2 class="shead">Equipos</h2>
   <div class="sgrid">
-    ${sCard('Posesión promedio', nst ? sRows(tAvg(a => 100 * a.pos / a.n, 0), v => v + '%') : noApi)}
-    ${sCard('Remates al arco por partido', nst ? sRows(tAvg(a => a.son / a.n)) : noApi)}
-    ${sCard('Remates totales por partido', nst ? sRows(tAvg(a => a.sh / a.n)) : noApi)}
-    ${sCard('Tiros de esquina por partido', nst ? sRows(tAvg(a => a.cor / a.n)) : noApi)}
-    ${sCard('Remates al arco recibidos', nst ? sRows(tAvg(a => a.sonC / a.n, 1, true)) : noApi, 'Por partido; de menos a más.')}
-    ${sCard('Fueras de juego por partido', nst ? sRows(tAvg(a => a.off / a.n)) : noApi)}
     ${sCard('Vallas invictas', sRows(tRes(r => r.cs)), 'Partidos sin recibir gol.')}
     ${sCard('Partidos sin anotar', sRows(tRes(r => r.ns)))}
-    ${sCard('Goles en el segundo tiempo', sRows(tids.map(t => ({ t, name: T[t].name, v: (half[t] || {}).b || 0, sub: `${(half[t] || {}).a || 0} en el 1.º · ${(half[t] || {}).b || 0} en el 2.º` })).sort((a, b) => b.v - a.v).map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))))}
-    ${sCard('Goles del minuto 76 en adelante', sRows(ranked(tids.map(t => ({ t, name: T[t].name, v: lateG[t] || 0 })).sort((a, b) => b.v - a.v), 'v').map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))))}
-    ${sCard('Juego limpio', sRows(ranked(fair, 'v').map(r => ({ ...r, v: r.v }))), 'Puntos: amarilla 1, roja 3. Menos es mejor.')}
+    ${sCard('Goles en el segundo tiempo', sRows(tids.map(t => ({ t, name: T[t].name, v: (half[t] || {}).b || 0, sub: `${(half[t] || {}).a || 0} en el 1.º · ${(half[t] || {}).b || 0} en el 2.º` })).sort((a, b) => b.v - a.v).map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))), noEv)}
+    ${sCard('Goles del minuto 76 en adelante', sRows(ranked(tids.map(t => ({ t, name: T[t].name, v: lateG[t] || 0 })).sort((a, b) => b.v - a.v), 'v').map((r, i, A) => ({ ...r, bar: 100 * r.v / (A[0].v || 1) }))), noEv)}
   </div>
-  <p class="foot">Estadísticas de equipo (posesión, remates, tiros de esquina, fueras de juego) calculadas con ${Math.round(nst)} de ${P.length} partidos que tienen esos datos${tids.filter(t => !acc[t]).length ? `; la fuente no trae esos datos para ${tids.filter(t => !acc[t]).map(t => esc(T[t].name)).join(', ')}` : ''}. ${srcNote}</p>`;
+  <p class="foot">Todo sale de los resultados y del minuto a minuto de cada partido, y se actualiza solo.</p>`;
 }
 const cardRow = n => `<span class="cards" aria-label="${n} amarillas">${Array.from({length:n}, () => '<i class="ico yc"></i>').join('')}</span>`;
 function yellowsHtml(n) {
