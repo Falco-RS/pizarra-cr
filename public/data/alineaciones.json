@@ -1485,7 +1485,7 @@
   },
   "home": {
    "fuente": "redes de Puntarenas",
-   "formation": "4-5-1",
+   "formation": "4-4-2",
    "rows": [
     [
      {
@@ -1495,8 +1495,8 @@
     ],
     [
      {
-      "n": 25,
-      "name": "K. Gómez"
+      "n": 2,
+      "name": "W. Cortés"
      },
      {
       "n": 17,
@@ -1507,26 +1507,22 @@
       "name": "D. Cordero"
      },
      {
-      "n": 29,
-      "name": "V. Edghill"
+      "n": 25,
+      "name": "K. Gómez"
      }
     ],
     [
      {
-      "n": 14,
-      "name": "A. Arias"
+      "n": 29,
+      "name": "V. Edghill"
      },
      {
       "n": 33,
       "name": "J. Hadden"
      },
      {
-      "n": 22,
-      "name": "D. Castrillo"
-     },
-     {
-      "n": 2,
-      "name": "W. Cortés"
+      "n": 14,
+      "name": "A. Arias"
      },
      {
       "n": 7,
@@ -1534,6 +1530,10 @@
      }
     ],
     [
+     {
+      "n": 22,
+      "name": "D. Castrillo"
+     },
      {
       "n": 21,
       "name": "D. Rodríguez"
@@ -1547,8 +1547,8 @@
      "name": "A. Pineda"
     },
     {
-     "n": 25,
-     "name": "K. Gómez"
+     "n": 2,
+     "name": "W. Cortés"
     },
     {
      "n": 17,
@@ -1559,28 +1559,28 @@
      "name": "D. Cordero"
     },
     {
-     "n": 29,
-     "name": "V. Edghill"
+     "n": 25,
+     "name": "K. Gómez"
     },
     {
-     "n": 14,
-     "name": "A. Arias"
+     "n": 29,
+     "name": "V. Edghill"
     },
     {
      "n": 33,
      "name": "J. Hadden"
     },
     {
-     "n": 22,
-     "name": "D. Castrillo"
-    },
-    {
-     "n": 2,
-     "name": "W. Cortés"
+     "n": 14,
+     "name": "A. Arias"
     },
     {
      "n": 7,
      "name": "L. Comachi"
+    },
+    {
+     "n": 22,
+     "name": "D. Castrillo"
     },
     {
      "n": 21,
