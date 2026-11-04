@@ -1051,7 +1051,7 @@
  "1320515355": {
   "home": {
    "fuente": "redes de Sporting",
-   "formation": "3-4-2-1",
+   "formation": "5-4-1",
    "rows": [
     [
      {
@@ -1060,6 +1060,10 @@
      }
     ],
     [
+     {
+      "n": 35,
+      "name": "J. C. Batista"
+     },
      {
       "n": 22,
       "name": "D. Salas"
@@ -1071,20 +1075,6 @@
      {
       "n": 5,
       "name": "A. Soto"
-     }
-    ],
-    [
-     {
-      "n": 35,
-      "name": "J. C. Batista"
-     },
-     {
-      "n": 10,
-      "name": "A. López"
-     },
-     {
-      "n": 6,
-      "name": "G. Leiva"
      },
      {
       "n": 27,
@@ -1095,6 +1085,14 @@
      {
       "n": 19,
       "name": "J. Méndez"
+     },
+     {
+      "n": 10,
+      "name": "A. López"
+     },
+     {
+      "n": 6,
+      "name": "G. Leiva"
      },
      {
       "n": 16,
@@ -1115,6 +1113,10 @@
      "name": "L. Moreira"
     },
     {
+     "n": 35,
+     "name": "J. C. Batista"
+    },
+    {
      "n": 22,
      "name": "D. Salas"
     },
@@ -1127,8 +1129,12 @@
      "name": "A. Soto"
     },
     {
-     "n": 35,
-     "name": "J. C. Batista"
+     "n": 27,
+     "name": "A. Chévez"
+    },
+    {
+     "n": 19,
+     "name": "J. Méndez"
     },
     {
      "n": 10,
@@ -1137,14 +1143,6 @@
     {
      "n": 6,
      "name": "G. Leiva"
-    },
-    {
-     "n": 27,
-     "name": "A. Chévez"
-    },
-    {
-     "n": 19,
-     "name": "J. Méndez"
     },
     {
      "n": 16,
@@ -1191,7 +1189,7 @@
   },
   "away": {
    "fuente": "redes de Pérez Zeledón",
-   "formation": "4-2-3-1",
+   "formation": "5-4-1",
    "rows": [
     [
      {
@@ -1201,31 +1199,24 @@
     ],
     [
      {
-      "n": 38,
-      "name": "K. González"
-     },
-     {
-      "n": 5,
-      "name": "W. Fernández"
+      "n": 18,
+      "name": "E. Quesada"
      },
      {
       "n": 4,
       "name": "R. Rodríguez"
      },
      {
-      "n": 12,
-      "name": "M. Aguilar"
-     }
-    ],
-    [
-     {
-      "n": 23,
-      "name": "J. Aguirre",
-      "c": true
+      "n": 28,
+      "name": "M. Núñez"
      },
      {
-      "n": 15,
-      "name": "A. Porras"
+      "n": 12,
+      "name": "M. Aguilar"
+     },
+     {
+      "n": 5,
+      "name": "W. Fernández"
      }
     ],
     [
@@ -1234,12 +1225,17 @@
       "name": "A. Fallas"
      },
      {
-      "n": 18,
-      "name": "E. Quesada"
+      "n": 23,
+      "name": "J. Aguirre",
+      "c": true
      },
      {
-      "n": 28,
-      "name": "M. Núñez"
+      "n": 15,
+      "name": "A. Porras"
+     },
+     {
+      "n": 38,
+      "name": "K. González"
      }
     ],
     [
@@ -1256,20 +1252,28 @@
      "name": "M. Ajú"
     },
     {
-     "n": 38,
-     "name": "K. González"
-    },
-    {
-     "n": 5,
-     "name": "W. Fernández"
+     "n": 18,
+     "name": "E. Quesada"
     },
     {
      "n": 4,
      "name": "R. Rodríguez"
     },
     {
+     "n": 28,
+     "name": "M. Núñez"
+    },
+    {
      "n": 12,
      "name": "M. Aguilar"
+    },
+    {
+     "n": 5,
+     "name": "W. Fernández"
+    },
+    {
+     "n": 27,
+     "name": "A. Fallas"
     },
     {
      "n": 23,
@@ -1281,16 +1285,8 @@
      "name": "A. Porras"
     },
     {
-     "n": 27,
-     "name": "A. Fallas"
-    },
-    {
-     "n": 18,
-     "name": "E. Quesada"
-    },
-    {
-     "n": 28,
-     "name": "M. Núñez"
+     "n": 38,
+     "name": "K. González"
     },
     {
      "n": 9,
