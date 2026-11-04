@@ -1329,5 +1329,159 @@
    ],
    "dt": "Ronald Gómez"
   }
+ },
+ "1320514504": {
+  "away": {
+   "fuente": "redes de San Carlos",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "J. D. Vega"
+     }
+    ],
+    [
+     {
+      "n": 22,
+      "name": "J. C. Agüero"
+     },
+     {
+      "n": 16,
+      "name": "G. Castillo"
+     },
+     {
+      "n": 6,
+      "name": "Y. Piedra",
+      "c": true
+     },
+     {
+      "n": 17,
+      "name": "J. Evans"
+     }
+    ],
+    [
+     {
+      "n": 5,
+      "name": "C. Martínez"
+     },
+     {
+      "n": 10,
+      "name": "K. Cerdas"
+     }
+    ],
+    [
+     {
+      "n": 2,
+      "name": "J. Valverde"
+     },
+     {
+      "n": 11,
+      "name": "R. Córdoba"
+     },
+     {
+      "n": 21,
+      "name": "J. Venegas"
+     }
+    ],
+    [
+     {
+      "n": 88,
+      "name": "R. Vidal"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "J. D. Vega"
+    },
+    {
+     "n": 22,
+     "name": "J. C. Agüero"
+    },
+    {
+     "n": 16,
+     "name": "G. Castillo"
+    },
+    {
+     "n": 6,
+     "name": "Y. Piedra",
+     "c": true
+    },
+    {
+     "n": 17,
+     "name": "J. Evans"
+    },
+    {
+     "n": 5,
+     "name": "C. Martínez"
+    },
+    {
+     "n": 10,
+     "name": "K. Cerdas"
+    },
+    {
+     "n": 2,
+     "name": "J. Valverde"
+    },
+    {
+     "n": 11,
+     "name": "R. Córdoba"
+    },
+    {
+     "n": 21,
+     "name": "J. Venegas"
+    },
+    {
+     "n": 88,
+     "name": "R. Vidal"
+    }
+   ],
+   "subs": [
+    {
+     "n": 77,
+     "name": "J. Vega"
+    },
+    {
+     "n": 4,
+     "name": "P. Fonseca"
+    },
+    {
+     "n": 7,
+     "name": "A. Guevara"
+    },
+    {
+     "n": 8,
+     "name": "E. Hernández"
+    },
+    {
+     "n": 18,
+     "name": "J. Aguilar"
+    },
+    {
+     "n": 20,
+     "name": "C. Agualimpia"
+    },
+    {
+     "n": 24,
+     "name": "J. Rivera"
+    },
+    {
+     "n": 27,
+     "name": "D. Masís"
+    },
+    {
+     "n": 30,
+     "name": "P. Agüero"
+    },
+    {
+     "n": 38,
+     "name": "K. Gómez"
+    }
+   ],
+   "dt": "Walter Centeno"
+  }
  }
 }
