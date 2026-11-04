@@ -1482,6 +1482,154 @@
     }
    ],
    "dt": "Walter Centeno"
+  },
+  "home": {
+   "fuente": "redes de Puntarenas",
+   "formation": "4-5-1",
+   "rows": [
+    [
+     {
+      "n": 97,
+      "name": "A. Pineda"
+     }
+    ],
+    [
+     {
+      "n": 25,
+      "name": "K. Gómez"
+     },
+     {
+      "n": 17,
+      "name": "W. Decas"
+     },
+     {
+      "n": 41,
+      "name": "D. Cordero"
+     },
+     {
+      "n": 29,
+      "name": "V. Edghill"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "A. Arias"
+     },
+     {
+      "n": 33,
+      "name": "J. Hadden"
+     },
+     {
+      "n": 22,
+      "name": "D. Castrillo"
+     },
+     {
+      "n": 2,
+      "name": "W. Cortés"
+     },
+     {
+      "n": 7,
+      "name": "L. Comachi"
+     }
+    ],
+    [
+     {
+      "n": 21,
+      "name": "D. Rodríguez"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 97,
+     "name": "A. Pineda"
+    },
+    {
+     "n": 25,
+     "name": "K. Gómez"
+    },
+    {
+     "n": 17,
+     "name": "W. Decas"
+    },
+    {
+     "n": 41,
+     "name": "D. Cordero"
+    },
+    {
+     "n": 29,
+     "name": "V. Edghill"
+    },
+    {
+     "n": 14,
+     "name": "A. Arias"
+    },
+    {
+     "n": 33,
+     "name": "J. Hadden"
+    },
+    {
+     "n": 22,
+     "name": "D. Castrillo"
+    },
+    {
+     "n": 2,
+     "name": "W. Cortés"
+    },
+    {
+     "n": 7,
+     "name": "L. Comachi"
+    },
+    {
+     "n": 21,
+     "name": "D. Rodríguez"
+    }
+   ],
+   "subs": [
+    {
+     "n": 35,
+     "name": "D. Rojas"
+    },
+    {
+     "n": 3,
+     "name": "K. Fajardo"
+    },
+    {
+     "n": 6,
+     "name": "K. Cabezas"
+    },
+    {
+     "n": 8,
+     "name": "U. Segura"
+    },
+    {
+     "n": 11,
+     "name": "R. Taylor"
+    },
+    {
+     "n": 12,
+     "name": "K. Villalobos"
+    },
+    {
+     "n": 15,
+     "name": "H. Muñoz"
+    },
+    {
+     "n": 16,
+     "name": "W. Hernández"
+    },
+    {
+     "n": 26,
+     "name": "J. Hernández"
+    },
+    {
+     "n": 77,
+     "name": "P. Álvarez"
+    }
+   ],
+   "dt": "César Alpízar"
   }
  }
 }
