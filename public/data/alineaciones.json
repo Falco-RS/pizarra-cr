@@ -1631,5 +1631,309 @@
    ],
    "dt": "César Alpízar"
   }
+ },
+ "1360596604": {
+  "home": {
+   "fuente": "redes de Escorpiones",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 76,
+      "name": "Álvarez"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "Morales"
+     },
+     {
+      "n": 71,
+      "name": "Ordóñez"
+     },
+     {
+      "n": 13,
+      "name": "Morera"
+     },
+     {
+      "n": 6,
+      "name": "Mena"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "Muñoz"
+     },
+     {
+      "n": 30,
+      "name": "Monge",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 16,
+      "name": "Salazar"
+     },
+     {
+      "n": 10,
+      "name": "Fonseca"
+     },
+     {
+      "n": 7,
+      "name": "Hidalgo"
+     }
+    ],
+    [
+     {
+      "n": 99,
+      "name": "Pimpinati"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 76,
+     "name": "Álvarez"
+    },
+    {
+     "n": 14,
+     "name": "Morales"
+    },
+    {
+     "n": 71,
+     "name": "Ordóñez"
+    },
+    {
+     "n": 13,
+     "name": "Morera"
+    },
+    {
+     "n": 6,
+     "name": "Mena"
+    },
+    {
+     "n": 8,
+     "name": "Muñoz"
+    },
+    {
+     "n": 30,
+     "name": "Monge",
+     "c": true
+    },
+    {
+     "n": 16,
+     "name": "Salazar"
+    },
+    {
+     "n": 10,
+     "name": "Fonseca"
+    },
+    {
+     "n": 7,
+     "name": "Hidalgo"
+    },
+    {
+     "n": 99,
+     "name": "Pimpinati"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "Montenegro"
+    },
+    {
+     "n": 15,
+     "name": "Vega"
+    },
+    {
+     "n": 47,
+     "name": "Camejo"
+    },
+    {
+     "n": 77,
+     "name": "Fernández"
+    },
+    {
+     "n": 80,
+     "name": "Flores"
+    },
+    {
+     "n": 3,
+     "name": "Tello"
+    },
+    {
+     "n": 18,
+     "name": "Peña"
+    },
+    {
+     "n": 19,
+     "name": "Serrano"
+    },
+    {
+     "n": 70,
+     "name": "Dávila"
+    },
+    {
+     "n": 39,
+     "name": "Umanzor"
+    }
+   ]
+  },
+  "away": {
+   "fuente": "redes de Alajuelense",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "W. Ortega"
+     }
+    ],
+    [
+     {
+      "n": 42,
+      "name": "J. P. Ruiz"
+     },
+     {
+      "n": 21,
+      "name": "Y. Molina"
+     },
+     {
+      "n": 13,
+      "name": "A. Gamboa",
+      "c": true
+     },
+     {
+      "n": 28,
+      "name": "Y. Sosa"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "R. Wilson"
+     },
+     {
+      "n": 24,
+      "name": "A. Salazar"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "A. Hernández"
+     },
+     {
+      "n": 39,
+      "name": "E. Cruz"
+     },
+     {
+      "n": 99,
+      "name": "K. Michel"
+     }
+    ],
+    [
+     {
+      "n": 18,
+      "name": "R. Cisneros"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "W. Ortega"
+    },
+    {
+     "n": 42,
+     "name": "J. P. Ruiz"
+    },
+    {
+     "n": 21,
+     "name": "Y. Molina"
+    },
+    {
+     "n": 13,
+     "name": "A. Gamboa",
+     "c": true
+    },
+    {
+     "n": 28,
+     "name": "Y. Sosa"
+    },
+    {
+     "n": 14,
+     "name": "R. Wilson"
+    },
+    {
+     "n": 24,
+     "name": "A. Salazar"
+    },
+    {
+     "n": 7,
+     "name": "A. Hernández"
+    },
+    {
+     "n": 39,
+     "name": "E. Cruz"
+    },
+    {
+     "n": 99,
+     "name": "K. Michel"
+    },
+    {
+     "n": 18,
+     "name": "R. Cisneros"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "Mora"
+    },
+    {
+     "n": 2,
+     "name": "Paz"
+    },
+    {
+     "n": 5,
+     "name": "Borges"
+    },
+    {
+     "n": 10,
+     "name": "Añor"
+    },
+    {
+     "n": 9,
+     "name": "Zaldívar"
+    },
+    {
+     "n": 11,
+     "name": "Díaz"
+    },
+    {
+     "n": 15,
+     "name": "Samadian"
+    },
+    {
+     "n": 26,
+     "name": "Piñar"
+    },
+    {
+     "n": 34,
+     "name": "Pérez"
+    },
+    {
+     "n": 35,
+     "name": "Parkins"
+    }
+   ]
+  }
  }
 }
