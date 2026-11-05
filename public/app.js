@@ -332,7 +332,11 @@ function renderDetail() {
         <div class="fbar"><span><i class="dot a"></i> ${esc(T[m.a].name)}</span><span class="f">${esc(man.away?.formation || '')}</span></div>
         ${man.home?.dt || man.away?.dt ? `<div class="dts">${man.home?.dt ? `<span><i class="dot h"></i> DT ${esc(man.home.dt)}</span>` : ''}${man.away?.dt ? `<span><i class="dot a"></i> DT ${esc(man.away.dt)}</span>` : ''}</div>` : ''}</div>`
     : '';
-  if (statsBlock || lineBlock) extra = `<div class="dcols">${lineBlock}${statsBlock}</div>`;
+  // sin estadísticas: en ese espacio van los suplentes (de las alineaciones publicadas por los clubes)
+  const subsList = x => x?.subs?.length ? `<ul class="plist">${x.subs.map(p => `<li><b style="min-width:26px;display:inline-block">${p.n ?? ''}</b>${esc(p.name)}</li>`).join('')}</ul>` : '<p class="hint">Sin datos.</p>';
+  const subsBlock = !statsBlock && man && (man.home?.subs?.length || man.away?.subs?.length)
+    ? `<div><h3>Suplentes</h3><div class="two"><div><p class="lead">${esc(T[m.h].name)}</p>${subsList(man.home)}</div><div><p class="lead">${esc(T[m.a].name)}</p>${subsList(man.away)}</div></div></div>` : '';
+  if (statsBlock || lineBlock) extra = `<div class="dcols">${lineBlock}${statsBlock || subsBlock}</div>`;
   else if (!det && !lv) extra = '';
   box.innerHTML = `<div class="detail">
     <div class="dscore">
