@@ -318,7 +318,7 @@ function renderDetail() {
       return `<div class="sbar"><div class="lab"><span>${f(h)}</span><span>${lab}</span><span>${f(a)}</span></div>
         <div class="bars"><i style="flex:${h/tot || .001};background:var(--accent)"></i><i style="flex:${a/tot || .001};background:var(--draw)"></i></div></div>`;
     }).join(''); })() : '';
-  const statsBlock = bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : lv ? '' : '';
+  const statsBlock = bars ? `<div><h3>Estadísticas</h3>${bars}</div>` : lv && !lv.finished ? `<div><h3>Estadísticas</h3><p class="hint">Todavía sin estadísticas.</p></div>` : '';
   // Alineaciones: las de la API si las trae; si no, las publicadas por los clubes (cargadas a mano)
   const xi = side => `<ol>${side.xi.map(p => `<li><b>${p.n ?? ''}</b><span>${esc(p.name)}</span></li>`).join('')}</ol>`;
   const man = MANUAL[m.id];
