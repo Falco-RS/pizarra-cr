@@ -196,7 +196,8 @@ const KIT = { 'Saprissa': ['#7B1E57', '#fff'], 'Alajuelense': ['#D7263D', '#fff'
   'Inter San Carlos': ['#2E8B57', '#fff'], 'Sporting': ['#F4F6F2', '#141A16'] };
 function kitVars(hName, aName) {
   const nn = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  const find = n => Object.entries(KIT).find(([k]) => nn(n).includes(nn(k)))?.[1];
+  // el nombre más largo gana: "Inter San Carlos" no debe agarrar los colores de "San Carlos"
+  const find = n => Object.entries(KIT).filter(([k]) => nn(n).includes(nn(k))).sort((x, y) => y[0].length - x[0].length)[0]?.[1];
   const h = find(hName) || ['#F4F6F2', '#141A16'];
   let a = find(aName) || ['#2F62D8', '#fff'];
   if (a[0] === h[0]) a = h[0] === '#2F62D8' ? ['#F4F6F2', '#141A16'] : ['#2F62D8', '#fff'];
