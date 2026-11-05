@@ -457,8 +457,9 @@ function yellowsHtml(n) {
 // El bloque de la jornada solo va en Inicio; en las otras pestañas queda solo la franja en vivo (si hay)
 function syncBoard() {
   const home = S.view === 'inicio';
+  const sinFranja = ['ascenso', 'legionarios', 'sele'].includes(S.view);   // pestañas que no son de la Primera
   document.querySelectorAll('[data-home]').forEach(el => { el.hidden = !home; });
-  document.querySelector('.board').hidden = !home && document.getElementById('live').hidden;
+  document.querySelector('.board').hidden = sinFranja || (!home && document.getElementById('live').hidden);
 }
 function renderView() {
   syncBoard();

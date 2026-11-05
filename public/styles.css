@@ -357,3 +357,5 @@ tr.aq td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .redes .rb:hover{background:#F0BE1E;color:#141A16}
 .redes .rx{min-width:36px;min-height:36px;border:0;border-radius:8px;background:transparent;color:#FFFFFF;font-size:16px;cursor:pointer}
 .redes .rx:hover{background:rgba(255,255,255,.15)}
+
+[hidden]{display:none!important}
