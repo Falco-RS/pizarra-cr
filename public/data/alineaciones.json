@@ -1935,5 +1935,304 @@
     }
    ]
   }
+ },
+ "1320512802": {
+  "home": {
+   "fuente": "redes de Inter San Carlos",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "A. Cruz"
+     }
+    ],
+    [
+     {
+      "n": 19,
+      "name": "J. L. Pérez"
+     },
+     {
+      "n": 4,
+      "name": "J. Ramos"
+     },
+     {
+      "n": 13,
+      "name": "A. Rodríguez"
+     },
+     {
+      "n": 67,
+      "name": "C. Martínez"
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "W. Azofeifa"
+     },
+     {
+      "n": 8,
+      "name": "Y. Villán"
+     },
+     {
+      "n": 40,
+      "name": "Y. Leal"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "S. Castro"
+     },
+     {
+      "n": 9,
+      "name": "E. Torres"
+     },
+     {
+      "n": 10,
+      "name": "J. Campbell"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 19,
+     "name": "J. L. Pérez"
+    },
+    {
+     "n": 4,
+     "name": "J. Ramos"
+    },
+    {
+     "n": 13,
+     "name": "A. Rodríguez"
+    },
+    {
+     "n": 67,
+     "name": "C. Martínez"
+    },
+    {
+     "n": 20,
+     "name": "W. Azofeifa"
+    },
+    {
+     "n": 8,
+     "name": "Y. Villán"
+    },
+    {
+     "n": 40,
+     "name": "Y. Leal"
+    },
+    {
+     "n": 7,
+     "name": "S. Castro"
+    },
+    {
+     "n": 9,
+     "name": "E. Torres"
+    },
+    {
+     "n": 10,
+     "name": "J. Campbell"
+    }
+   ],
+   "subs": [
+    {
+     "n": 99,
+     "name": "Jiménez"
+    },
+    {
+     "n": 16,
+     "name": "Ramos"
+    },
+    {
+     "n": 2,
+     "name": "Chacón"
+    },
+    {
+     "n": 14,
+     "name": "Porras"
+    },
+    {
+     "n": 12,
+     "name": "Leal"
+    },
+    {
+     "n": 6,
+     "name": "Casanova"
+    },
+    {
+     "n": 5,
+     "name": "Mendoza"
+    },
+    {
+     "n": 70,
+     "name": "Román"
+    },
+    {
+     "n": 50,
+     "name": "Vega"
+    },
+    {
+     "n": 33,
+     "name": "Gómez"
+    }
+   ],
+   "dt": "Douglas Sequeira"
+  },
+  "away": {
+   "fuente": "redes de Cartaginés",
+   "formation": "4-4-2",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "K. Briceño",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "D. Mesén"
+     },
+     {
+      "n": 4,
+      "name": "L. Olivas"
+     },
+     {
+      "n": 12,
+      "name": "J. Quirós"
+     },
+     {
+      "n": 18,
+      "name": "C. Barahona"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "M. Morán"
+     },
+     {
+      "n": 15,
+      "name": "L. Flores"
+     },
+     {
+      "n": 31,
+      "name": "G. Morera"
+     },
+     {
+      "n": 6,
+      "name": "C. Montero"
+     }
+    ],
+    [
+     {
+      "n": 9,
+      "name": "J. González"
+     },
+     {
+      "n": 22,
+      "name": "A. Hernández"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "K. Briceño",
+     "c": true
+    },
+    {
+     "n": 20,
+     "name": "D. Mesén"
+    },
+    {
+     "n": 4,
+     "name": "L. Olivas"
+    },
+    {
+     "n": 12,
+     "name": "J. Quirós"
+    },
+    {
+     "n": 18,
+     "name": "C. Barahona"
+    },
+    {
+     "n": 7,
+     "name": "M. Morán"
+    },
+    {
+     "n": 15,
+     "name": "L. Flores"
+    },
+    {
+     "n": 31,
+     "name": "G. Morera"
+    },
+    {
+     "n": 6,
+     "name": "C. Montero"
+    },
+    {
+     "n": 9,
+     "name": "J. González"
+    },
+    {
+     "n": 22,
+     "name": "A. Hernández"
+    }
+   ],
+   "subs": [
+    {
+     "n": 34,
+     "name": "D. Hidalgo"
+    },
+    {
+     "n": 2,
+     "name": "R. Cordero"
+    },
+    {
+     "n": 21,
+     "name": "J. Cortés"
+    },
+    {
+     "n": 16,
+     "name": "G. Castro"
+    },
+    {
+     "n": 39,
+     "name": "M. Villalobos"
+    },
+    {
+     "n": 19,
+     "name": "D. González"
+    },
+    {
+     "n": 11,
+     "name": "L. Alfaro"
+    },
+    {
+     "n": 8,
+     "name": "D. López"
+    },
+    {
+     "n": 17,
+     "name": "Y. López"
+    },
+    {
+     "n": 43,
+     "name": "C. Abarca"
+    }
+   ]
+  }
  }
 }
