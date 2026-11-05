@@ -13,10 +13,12 @@ const off = m => MESA[m.id] ? { ...m, ...MESA[m.id] } : m;
 const venueOf = m => (ESTADIOS.partidos || {})[m.id] || ESTADIOS[T[m.h]?.name] || '';
 const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">${esc(v)}</a>` : '';
 /* Nombres que la API dejó vacíos en el minuto a minuto, completados a mano (public/data/eventos.json) */
-for (const m of D.matches) for (const fx of (EVENTOS[m.id] || [])) {
-  const e = (m.ev || []).find(e => String(e[0]) === String(fx.t) && e[1] === fx.tipo && !e[3]);
+// (también se aplica al minuto a minuto en vivo; el minuto puede variar ±2 entre lo que manda la API y lo anotado)
+const fillEv = (id, ev) => { for (const fx of (EVENTOS[id] || [])) {
+  const e = (ev || []).find(e => e[1] === fx.tipo && !e[3] && (String(e[0]) === String(fx.t) || Math.abs(parseInt(e[0]) - parseInt(fx.t)) <= 2));
   if (e) e[3] = fx.jugador;
-}
+} return ev; };
+for (const m of D.matches) fillEv(m.id, m.ev);
 const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
 const rounds = [...new Set(M.map(m => m.r))].sort((a,b) => a-b);
 const lastPlayed = Math.max(...M.filter(played).map(m => m.r));
@@ -148,7 +150,7 @@ function renderBoard() {
   document.getElementById('mgrid').innerHTML = list.map(m0 => {
     // también se usa el resultado del en vivo recién terminado, mientras llega la actualización de datos
     const lv = !played(m0) && LIVE.find(x => x.id === m0.id && x.started && x.score);
-    const m = lv ? { ...m0, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: lv.events, ...(lv.finished ? {} : { liveClock: lv.clock }) } : m0;
+    const m = lv ? { ...m0, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: fillEv(m0.id, lv.events), ...(lv.finished ? {} : { liveClock: lv.clock }) } : m0;
     const live = lv && !lv.finished;
     const p = played(m), hl = p && !live && m.hs < m.as, al = p && !live && m.as < m.hs;
     return `<button class="mc" data-id="${m.id}" aria-pressed="${S.sel === m.id}">
@@ -306,7 +308,7 @@ function renderDetail() {
   const box = document.getElementById('detail');
   const base = M.find(x => x.id === S.sel);
   const lv = base && LIVE.find(x => x.id === base.id && x.started);
-  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(lv.events, +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
+  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(fillEv(base.id, lv.events), +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
   if (!m) { box.innerHTML = ''; return; }
   if (!played(m) && !lv) { renderPrevia(m, box); return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
