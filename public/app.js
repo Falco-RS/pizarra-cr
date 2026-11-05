@@ -1022,6 +1022,9 @@ let MANUAL = {}, ESTADIOS = {}, TARJETAS = {}, EVENTOS = {}, XSTATS = {}, ASIS =
 fetch('/data/estadios.json').then(r => r.ok ? r.json() : {}).then(j => { ESTADIOS = j || {}; }).catch(() => {});
 const loadManual = () => fetch('/data/alineaciones.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { MANUAL = j || {}; });
 setInterval(() => loadManual(), 60000);
-loadManual().then(() => fetch('/data/tarjetas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { TARJETAS = j || {}; }).then(() => fetch('/data/eventos.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { EVENTOS = j || {}; }).then(() => fetch('/data/estadisticas.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { XSTATS = j || {}; }).then(() => fetch('/data/asistencias.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))).then(j => { ASIS = j || {}; }).then(() => fetch('/data/season.json', { cache: 'no-cache' })).then(r => r.json()).then(start).catch(() => {
+const getJ = (u, d = {}) => fetch(u, { cache: 'no-cache' }).then(r => r.ok ? r.json() : d).catch(() => d);
+// todo se pide a la vez (antes iba uno detrás de otro y la página tardaba en aparecer)
+Promise.all([loadManual(), getJ('/data/tarjetas.json'), getJ('/data/eventos.json'), getJ('/data/estadisticas.json'), getJ('/data/asistencias.json'), getJ('/data/season.json', null)])
+  .then(([, tj, ev, st, as, season]) => { TARJETAS = tj || {}; EVENTOS = ev || {}; XSTATS = st || {}; ASIS = as || {}; if (!season) throw new Error('season'); return season; }).then(start).catch(() => {
   document.getElementById('view').innerHTML = '<p class="hint">No se pudieron cargar los datos. Recargá la página.</p>';
 });
