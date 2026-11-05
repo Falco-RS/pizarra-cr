@@ -359,3 +359,16 @@ tr.aq td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .redes .rx:hover{background:rgba(255,255,255,.15)}
 
 [hidden]{display:none!important}
+
+/* botón y ventanita de "Poner en mi celular" */
+.redes .rb-app{background:#F0BE1E;color:#141A16;border:0;cursor:pointer;font-family:inherit}
+.redes .rb-app:hover{background:#FFFFFF;color:#0E6B3D}
+.appdlg{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.appdlg-box{position:relative;background:var(--surface,#1B2420);color:var(--ink,#EEF2EC);border-radius:16px;padding:22px 22px 18px;max-width:440px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.appdlg-box h2{font-family:var(--display);font-size:26px;margin:0 0 10px}
+.appdlg-box ol{margin:0 0 10px;padding-left:22px;line-height:1.55;font-size:16px}
+.appdlg-box p{margin:6px 0;font-size:15px;line-height:1.45}
+.appdlg-box .rx{position:absolute;top:10px;right:10px;color:inherit;background:transparent;border:0;font-size:18px;min-width:36px;min-height:36px;cursor:pointer}
+@media (min-width:700px){.appdlg{align-items:center}}
+@media (max-width:600px){.redes .inner{padding-block:10px}.redes-btns{flex-wrap:wrap}.redes .rb{min-height:34px;padding:0 12px;font-size:13px}}
+@media (max-width:600px){.redes .inner{position:relative}.redes #redes-x{position:absolute;top:4px;right:0}.redes p{padding-right:36px}}

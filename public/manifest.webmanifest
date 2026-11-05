@@ -1,0 +1,16 @@
+{
+  "name": "Pizarra CR",
+  "short_name": "Pizarra CR",
+  "description": "Tabla, resultados, goleadores y partidos en vivo del fútbol de Costa Rica.",
+  "lang": "es-CR",
+  "start_url": "/de/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#121815",
+  "theme_color": "#121815",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

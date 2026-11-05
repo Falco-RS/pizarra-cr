@@ -19,6 +19,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://pizarracr.com/og.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pizarra CR">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,28 +33,61 @@
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-<!-- Aviso temporal de redes sociales: se oculta solo después del 5 nov 2026 (medianoche CR). Borrar este bloque cuando ya no se ocupe. -->
+<!-- Aviso de arriba: redes sociales y "poner la página en el celular" (se cierra con la ✕ y se recuerda) -->
 <div class="redes gut" id="redes" hidden>
   <div class="inner">
-    <p><b>¡Pizarra CR ya tiene redes!</b> Seguinos para estar al tanto de todas las novedades del proyecto.</p>
+    <p><b>¡Tené Pizarra CR en tu celular!</b> <span id="redes-txt">Tocá el botón amarillo y te queda en la pantalla de tu teléfono, como cualquier aplicación.</span></p>
     <div class="redes-btns">
+      <button class="rb rb-app" id="app-btn" type="button" hidden>Poner en mi celular</button>
       <a class="rb" href="https://www.facebook.com/share/1Qh61niCQm/" target="_blank" rel="noopener">Facebook</a>
       <a class="rb" href="https://www.instagram.com/pizarracr/" target="_blank" rel="noopener">Instagram</a>
       <button class="rx" id="redes-x" aria-label="Cerrar aviso">✕</button>
     </div>
   </div>
 </div>
+<div class="appdlg" id="app-dlg" hidden role="dialog" aria-modal="true" aria-labelledby="app-dlg-t">
+  <div class="appdlg-box">
+    <button class="rx" id="app-dlg-x" aria-label="Cerrar">✕</button>
+    <h2 id="app-dlg-t">Ponela en tu celular</h2>
+    <div id="app-dlg-body"></div>
+  </div>
+</div>
 <script>
 (function(){
-  var fin = Date.parse('2026-11-06T06:00:00Z');
-  var el = document.getElementById('redes');
+  var el = document.getElementById('redes'), btn = document.getElementById('app-btn'), txt = document.getElementById('redes-txt');
+  var dlg = document.getElementById('app-dlg'), body = document.getElementById('app-dlg-body');
+  var ua = navigator.userAgent || '';
+  var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var movil = ios || /android/i.test(ua);
+  var dentroDeFace = /FBAN|FBAV|FB_IAB|Instagram/i.test(ua);
+  var instalada = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   var cerrado = false;
-  try { cerrado = localStorage.getItem('redes-cerrado') === '1'; } catch (e) {}
-  if (Date.now() < fin && !cerrado) el.hidden = false;
-  document.getElementById('redes-x').addEventListener('click', function(){
-    el.hidden = true;
-    try { localStorage.setItem('redes-cerrado', '1'); } catch (e) {}
+  try { cerrado = localStorage.getItem('aviso-app-cerrado') === '1'; } catch (e) {}
+  var pedido = null;   // el aviso de instalar de Android/Chrome
+  if ('serviceWorker' in navigator) window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js').catch(function(){}); });
+  function mostrar(){
+    var verBoton = !instalada && (movil || pedido);
+    btn.hidden = !verBoton;
+    if (!verBoton) txt.textContent = 'Seguinos en redes para estar al tanto de todas las novedades.';
+    el.hidden = cerrado || (instalada);
+  }
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); pedido = e; mostrar(); });
+  window.addEventListener('appinstalled', function(){ instalada = true; pedido = null; mostrar(); try { window.va && window.va('event', { name: 'app-instalada' }); } catch (e) {} });
+  function pasos(html){ body.innerHTML = html; dlg.hidden = false; }
+  btn.addEventListener('click', function(){
+    try { window.va && window.va('event', { name: 'app-boton' }); } catch (e) {}
+    if (pedido) { pedido.prompt(); pedido.userChoice.finally(function(){ pedido = null; }); return; }
+    if (dentroDeFace) return pasos('<p>Estás viendo la página dentro de Facebook o Instagram, y desde ahí no se puede.</p><ol><li>Tocá los <b>tres puntitos</b> (arriba a la derecha).</li><li>Elegí <b>Abrir en el navegador</b>' + (ios ? ' (Safari)' : ' (Chrome)') + '.</li><li>Ahí volvé a tocar el botón amarillo <b>Poner en mi celular</b>.</li></ol>');
+    if (ios) return pasos('<ol><li>Abajo en Safari, tocá el botón <b>Compartir</b> (el cuadrito con una flecha hacia arriba).</li><li>Bajá un poco y tocá <b>Agregar a inicio</b>.</li><li>Tocá <b>Agregar</b>, arriba a la derecha.</li></ol><p>¡Listo! Te queda el ícono de Pizarra CR en la pantalla del teléfono.</p>');
+    pasos('<ol><li>Tocá los <b>tres puntitos</b> de Chrome (arriba a la derecha).</li><li>Tocá <b>Agregar a la pantalla principal</b> o <b>Instalar aplicación</b>.</li><li>Tocá <b>Instalar</b>.</li></ol><p>¡Listo! Te queda el ícono de Pizarra CR en la pantalla del teléfono.</p>');
   });
+  document.getElementById('app-dlg-x').addEventListener('click', function(){ dlg.hidden = true; });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.hidden = true; });
+  document.getElementById('redes-x').addEventListener('click', function(){
+    el.hidden = true; cerrado = true;
+    try { localStorage.setItem('aviso-app-cerrado', '1'); } catch (e) {}
+  });
+  mostrar();
 })();
 </script>
 <header class="top gut">
