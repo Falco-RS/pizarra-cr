@@ -14,7 +14,9 @@ const venueOf = m => (ESTADIOS.partidos || {})[m.id] || ESTADIOS[T[m.h]?.name] |
 const venueHtml = v => v ? ` · <a class="venue" href="https://www.google.com/maps/search/${encodeURIComponent(v + ', Costa Rica')}" target="_blank" rel="noopener">${esc(v)}</a>` : '';
 /* Nombres que la API dejó vacíos en el minuto a minuto, completados a mano (public/data/eventos.json) */
 // (también se aplica al minuto a minuto en vivo; el minuto puede variar ±2 entre lo que manda la API y lo anotado)
-const fillEv = (id, ev) => { for (const fx of (EVENTOS[id] || [])) {
+const fillEv = (id, ev) => { ev = ev || []; for (const fx of (EVENTOS[id] || [])) {
+  // jugadas que la API no registra (p. ej. penal señalado): se agregan tal cual, una sola vez
+  if (fx.agregar) { if (!ev.some(e => e.manual && e[0] === fx.t && e[1] === fx.tipo)) { const x = [fx.t, fx.tipo, fx.local ? 1 : 0, fx.jugador || null, null]; x.manual = true; ev.push(x); } continue; }
   const e = (ev || []).find(e => e[1] === fx.tipo && !e[3] && (String(e[0]) === String(fx.t) || Math.abs(parseInt(e[0]) - parseInt(fx.t)) <= 2));
   if (e) e[3] = fx.jugador;
 } return ev; };
@@ -293,7 +295,7 @@ function renderPrevia(m, box) {
     </div></div>`;
 }
 
-const EVL = { goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
+const EVL = { psen:'Penal señalado', goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
 const ICO = { goal:'goal', pen:'goal', og:'goal', yc:'yc', rc:'rc', mp:'miss', var:'miss' };
 function evHtml(e) {
   const [time, type, , player, subIn] = e;

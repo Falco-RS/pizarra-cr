@@ -17,6 +17,13 @@
       "t": "11",
       "tipo": "goal",
       "jugador": "E. Torres"
+    },
+    {
+      "t": "79",
+      "tipo": "psen",
+      "local": false,
+      "jugador": "Penal a favor de Cartaginés",
+      "agregar": true
     }
   ]
 }
