@@ -24,6 +24,26 @@
       "local": false,
       "jugador": "Penal a favor de Cartaginés",
       "agregar": true
+    },
+    {
+      "t": "42",
+      "tipo": "yc",
+      "jugador": "C. Barahona"
+    },
+    {
+      "t": "58",
+      "tipo": "yc",
+      "jugador": "G. M. Morera"
+    },
+    {
+      "t": "90+3",
+      "tipo": "yc",
+      "jugador": "A. Rodriguez Elizondo"
+    },
+    {
+      "t": "90+6",
+      "tipo": "yc",
+      "jugador": "L. A. Olivas Salcedo"
     }
   ]
 }
