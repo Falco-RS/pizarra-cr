@@ -44,6 +44,12 @@
       "tipo": "rc",
       "partidos": 2,
       "fuente": "Tribunal Disciplinario FCRF tras J14: expulsado, 2 partidos (art. 37 inc. 2)"
+    },
+    {
+      "jugador": "J. Bolanos",
+      "equipo": "Inter San Carlos",
+      "r": 5,
+      "fuente": "UNAFUT: 3 amarillas tras J15 (jornada aproximada)"
     }
   ],
   "quitar": [
@@ -52,6 +58,12 @@
       "equipo": "Sporting",
       "r": 3,
       "fuente": "UNAFUT: 4 amarillas, la API tiene 5 (jornada aproximada)"
+    },
+    {
+      "jugador": "N. Bennette",
+      "equipo": "Herediano",
+      "r": 15,
+      "fuente": "La amarilla del 36' se cambió por roja tras el VAR: no cuenta"
     }
   ],
   "sanciones": [
@@ -61,6 +73,13 @@
       "r": 14,
       "partidos": 2,
       "fuente": "Tribunal Disciplinario FCRF tras J14: 2 partidos (art. 37 inc. 2)"
+    },
+    {
+      "jugador": "N. Bennette",
+      "equipo": "Herediano",
+      "r": 15,
+      "partidos": 2,
+      "fuente": "Expulsión directa en J15"
     }
   ]
 }
