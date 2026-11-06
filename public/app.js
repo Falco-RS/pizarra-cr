@@ -111,8 +111,9 @@ function tableRows(mode) {
   for (const t of Object.keys(T)) acc[t] = { t: +t, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 };
   const results = M.map(m => {
     if (played(m)) return off(m);
-    const lv = LIVE.find(x => x.id === m.id && x.finished && x.score);
-    return lv ? { ...m, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1] } : null;
+    // también los partidos EN VIVO, con el marcador del momento (la tabla se mueve mientras se juega)
+    const lv = LIVE.find(x => x.id === m.id && x.started && x.score);
+    return lv ? { ...m, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], enVivo: !lv.finished } : null;
   }).filter(Boolean);
   for (const m of results) {
     for (const [tid, gf, ga, isHome] of [[m.h, m.hs, m.as, true], [m.a, m.as, m.hs, false]]) {
@@ -120,6 +121,7 @@ function tableRows(mode) {
       if (mode === 'away' && isHome) continue;
       const r = acc[tid] ||= { t: tid, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, pts: 0 };
       r.pj++; r.gf += gf; r.gc += ga;
+      if (m.enVivo) r.live = { gf, ga, k: gf > ga ? 'W' : gf < ga ? 'L' : 'D' };
       if (gf > ga) { r.g++; r.pts += 3; } else if (gf === ga) { r.e++; r.pts += 1; } else r.p++;
     }
   }
@@ -363,7 +365,7 @@ function tableHtml(mode, compact) {
     <thead><tr><th class="l">#</th><th class="l">Equipo</th><th>PJ</th>${compact ? '' : '<th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th>'}<th>DG</th><th>Pts</th>${compact ? '' : '<th class="l">Últimos 5</th>'}</tr></thead>
     <tbody>${rows.map((r,i) => { const dg = r.gf - r.gc; return `<tr>
       <td class="l"><span class="pos">${i+1}</span></td>
-      <td class="l"><span class="tn">${crest(r.t)}${esc(T[r.t].name)}</span></td>
+      <td class="l"><span class="tn">${crest(r.t)}${esc(T[r.t].name)}${r.live ? `<span class="lvc ${r.live.k}" title="En vivo">${r.live.gf}-${r.live.ga}</span>` : ''}</span></td>
       <td>${r.pj}</td>${compact ? '' : `<td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td>${r.gf}</td><td>${r.gc}</td>`}
       <td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${r.pts}</td>${compact ? '' : `<td class="l">${formHtml(formOf(r.t, mode))}</td>`}</tr>`; }).join('')}</tbody></table></div>`;
 }
