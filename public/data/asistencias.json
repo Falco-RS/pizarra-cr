@@ -1,12 +1,12 @@
 {
  "_nota": "Asistidores oficiales de UNAFUT. Se actualiza A MANO al final de cada jornada. Solo jugadores con 3 o más. equipo = nombre como sale en la página.",
- "jornada": 14,
+ "jornada": 15,
  "minimo": 3,
  "lista": [
   {
    "jugador": "Luis Paradela",
    "equipo": "Saprissa",
-   "a": 7
+   "a": 8
   },
   {
    "jugador": "Manuel Morán",
@@ -14,14 +14,19 @@
    "a": 6
   },
   {
-   "jugador": "José González",
-   "equipo": "Cartaginés",
+   "jugador": "Mariano Torres",
+   "equipo": "Saprissa",
    "a": 4
   },
   {
-   "jugador": "Mariano Torres",
-   "equipo": "Saprissa",
-   "a": 3
+   "jugador": "Kenneth Cerdas",
+   "equipo": "San Carlos",
+   "a": 4
+  },
+  {
+   "jugador": "José González",
+   "equipo": "Cartaginés",
+   "a": 4
   },
   {
    "jugador": "Dominic Chévez",
@@ -31,11 +36,6 @@
   {
    "jugador": "Geancarlo Castro",
    "equipo": "Cartaginés",
-   "a": 3
-  },
-  {
-   "jugador": "Kenneth Cerdas",
-   "equipo": "San Carlos",
    "a": 3
   },
   {
@@ -74,5 +74,5 @@
    "a": 3
   }
  ],
- "actualizado": "2/11/26"
+ "actualizado": "5/11/26"
 }

@@ -94,7 +94,7 @@ const suspendedNext = suspensions.filter(s => playedAfter(s) < (s.n || 1))
   .map(s => {
     const left = (s.n || 1) - playedAfter(s);
     const nexts = M.filter(m => !played(m) && (m.h === s.t || m.a === s.t)).slice(0, left);
-    return { ...s, next: nexts[0], nexts, why: s.n > 1 ? `Roja · ${s.n} partidos` : s.why };
+    return { ...s, next: nexts[0], nexts, why: s.n > 1 ? `Roja · ${left === 1 ? 'le queda 1 partido' : left + ' partidos'}` : s.why };
   });
 const onFour = Object.values(yellows).filter(y => y.cycle === YELLOW_LIMIT - 1).sort((a,b) => a.name.localeCompare(b.name));
 reds.sort((a,b) => b.r - a.r);
