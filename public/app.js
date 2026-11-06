@@ -310,7 +310,7 @@ function renderDetail() {
   const box = document.getElementById('detail');
   const base = M.find(x => x.id === S.sel);
   const lv = base && LIVE.find(x => x.id === base.id && x.started);
-  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(fillEv(base.id, lv.events), +lv.score.split(' - ')[0], +lv.score.split(' - ')[1]), liveClock: lv.finished ? undefined : lv.clock } : base;
+  const m = lv ? { ...base, hs: +lv.score.split(' - ')[0], as: +lv.score.split(' - ')[1], ev: reconcile(fillEv(base.id, lv.events), +lv.score.split(' - ')[0], +lv.score.split(' - ')[1], !lv.finished), liveClock: lv.finished ? undefined : lv.clock } : base;
   if (!m) { box.innerHTML = ''; return; }
   if (!played(m) && !lv) { renderPrevia(m, box); return; }
   const ev = (m.ev || []).slice().sort((a,b) => parseInt(a[0]) - parseInt(b[0]) || (a[0].includes('+') - b[0].includes('+')));
@@ -944,8 +944,10 @@ document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.da
 
 /* Si el minuto a minuto tiene más goles que el marcador (gol anulado que la API no ha borrado),
    el marcador manda y los goles sobrantes, de atrás para adelante, se marcan como anulados. */
-function reconcile(events, hs, as) {
+function reconcile(events, hs, as, enVivo) {
   const ev = events.map(e => e.slice());
+  // en vivo la API a veces manda el gol antes de actualizar el marcador: no marcarlo como anulado
+  if (enVivo) return ev;
   const isGoal = e => e[1] === 'goal' || e[1] === 'pen' || e[1] === 'og';
   for (const [side, max] of [[1, hs], [0, as]]) {
     let count = ev.filter(e => isGoal(e) && e[2] === side).length;
