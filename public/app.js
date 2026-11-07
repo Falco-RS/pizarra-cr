@@ -763,10 +763,33 @@ function renderLegio(v) {
 let SE = null, SEsel = null, SEms = [];
 /* ---------- Liga de Ascenso (manual, public/data/ascenso.json) ---------- */
 let ASC = null, ASCX = {};
+function loadAsc(then) {
+  if (ASC === null) { ASC = false; Promise.all([fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null), fetch('/data/ascenso-api.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]).then(([j, x]) => { ASC = j || { series: [], grupos: [], equipos: {} }; ASCX = x || {}; then && then(); }); }
+}
+const ascH = () => {
+  const E = ASC.equipos || {};
+  return { E,
+    cr: (k, cls = 'crest') => E[k]?.escudo ? `<img class="${cls}" src="${esc(E[k].escudo)}" alt="" loading="lazy">` : `<span class="${cls} ph" aria-hidden="true">${esc((E[k]?.nombre || k).slice(0, 3).toUpperCase())}</span>`,
+    nm: k => esc(E[k]?.nombre || k),
+    when: l => l.fecha ? `${fmtDay(l.fecha)} · ${fmtTime(l.fecha)}` : 'Fecha por confirmar' };
+};
+// equipo de la API -> nuestro equipo (nombre y escudo que pasó Falco)
+const ascTeam = id => { const k = ASC && Object.keys(ASCX.ids || {}).find(k => ASCX.ids[k] === id); return k ? ASC.equipos[k] : null; };
+/* Detalle del partido de Ascenso abierto desde la franja de Inicio (se abre ahí mismo, debajo de la franja) */
+function renderLdet() {
+  let el = document.getElementById('ldetail');
+  if (!el) { el = document.createElement('div'); el.id = 'ldetail'; document.getElementById('live').after(el); }
+  if (!S.ldet || S.view !== 'inicio' || !ASC) { el.innerHTML = ''; return; }
+  const n = Object.entries(ASCX.series || {}).find(([, x]) => (x.legs || []).some(l => l.id === S.ldet))?.[0];
+  const ser = (ASC.series || []).find(x => x.n === +n);
+  if (!ser) { el.innerHTML = ''; return; }
+  const h = ascH();
+  el.innerHTML = ascPrevia(ascLegs(ser), h.E, h.cr, h.nm, h.when);
+}
 function renderAscenso(v) {
   if (!ASC) {
     v.innerHTML = '<section class="panel"><p class="hint">Cargando la Liga de Ascenso…</p></section>';
-    if (ASC === null) { ASC = false; Promise.all([fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null), fetch('/data/ascenso-api.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]).then(([j, x]) => { ASC = j || { series: [], grupos: [], equipos: {} }; ASCX = x || {}; if (S.view === 'ascenso') renderView(); }); }
+    loadAsc(() => { if (S.view === 'ascenso') renderView(); });
     return;
   }
   if (S.ascPick) { const n = Object.entries(ASCX.series || {}).find(([, x]) => (x.legs || []).some(l => l.id === S.ascPick))?.[0]; if (n) S.asel = +n; S.ascPick = null; }
@@ -967,7 +990,7 @@ function seleDetailHtml(m, CR, compName) {
       <section><h3>Contra ${esc(rival.name)}, últimos dos años</h3><ul class="plist">${h2h.map(line).join('') || '<li><span class="x" style="margin:0">No se enfrentaron en este periodo</span></li>'}</ul></section>
     </div></div></div>`;
 }
-function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); try { renderLive(); } catch (e) {} window.scrollTo({ top: 0 }); }
+function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); try { renderLive(); renderLdet(); } catch (e) {} window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));
 
 /* Si el minuto a minuto tiene más goles que el marcador (gol anulado que la API no ha borrado),
@@ -1001,7 +1024,10 @@ function renderLive() {
   if (!now.length && !soon.length) { el.hidden = true; syncBoard(); return; }
   el.hidden = false; syncBoard();
   const cr = t => t.logo || t.id ? `<img class="crest" src="${esc(t.logo || `https://highlightly.net/soccer/images/teams/${t.id}.png`)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab || '')}</span>`;
-  const item = L => {
+  if (LIVE.some(x => x.comp === 'Liga de Ascenso') && ASC === null) loadAsc(() => { renderLive(); renderLdet(); });
+  const fixT = t => { const o = ascTeam(t.id); return o ? { ...t, name: o.nombre, logo: o.escudo } : t; };
+  const item = L0 => {
+    const L = L0.comp === 'Liga de Ascenso' ? { ...L0, h: fixT(L0.h), a: fixT(L0.a) } : L0;
     const [hs, as] = (L.score || '0 - 0').split(' - ');
     const evs = reconcile(L.events, +hs, +as);
     const e = evs[evs.length - 1];
@@ -1016,7 +1042,7 @@ function renderLive() {
   el.querySelectorAll('[data-live]').forEach(b => b.onclick = () => {
     const m = M.find(x => x.id === +b.dataset.live);
     const L = LIVE.find(x => x.id === +b.dataset.live);
-    if (L && L.comp === 'Liga de Ascenso') { S.ascPick = L.id; go('ascenso'); return; }
+    if (L && L.comp === 'Liga de Ascenso') { S.ldet = S.ldet === L.id ? null : L.id; renderLdet(); if (S.ldet) document.getElementById('ldetail').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     if (!m) { S.cid = +b.dataset.live; go('copa'); setTimeout(() => document.getElementById('cdetail')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); return; }
     S.j = m.r; S.sel = m.id; S.moved = true; renderBoard();
     document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1031,7 +1057,7 @@ async function pollLive() {
     const lvM = LIVE.map(x => M.find(m => m.id === x.id && x.started && !x.finished)).find(Boolean);
     if (lvM && !S.moved) S.j = lvM.r;
   } catch (e) { /* sin conexión: se mantiene lo último */ }
-  renderLive(); renderBoard();
+  renderLive(); renderBoard(); renderLdet();
   // la tabla y los goleadores también usan los resultados recién terminados
   if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa' || (S.view === 'ascenso' && LIVE.some(x => x.comp === 'Liga de Ascenso'))) renderView();
 }
@@ -1045,6 +1071,7 @@ function addCloseButtons() {
       if (d.closest('#cdetail')) { S.cid = null; renderView(); }
       else if (d.closest('#sdetail')) { SEsel = null; renderView(); }
       else if (d.closest('#adetail')) { S.asel = null; renderView(); }
+      else if (d.closest('#ldetail')) { S.ldet = null; renderLdet(); }
       else { S.sel = null; renderBoard(); }
     };
     d.prepend(b);
