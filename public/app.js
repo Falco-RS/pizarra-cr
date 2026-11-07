@@ -774,13 +774,14 @@ function renderAscenso(v) {
   const nm = k => esc(E[k]?.nombre || k);
   const when = l => l.fecha ? `${fmtDay(l.fecha)} · ${fmtTime(l.fecha)}` : 'Fecha por confirmar';
   const sc = x => x == null ? '' : x;
-  const series = (ASC.series || []).map(s => {
-    const i = s.ida || {}, vu = s.vuelta || {};
+  const series = (ASC.series || []).map(s0 => {
+    const s = ascLegs(s0); const i = s.ida || {}, vu = s.vuelta || {};
     const both = i.ga != null && vu.ga != null;
     const ta = (i.ga ?? 0) + (vu.ga ?? 0), tb = (i.gb ?? 0) + (vu.gb ?? 0);
     const pasa = s.pasa || (both && ta !== tb ? (ta > tb ? 'a' : 'b') : null);
+    const tag = l => l.vivo ? `<span class="alive">${esc(l.vivo)}</span>` : '';
     const row = (side, k, g1, g2, tot) => `<div class="asr${pasa === side ? ' win' : pasa ? ' out' : ''}">${cr(k)}<b>${nm(k)}</b><span class="g">${sc(g1)}</span><span class="g">${sc(g2)}</span><span class="g tot">${i.ga != null ? tot : ''}</span></div>`;
-    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>previa</u></span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
+    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>${i.vivo || vu.vivo ? 'en vivo' : i.ga != null ? 'partido' : 'previa'}</u> ${tag(i)}${tag(vu)}</span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
       ${row('a', s.a, i.ga, vu.ga, ta)}${row('b', s.b, i.gb, vu.gb, tb)}
       <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · ${esc(i.tv)}` : ''}</li>
       <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · ${esc(vu.tv)}` : ''}</li></ul>
@@ -791,7 +792,7 @@ function renderAscenso(v) {
     <tbody>${g.tabla.map((r, i) => { const [n, pj, gg, e, p, gf, gc, pts] = r, dg = gf - gc, k = Object.keys(E).find(k => E[k].nombre === n.replace(/\s*\*$/, ''));
       return `<tr class="${i < (g.clasifican || 0) ? 'aq' : ''}"><td class="l"><span class="pos">${i + 1}</span></td><td class="l"><span class="tn">${k ? cr(k) : ''}${esc(n)}</span></td><td>${pj}</td><td>${gg}</td><td>${e}</td><td>${p}</td><td>${gf}</td><td>${gc}</td><td>${dg > 0 ? '+' + dg : dg}</td><td class="pts">${pts}</td></tr>`; }).join('')}</tbody></table></div></section>`;
   v.innerHTML = `<section class="panel"><div class="ph2"><h2>Liga de Ascenso · ${esc(ASC.torneo || '')}</h2><span class="chip">${esc(ASC.fase || '')}</span></div>
-      <div class="agrid">${series}</div><div id="adetail">${S.asel ? ascPrevia((ASC.series || []).find(x => x.n === S.asel), E, cr, nm, when) : ''}</div></section>
+      <div class="agrid">${series}</div><div id="adetail">${S.asel ? ascPrevia(ascLegs((ASC.series || []).find(x => x.n === S.asel)), E, cr, nm, when) : ''}</div></section>
     <h2 class="shead">Fase regular</h2>
     <div class="agrid2">${(ASC.grupos || []).map(tabla).join('')}</div>
     ${(ASC.goleadores?.lista || []).length ? (() => { let last, pos = 0; const G = ASC.goleadores.lista.slice().sort((a, b) => b.g - a.g);
@@ -802,10 +803,33 @@ function renderAscenso(v) {
   v.querySelectorAll('[data-aser]').forEach(b => { const go_ = () => { const n = +b.dataset.aser; S.asel = S.asel === n ? null : n; renderView(); if (S.asel) document.getElementById('adetail').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
     b.onclick = go_; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go_(); } }; });
 }
+/* Partidos de la serie según la API (en vivo o terminados): completan los marcadores que no están puestos a mano */
+function ascLegs(s0) {
+  if (!s0) return s0;
+  const s = { ...s0, ida: { ...(s0.ida || {}) }, vuelta: { ...(s0.vuelta || {}) } };
+  const X = (ASCX.series || {})[s.n], A = (ASCX.ids || {})[s.a];
+  for (const l of (X && X.legs) || []) {
+    const leg = l.h.id === A ? s.ida : s.vuelta, aHome = l.h.id === A;
+    const lv = LIVE.find(x => x.id === l.id && x.started);
+    const sc = lv && lv.score ? lv.score.split(' - ').map(Number) : l.hs !== undefined ? [l.hs, l.as] : null;
+    leg.apiId = l.id; leg.live = lv || null;
+    if (leg.ga == null && sc) { leg.ga = aHome ? sc[0] : sc[1]; leg.gb = aHome ? sc[1] : sc[0]; }
+    if (lv && !lv.finished) leg.vivo = /half time/i.test(lv.status) ? 'ENTRETIEMPO' : `EN VIVO ${lv.clock ?? ''}'`;
+  }
+  return s;
+}
+function ascLiveHtml(leg, local, vis, nm) {
+  const lv = leg.live; if (!lv) return '';
+  const ev = sortEvents({ events: (lv.events || []).map(e => e.slice()) }).events || [];
+  const st = lv.stats || [], ph = st[0]?.s?.Possession, pa = st[1]?.s?.Possession;
+  const pos = ph != null && pa != null ? `<section><h3>Posesión</h3><div class="apos"><b>${Math.round(ph * 100)}%</b><span class="bar"><i style="width:${ph * 100}%"></i></span><b>${Math.round(pa * 100)}%</b></div><div class="apos-l"><span>${nm(local)}</span><span>${nm(vis)}</span></div></section>` : '';
+  return `<section><h3>Minuto a minuto ${leg.vivo ? `<span class="alive">${esc(leg.vivo)}</span>` : '<span class="chip">Final</span>'}</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Sin eventos registrados.</p>'}</section>${pos}`;
+}
 function ascPrevia(s, E, cr, nm, when) {
   if (!s) return '';
   const i = s.ida || {}, vu = s.vuelta || {};
-  const leg = i.ga == null ? { ...i, cual: 'ida', local: s.a, vis: s.b } : { ...vu, cual: 'vuelta', local: s.b, vis: s.a };
+  const enJuego = i.vivo ? 'ida' : vu.vivo ? 'vuelta' : null;
+  const leg = (enJuego === 'ida' || (!enJuego && (i.ga == null || i.live && vu.ga == null && !vu.live))) ? { ...i, cual: 'ida', local: s.a, vis: s.b } : { ...vu, cual: 'vuelta', local: s.b, vis: s.a };
   const F = ASCX.forms || {};
   const fo = k => F[k] && F[k].verificado ? F[k].rows : null;
   const grp = k => { for (const g of ASC.grupos || []) { const ix = g.tabla.findIndex(r => r[0] === E[k]?.nombre); if (ix >= 0) return { g, ix, r: g.tabla[ix] }; } return null; };
@@ -829,11 +853,12 @@ function ascPrevia(s, E, cr, nm, when) {
   return `<div class="detail">
     <div class="dscore">
       <div class="dteam r"><span>${nm(L)}</span>${cr(L)}</div>
-      <div><div class="dnum" style="font-size:40px">${leg.fecha ? esc(fmtTime(leg.fecha)) : '—'}</div></div>
+      <div>${leg.live ? `<div class="dnum">${leg.cual === 'ida' ? `${leg.ga}–${leg.gb}` : `${leg.gb}–${leg.ga}`}</div>` : `<div class="dnum" style="font-size:40px">${leg.fecha ? esc(fmtTime(leg.fecha)) : '—'}</div>`}</div>
       <div class="dteam">${cr(V)}<span>${nm(V)}</span></div>
     </div>
-    <div class="dmeta">Previa · ${leg.fecha ? esc(fmtDay(leg.fecha)) : 'Fecha por confirmar'} · Serie ${s.n} · Cuartos de final (${leg.cual})${leg.estadio ? venueHtml(leg.estadio) : ''}${leg.tv ? ` · ${esc(leg.tv)}` : ''}</div>
+    <div class="dmeta">${leg.live ? (leg.vivo ? 'En vivo' : 'Final') : 'Previa'} · ${leg.fecha ? esc(fmtDay(leg.fecha)) : 'Fecha por confirmar'} · Serie ${s.n} · Cuartos de final (${leg.cual})${leg.estadio ? venueHtml(leg.estadio) : ''}${leg.tv ? ` · ${esc(leg.tv)}` : ''}</div>
     <div class="pv"><div class="pv-data" style="flex-basis:100%">
+      ${ascLiveHtml(leg, leg.local, leg.vis, nm)}
       <section><h3>La serie</h3><ul class="plist">
         <li><b>Ida</b>&nbsp;· local ${nm(s.a)}<span class="x">${esc(when(i))}${i.ga != null ? ` · ${i.ga}–${i.gb}` : ''}</span></li>
         <li><b>Vuelta</b>&nbsp;· local ${nm(s.b)}<span class="x">${esc(when(vu))}${vu.ga != null ? ` · ${vu.gb}–${vu.ga}` : ''}</span></li>
@@ -968,8 +993,9 @@ function sortEvents(L) {
 const COMP = { 'Concacaf Central American Cup': 'Copa Centroamericana', 'CONCACAF Champions Cup': 'Copa de Campeones Concacaf' };
 function renderLive() {
   const el = document.getElementById('live');
-  const now = LIVE.filter(x => x.started && !x.finished);
-  const soon = LIVE.filter(x => !x.started);
+  // la franja es de la Primera y la Copa; los playoffs de Ascenso se ven en su pestaña
+  const now = LIVE.filter(x => x.started && !x.finished && x.comp !== 'Liga de Ascenso');
+  const soon = LIVE.filter(x => !x.started && x.comp !== 'Liga de Ascenso');
   if (!now.length && !soon.length) { el.hidden = true; syncBoard(); return; }
   el.hidden = false; syncBoard();
   const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
@@ -1003,7 +1029,7 @@ async function pollLive() {
   } catch (e) { /* sin conexión: se mantiene lo último */ }
   renderLive(); renderBoard();
   // la tabla y los goleadores también usan los resultados recién terminados
-  if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa') renderView();
+  if (S.view === 'inicio' || S.view === 'tabla' || S.view === 'copa' || (S.view === 'ascenso' && LIVE.some(x => x.comp === 'Liga de Ascenso'))) renderView();
 }
 /* Botón ✕ en cualquier detalle de partido (liga, Copa, Sele) para cerrarlo sin tener que buscar el partido otra vez */
 function addCloseButtons() {

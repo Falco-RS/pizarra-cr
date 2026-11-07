@@ -23,12 +23,19 @@ export default async function handler(req, res) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const proto = req.headers['x-forwarded-proto'] || (String(host).startsWith('localhost') ? 'http' : 'https');
     const season = await (await fetch(`${proto}://${host}/data/season.json`)).json();
+    // Liga de Ascenso: los partidos de playoffs que el bot dejó en ascenso-api.json
+    let ascenso = [];
+    try {
+      const ax = await (await fetch(`${proto}://${host}/data/ascenso-api.json`)).json();
+      ascenso = Object.values(ax.series || {}).flatMap(s => s.legs || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: 139497, comp: 'Liga de Ascenso', h: { id: m.h.id, name: m.h.n }, a: { id: m.a.id, name: m.a.n } }));
+    } catch { /* sin Ascenso */ }
 
     const now = Date.now();
     const done = s => /finish|award|cancel|postpon|abandon/i.test(s || '');
     const candidates = [
       ...season.matches.map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: season.league.id, comp: season.league.name, h: season.teams[m.h], a: season.teams[m.a] })),
       ...(season.intl || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.leagueId, comp: m.comp, h: m.h, a: m.a })),
+      ...ascenso,
     // En juego, o ya terminado pero todavía sin guardar en los datos (hasta 24 h después),
     // para que la página siga mostrando el resultado final mientras corre la actualización.
     ].filter(m => { const k = new Date(m.d).getTime(); return now >= k - BEFORE && now <= k + 24 * 3600e3 && !done(m.s); });
@@ -74,7 +81,7 @@ export default async function handler(req, res) {
     }
     // Un partido terminó y todavía no está en los datos: pedir la actualización a GitHub ya
     // (necesita GH_TOKEN en Vercel; sin él, la actualización horaria lo recoge igual).
-    const pendingSave = live.some(m => m.finished);
+    const pendingSave = live.some(m => m.finished && m.comp !== 'Liga de Ascenso');
     if (pendingSave && process.env.GH_TOKEN) {
       await fetch('https://api.github.com/repos/' + (process.env.GH_REPO || 'Falco-RS/pizarra-cr') + '/actions/workflows/actualizar-datos.yml/dispatches', {
         method: 'POST',
