@@ -769,6 +769,7 @@ function renderAscenso(v) {
     if (ASC === null) { ASC = false; Promise.all([fetch('/data/ascenso.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null), fetch('/data/ascenso-api.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]).then(([j, x]) => { ASC = j || { series: [], grupos: [], equipos: {} }; ASCX = x || {}; if (S.view === 'ascenso') renderView(); }); }
     return;
   }
+  if (S.ascPick) { const n = Object.entries(ASCX.series || {}).find(([, x]) => (x.legs || []).some(l => l.id === S.ascPick))?.[0]; if (n) S.asel = +n; S.ascPick = null; }
   const E = ASC.equipos || {};
   const cr = (k, cls = 'crest') => E[k]?.escudo ? `<img class="${cls}" src="${esc(E[k].escudo)}" alt="" loading="lazy">` : `<span class="${cls} ph" aria-hidden="true">${esc((E[k]?.nombre || k).slice(0, 3).toUpperCase())}</span>`;
   const nm = k => esc(E[k]?.nombre || k);
@@ -966,7 +967,7 @@ function seleDetailHtml(m, CR, compName) {
       <section><h3>Contra ${esc(rival.name)}, últimos dos años</h3><ul class="plist">${h2h.map(line).join('') || '<li><span class="x" style="margin:0">No se enfrentaron en este periodo</span></li>'}</ul></section>
     </div></div></div>`;
 }
-function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); window.scrollTo({ top: 0 }); }
+function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); try { renderLive(); } catch (e) {} window.scrollTo({ top: 0 }); }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.dataset.v));
 
 /* Si el minuto a minuto tiene más goles que el marcador (gol anulado que la API no ha borrado),
@@ -993,19 +994,20 @@ function sortEvents(L) {
 const COMP = { 'Concacaf Central American Cup': 'Copa Centroamericana', 'CONCACAF Champions Cup': 'Copa de Campeones Concacaf' };
 function renderLive() {
   const el = document.getElementById('live');
-  // la franja es de la Primera y la Copa; los playoffs de Ascenso se ven en su pestaña
-  const now = LIVE.filter(x => x.started && !x.finished && x.comp !== 'Liga de Ascenso');
-  const soon = LIVE.filter(x => !x.started && x.comp !== 'Liga de Ascenso');
+  // los playoffs de Ascenso salen en la franja solo en Inicio (y en su propia pestaña)
+  const okComp = x => x.comp !== 'Liga de Ascenso' || S.view === 'inicio';
+  const now = LIVE.filter(x => x.started && !x.finished && okComp(x));
+  const soon = LIVE.filter(x => !x.started && okComp(x) && x.comp !== 'Liga de Ascenso');
   if (!now.length && !soon.length) { el.hidden = true; syncBoard(); return; }
   el.hidden = false; syncBoard();
-  const cr = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab)}</span>`;
+  const cr = t => t.logo || t.id ? `<img class="crest" src="${esc(t.logo || `https://highlightly.net/soccer/images/teams/${t.id}.png`)}" alt="">` : `<span class="crest ph" aria-hidden="true">${esc(t.ab || '')}</span>`;
   const item = L => {
     const [hs, as] = (L.score || '0 - 0').split(' - ');
     const evs = reconcile(L.events, +hs, +as);
     const e = evs[evs.length - 1];
     const last = e ? `${esc(e[0])}' · ${e[1] === 'sub' ? `Entra <b>${esc(e[4])}</b> <span class="note">sale ${esc(e[3])}</span>` : `<b>${esc(e[3] || '')}</b> <span class="note">${EVL[e[1]] || esc(e[1])}</span>`}` : 'Sin eventos todavía';
     const clock = /half time/i.test(L.status) ? 'ENTRETIEMPO' : `EN VIVO ${L.clock ?? ''}'`;
-    const inLeague = M.some(x => x.id === L.id) || (D.intl || []).some(x => x.id === L.id);
+    const inLeague = M.some(x => x.id === L.id) || (D.intl || []).some(x => x.id === L.id) || L.comp === 'Liga de Ascenso';
     return `<${inLeague ? `button type="button" class="litem" data-live="${L.id}"` : 'div class="litem"'}>${L.started ? `<span class="tag"><i></i>${clock}</span>` : `<span class="tag soon">${esc(fmtTime(L.d))}</span>`}
       <span class="sc">${cr(L.h)}<span>${esc(L.h.name)}</span><b>${L.started ? `${hs} – ${as}` : 'vs'}</b><span>${esc(L.a.name)}</span>${cr(L.a)}</span>
       <span class="comp">${esc(COMP[L.comp] || L.comp)}</span>${L.started ? `<span class="last">Último: ${last}</span>` : ''}${inLeague ? '<span class="go">Ver partido →</span>' : ''}</${inLeague ? 'button' : 'div'}>`;
@@ -1013,6 +1015,8 @@ function renderLive() {
   el.innerHTML = [...now, ...soon].map(item).join('');
   el.querySelectorAll('[data-live]').forEach(b => b.onclick = () => {
     const m = M.find(x => x.id === +b.dataset.live);
+    const L = LIVE.find(x => x.id === +b.dataset.live);
+    if (L && L.comp === 'Liga de Ascenso') { S.ascPick = L.id; go('ascenso'); return; }
     if (!m) { S.cid = +b.dataset.live; go('copa'); setTimeout(() => document.getElementById('cdetail')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); return; }
     S.j = m.r; S.sel = m.id; S.moved = true; renderBoard();
     document.getElementById('detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
