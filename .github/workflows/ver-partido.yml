@@ -1,0 +1,19 @@
+name: Ver partido (solo consulta)
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: 'Id del partido en la API'
+        required: true
+jobs:
+  ver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/tools/ver-partido.mjs
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+          MATCH_ID: ${{ github.event.inputs.id }}
