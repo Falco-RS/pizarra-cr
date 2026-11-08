@@ -2809,5 +2809,298 @@
    ],
    "dt": "Ronald Gómez"
   }
+ },
+ "1320516206": {
+  "home": {
+   "fuente": "redes de Alajuelense",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "W. Ortega"
+     }
+    ],
+    [
+     {
+      "n": 42,
+      "name": "J. P. Ruiz"
+     },
+     {
+      "n": 21,
+      "name": "Y. Molina"
+     },
+     {
+      "n": 13,
+      "name": "A. Gamboa"
+     },
+     {
+      "n": 28,
+      "name": "Y. Sosa"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "R. Wilson"
+     },
+     {
+      "n": 5,
+      "name": "C. Borges",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 34,
+      "name": "C. Pérez"
+     },
+     {
+      "n": 10,
+      "name": "J. P. Añor"
+     },
+     {
+      "n": 99,
+      "name": "K. Michel"
+     }
+    ],
+    [
+     {
+      "n": 18,
+      "name": "R. Cisneros"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "W. Ortega"
+    },
+    {
+     "n": 42,
+     "name": "J. P. Ruiz"
+    },
+    {
+     "n": 21,
+     "name": "Y. Molina"
+    },
+    {
+     "n": 13,
+     "name": "A. Gamboa"
+    },
+    {
+     "n": 28,
+     "name": "Y. Sosa"
+    },
+    {
+     "n": 14,
+     "name": "R. Wilson"
+    },
+    {
+     "n": 5,
+     "name": "C. Borges",
+     "c": true
+    },
+    {
+     "n": 34,
+     "name": "C. Pérez"
+    },
+    {
+     "n": 10,
+     "name": "J. P. Añor"
+    },
+    {
+     "n": 99,
+     "name": "K. Michel"
+    },
+    {
+     "n": 18,
+     "name": "R. Cisneros"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "B. Mora"
+    },
+    {
+     "n": 2,
+     "name": "D. Paz"
+    },
+    {
+     "n": 7,
+     "name": "A. Hernández"
+    },
+    {
+     "n": 9,
+     "name": "A. Zaldívar"
+    },
+    {
+     "n": 11,
+     "name": "L. Díaz"
+    },
+    {
+     "n": 24,
+     "name": "A. Salazar"
+    },
+    {
+     "n": 26,
+     "name": "F. Piñar"
+    },
+    {
+     "n": 29,
+     "name": "D. Aguilar"
+    },
+    {
+     "n": 35,
+     "name": "R. Parkins"
+    },
+    {
+     "n": 39,
+     "name": "E. Cruz"
+    }
+   ]
+  },
+  "away": {
+   "fuente": "redes de Sporting",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "L. Moreira"
+     }
+    ],
+    [
+     {
+      "n": 35,
+      "name": "J. C. Batista"
+     },
+     {
+      "n": 3,
+      "name": "K. Espinoza"
+     },
+     {
+      "n": 5,
+      "name": "A. Soto"
+     },
+     {
+      "n": 27,
+      "name": "A. Chévez"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "C. Pineda"
+     },
+     {
+      "n": 10,
+      "name": "A. López"
+     }
+    ],
+    [
+     {
+      "n": 19,
+      "name": "J. Méndez"
+     },
+     {
+      "n": 6,
+      "name": "G. Leiva"
+     },
+     {
+      "n": 7,
+      "name": "J. M. Pinto"
+     }
+    ],
+    [
+     {
+      "n": 11,
+      "name": "R. Carballo"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "L. Moreira"
+    },
+    {
+     "n": 35,
+     "name": "J. C. Batista"
+    },
+    {
+     "n": 3,
+     "name": "K. Espinoza"
+    },
+    {
+     "n": 5,
+     "name": "A. Soto"
+    },
+    {
+     "n": 27,
+     "name": "A. Chévez"
+    },
+    {
+     "n": 8,
+     "name": "C. Pineda"
+    },
+    {
+     "n": 10,
+     "name": "A. López"
+    },
+    {
+     "n": 19,
+     "name": "J. Méndez"
+    },
+    {
+     "n": 6,
+     "name": "G. Leiva"
+    },
+    {
+     "n": 7,
+     "name": "J. M. Pinto"
+    },
+    {
+     "n": 11,
+     "name": "R. Carballo"
+    }
+   ],
+   "subs": [
+    {
+     "name": "Rodiney Leal"
+    },
+    {
+     "name": "Ignacio Gómez"
+    },
+    {
+     "name": "Daniel Colindres"
+    },
+    {
+     "name": "Ryan Bolaños"
+    },
+    {
+     "name": "Joshua Navarro"
+    },
+    {
+     "name": "Eduardo Pastrana"
+    },
+    {
+     "name": "Marco Ureña"
+    },
+    {
+     "name": "Yostin Salinas"
+    },
+    {
+     "name": "Delfín Salas"
+    },
+    {
+     "name": "Randy Ramírez"
+    }
+   ],
+   "dt": "Andrés Carevic"
+  }
  }
 }
