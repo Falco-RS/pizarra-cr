@@ -18,7 +18,7 @@ const fillEv = (id, ev) => { ev = ev || []; for (const fx of (EVENTOS[id] || [])
   // jugadas que la API no registra (p. ej. penal señalado): se agregan tal cual, una sola vez
   if (fx.agregar) { if (!ev.some(e => e.manual && e[0] === fx.t && e[1] === fx.tipo)) { const x = [fx.t, fx.tipo, fx.local ? 1 : 0, fx.jugador || null, null]; x.manual = true; ev.push(x); } continue; }
   const e = (ev || []).find(e => e[1] === fx.tipo && !e[3] && (String(e[0]) === String(fx.t) || Math.abs(parseInt(e[0]) - parseInt(fx.t)) <= 2));
-  if (e) e[3] = fx.jugador;
+  if (e) { if (fx.jugador) e[3] = fx.jugador; if (fx.como) e[1] = fx.como; }
 } return ev; };
 for (const m of D.matches) fillEv(m.id, m.ev);
 const M = D.matches.slice().sort((a,b) => new Date(a.d) - new Date(b.d));
@@ -591,7 +591,7 @@ function intlDetailHtml(m) {
   const roundName = ROUND_ES[m.round] || m.round;
   if (lv) {
     const [hs, as] = (lv.score || '0 - 0').split(' - ').map(Number);
-    const ev = reconcile(lv.events, hs, as);
+    const ev = reconcile(lv.events, hs, as, !lv.finished);
     const sts = lv.stats && lv.stats.length === 2 ? lv.stats : null;
     const hi = sts && sts[0].t === m.hId ? 0 : 1;
     const bars = sts ? STATS.map(([k, lab, f = v => v]) => { const h = sts[hi].s[k], a = sts[1 - hi].s[k]; if (h === undefined) return ''; const tot = (h + a) || 1;
@@ -1029,7 +1029,7 @@ function renderLive() {
   const item = L0 => {
     const L = L0.comp === 'Liga de Ascenso' ? { ...L0, h: fixT(L0.h), a: fixT(L0.a) } : L0;
     const [hs, as] = (L.score || '0 - 0').split(' - ');
-    const evs = reconcile(L.events, +hs, +as);
+    const evs = reconcile(L.events, +hs, +as, true);
     const e = evs[evs.length - 1];
     const last = e ? `${esc(e[0])}' · ${e[1] === 'sub' ? `Entra <b>${esc(e[4])}</b> <span class="note">sale ${esc(e[3])}</span>` : `<b>${esc(e[3] || '')}</b> <span class="note">${EVL[e[1]] || esc(e[1])}</span>`}` : 'Sin eventos todavía';
     const clock = /half time/i.test(L.status) ? 'ENTRETIEMPO' : `EN VIVO ${L.clock ?? ''}'`;

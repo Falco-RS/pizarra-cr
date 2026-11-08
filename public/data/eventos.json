@@ -1,61 +1,68 @@
 {
-  "_nota": "Nombres que la API dejó vacíos en el minuto a minuto. Clave: id del partido. t = minuto como sale en la página, tipo = goal, pen, og, yc, rc.",
-  "1320507696": [
-    {
-      "t": "86",
-      "tipo": "goal",
-      "jugador": "D. López"
-    },
-    {
-      "t": "90+1",
-      "tipo": "rc",
-      "jugador": "J. Gaete"
-    }
-  ],
-  "1320512802": [
-    {
-      "t": "11",
-      "tipo": "goal",
-      "jugador": "E. Torres"
-    },
-    {
-      "t": "79",
-      "tipo": "psen",
-      "local": false,
-      "jugador": "Penal a favor de Cartaginés",
-      "agregar": true
-    },
-    {
-      "t": "42",
-      "tipo": "yc",
-      "jugador": "C. Barahona"
-    },
-    {
-      "t": "58",
-      "tipo": "yc",
-      "jugador": "G. M. Morera"
-    },
-    {
-      "t": "90+3",
-      "tipo": "yc",
-      "jugador": "A. Rodriguez Elizondo"
-    },
-    {
-      "t": "90+6",
-      "tipo": "yc",
-      "jugador": "L. A. Olivas Salcedo"
-    }
-  ],
-  "1320511951": [
-    {
-      "t": "13",
-      "tipo": "goal",
-      "jugador": "N. Williams"
-    },
-    {
-      "t": "90+5",
-      "tipo": "yc",
-      "jugador": "H. Quiros"
-    }
-  ]
+ "_nota": "Nombres que la API dejó vacíos en el minuto a minuto. Clave: id del partido. t = minuto como sale en la página, tipo = goal, pen, og, yc, rc.",
+ "1320507696": [
+  {
+   "t": "86",
+   "tipo": "goal",
+   "jugador": "D. López"
+  },
+  {
+   "t": "90+1",
+   "tipo": "rc",
+   "jugador": "J. Gaete"
+  }
+ ],
+ "1320512802": [
+  {
+   "t": "11",
+   "tipo": "goal",
+   "jugador": "E. Torres"
+  },
+  {
+   "t": "79",
+   "tipo": "psen",
+   "local": false,
+   "jugador": "Penal a favor de Cartaginés",
+   "agregar": true
+  },
+  {
+   "t": "42",
+   "tipo": "yc",
+   "jugador": "C. Barahona"
+  },
+  {
+   "t": "58",
+   "tipo": "yc",
+   "jugador": "G. M. Morera"
+  },
+  {
+   "t": "90+3",
+   "tipo": "yc",
+   "jugador": "A. Rodriguez Elizondo"
+  },
+  {
+   "t": "90+6",
+   "tipo": "yc",
+   "jugador": "L. A. Olivas Salcedo"
+  }
+ ],
+ "1320511951": [
+  {
+   "t": "13",
+   "tipo": "goal",
+   "jugador": "N. Williams"
+  },
+  {
+   "t": "90+5",
+   "tipo": "yc",
+   "jugador": "H. Quiros"
+  }
+ ],
+ "1320518759": [
+  {
+   "t": "66",
+   "tipo": "goal",
+   "como": "pen"
+  }
+ ]
 }
