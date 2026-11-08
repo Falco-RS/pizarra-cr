@@ -297,8 +297,8 @@ function renderPrevia(m, box) {
     </div></div>`;
 }
 
-const EVL = { psen:'Penal señalado', goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
-const ICO = { goal:'goal', pen:'goal', og:'goal', yc:'yc', rc:'rc', mp:'miss', var:'miss' };
+const EVL = { dra:'Doble amarilla · expulsado', psen:'Penal señalado', goal:'Gol', pen:'Gol de penal', og:'Autogol', yc:'Amarilla', rc:'Roja', sub:'Cambio', mp:'Penal fallado', var:'Gol anulado' };
+const ICO = { dra:'rc', goal:'goal', pen:'goal', og:'goal', yc:'yc', rc:'rc', mp:'miss', var:'miss' };
 function evHtml(e) {
   const [time, type, , player, subIn] = e;
   const ic = type === 'sub' ? '<span class="ico sub" aria-hidden="true">⇄</span>' : `<span class="ico ${ICO[type] || 'miss'}" aria-hidden="true"></span>`;
@@ -995,8 +995,22 @@ document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => go(b.da
 
 /* Si el minuto a minuto tiene más goles que el marcador (gol anulado que la API no ha borrado),
    el marcador manda y los goles sobrantes, de atrás para adelante, se marcan como anulados. */
+/* Doble amarilla: la API manda la roja y la segunda amarilla por separado (a veces la roja primero).
+   Se muestra una sola línea "Doble amarilla · expulsado" en el minuto de la segunda amarilla. */
+function dobleAm(ev) {
+  const k = e => e[2] + '|' + e[3];
+  const ycs = {}; ev.forEach((e, i) => { if (e[1] === 'yc' && e[3]) (ycs[k(e)] ||= []).push(i); });
+  const drop = new Set();
+  for (const idx of Object.values(ycs)) {
+    if (idx.length < 2) continue;
+    idx.sort((i, j) => minN(ev[i][0]) - minN(ev[j][0]));
+    const second = ev[idx[1]]; second[1] = 'dra';
+    ev.forEach((e, i) => { if (e[1] === 'rc' && k(e) === k(second) && Math.abs(minN(e[0]) - minN(second[0])) <= 2) drop.add(i); });
+  }
+  return ev.filter((e, i) => !drop.has(i));
+}
 function reconcile(events, hs, as, enVivo) {
-  const ev = events.map(e => e.slice());
+  const ev = dobleAm(events.map(e => e.slice()));
   // en vivo la API a veces manda el gol antes de actualizar el marcador: no marcarlo como anulado
   if (enVivo) return ev;
   const isGoal = e => e[1] === 'goal' || e[1] === 'pen' || e[1] === 'og';
