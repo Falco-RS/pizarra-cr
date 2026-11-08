@@ -3544,6 +3544,158 @@
     }
    ],
    "dt": "Hernán Medford"
+  },
+  "away": {
+   "fuente": "redes de Puntarenas",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 97,
+      "name": "A. Pineda"
+     }
+    ],
+    [
+     {
+      "n": 12,
+      "name": "K. Villalobos"
+     },
+     {
+      "n": 17,
+      "name": "W. Decas"
+     },
+     {
+      "n": 41,
+      "name": "D. Cordero"
+     },
+     {
+      "n": 25,
+      "name": "K. Gómez"
+     }
+    ],
+    [
+     {
+      "n": 5,
+      "name": "Y. Tejeda",
+      "c": true
+     },
+     {
+      "n": 8,
+      "name": "U. Segura"
+     }
+    ],
+    [
+     {
+      "n": 29,
+      "name": "V. Edghill"
+     },
+     {
+      "n": 77,
+      "name": "P. Álvarez"
+     },
+     {
+      "n": 7,
+      "name": "L. Comachi"
+     }
+    ],
+    [
+     {
+      "n": 21,
+      "name": "D. Rodríguez"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 97,
+     "name": "A. Pineda"
+    },
+    {
+     "n": 12,
+     "name": "K. Villalobos"
+    },
+    {
+     "n": 17,
+     "name": "W. Decas"
+    },
+    {
+     "n": 41,
+     "name": "D. Cordero"
+    },
+    {
+     "n": 25,
+     "name": "K. Gómez"
+    },
+    {
+     "n": 5,
+     "name": "Y. Tejeda",
+     "c": true
+    },
+    {
+     "n": 8,
+     "name": "U. Segura"
+    },
+    {
+     "n": 29,
+     "name": "V. Edghill"
+    },
+    {
+     "n": 77,
+     "name": "P. Álvarez"
+    },
+    {
+     "n": 7,
+     "name": "L. Comachi"
+    },
+    {
+     "n": 21,
+     "name": "D. Rodríguez"
+    }
+   ],
+   "subs": [
+    {
+     "n": 35,
+     "name": "Daniel Rojas"
+    },
+    {
+     "n": 3,
+     "name": "Kevin Fajardo"
+    },
+    {
+     "n": 6,
+     "name": "Kevin Cabezas"
+    },
+    {
+     "n": 11,
+     "name": "Randy Taylor"
+    },
+    {
+     "n": 14,
+     "name": "Amferny Arias"
+    },
+    {
+     "n": 15,
+     "name": "Hiram Muñoz"
+    },
+    {
+     "n": 16,
+     "name": "Wilson Hernández"
+    },
+    {
+     "n": 22,
+     "name": "Dariel Castrillo"
+    },
+    {
+     "n": 33,
+     "name": "Jaylon Hadden"
+    },
+    {
+     "n": 50,
+     "name": "Jaret Hernández"
+    }
+   ],
+   "dt": "César Alpízar"
   }
  }
 }
