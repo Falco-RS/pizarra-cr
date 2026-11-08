@@ -3405,5 +3405,145 @@
     }
    ]
   }
+ },
+ "1320519610": {
+  "home": {
+   "fuente": "redes de Saprissa",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 40,
+      "name": "A. Madriz"
+     }
+    ],
+    [
+     {
+      "n": 17,
+      "name": "G. Taylor"
+     },
+     {
+      "n": 15,
+      "name": "D. Sequeira"
+     },
+     {
+      "n": 21,
+      "name": "F. Escobar"
+     },
+     {
+      "n": 5,
+      "name": "J. Mora"
+     }
+    ],
+    [
+     {
+      "n": 39,
+      "name": "A. Barahona"
+     },
+     {
+      "n": 20,
+      "name": "M. Torres"
+     },
+     {
+      "n": 26,
+      "name": "A. Soto"
+     }
+    ],
+    [
+     {
+      "n": 46,
+      "name": "D. Woodly"
+     },
+     {
+      "n": 7,
+      "name": "N. Williams"
+     },
+     {
+      "n": 28,
+      "name": "G. Torres"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 40,
+     "name": "A. Madriz"
+    },
+    {
+     "n": 17,
+     "name": "G. Taylor"
+    },
+    {
+     "n": 15,
+     "name": "D. Sequeira"
+    },
+    {
+     "n": 21,
+     "name": "F. Escobar"
+    },
+    {
+     "n": 5,
+     "name": "J. Mora"
+    },
+    {
+     "n": 39,
+     "name": "A. Barahona"
+    },
+    {
+     "n": 20,
+     "name": "M. Torres"
+    },
+    {
+     "n": 26,
+     "name": "A. Soto"
+    },
+    {
+     "n": 46,
+     "name": "D. Woodly"
+    },
+    {
+     "n": 7,
+     "name": "N. Williams"
+    },
+    {
+     "n": 28,
+     "name": "G. Torres"
+    }
+   ],
+   "subs": [
+    {
+     "name": "M. Álvarez"
+    },
+    {
+     "name": "J. Azofeifa"
+    },
+    {
+     "name": "S. Taylor"
+    },
+    {
+     "name": "P. Arboine"
+    },
+    {
+     "name": "K. Waston"
+    },
+    {
+     "name": "D. Guzmán"
+    },
+    {
+     "name": "M. Elizondo"
+    },
+    {
+     "name": "B. Hernández"
+    },
+    {
+     "name": "K. Arboine"
+    },
+    {
+     "name": "A. Rodríguez"
+    }
+   ],
+   "dt": "Hernán Medford"
+  }
  }
 }
