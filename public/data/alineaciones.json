@@ -3102,5 +3102,308 @@
    ],
    "dt": "Andrés Carevic"
   }
+ },
+ "1360597455": {
+  "home": {
+   "fuente": "redes de Cartaginés",
+   "formation": "4-4-2",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "K. Briceño",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "D. Mesén"
+     },
+     {
+      "n": 4,
+      "name": "L. Olivas"
+     },
+     {
+      "n": 19,
+      "name": "D. González"
+     },
+     {
+      "n": 18,
+      "name": "C. Barahona"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "M. Morán"
+     },
+     {
+      "n": 15,
+      "name": "L. Flores"
+     },
+     {
+      "n": 8,
+      "name": "D. López"
+     },
+     {
+      "n": 39,
+      "name": "M. Villalobos"
+     }
+    ],
+    [
+     {
+      "n": 9,
+      "name": "J. González"
+     },
+     {
+      "n": 22,
+      "name": "A. Hernández"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "K. Briceño",
+     "c": true
+    },
+    {
+     "n": 20,
+     "name": "D. Mesén"
+    },
+    {
+     "n": 4,
+     "name": "L. Olivas"
+    },
+    {
+     "n": 19,
+     "name": "D. González"
+    },
+    {
+     "n": 18,
+     "name": "C. Barahona"
+    },
+    {
+     "n": 7,
+     "name": "M. Morán"
+    },
+    {
+     "n": 15,
+     "name": "L. Flores"
+    },
+    {
+     "n": 8,
+     "name": "D. López"
+    },
+    {
+     "n": 39,
+     "name": "M. Villalobos"
+    },
+    {
+     "n": 9,
+     "name": "J. González"
+    },
+    {
+     "n": 22,
+     "name": "A. Hernández"
+    }
+   ],
+   "subs": [
+    {
+     "n": 33,
+     "name": "C. Moya"
+    },
+    {
+     "n": 2,
+     "name": "R. Cordero"
+    },
+    {
+     "n": 21,
+     "name": "J. Cortés"
+    },
+    {
+     "n": 12,
+     "name": "J. Quirós"
+    },
+    {
+     "n": 16,
+     "name": "G. Castro"
+    },
+    {
+     "n": 6,
+     "name": "C. Montero"
+    },
+    {
+     "n": 11,
+     "name": "L. Alfaro"
+    },
+    {
+     "n": 40,
+     "name": "S. Fallas"
+    },
+    {
+     "n": 17,
+     "name": "Y. López"
+    },
+    {
+     "n": 43,
+     "name": "C. Abarca"
+    }
+   ],
+   "dt": "Amarini Villatoro"
+  },
+  "away": {
+   "fuente": "redes de Escorpiones",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 76,
+      "name": "Álvarez"
+     }
+    ],
+    [
+     {
+      "n": 14,
+      "name": "Morales"
+     },
+     {
+      "n": 71,
+      "name": "Ordóñez"
+     },
+     {
+      "n": 13,
+      "name": "Morera"
+     },
+     {
+      "n": 6,
+      "name": "Mena"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "Muñoz"
+     },
+     {
+      "n": 30,
+      "name": "Monge",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 77,
+      "name": "Fernández"
+     },
+     {
+      "n": 10,
+      "name": "Fonseca"
+     },
+     {
+      "n": 47,
+      "name": "Camejo"
+     }
+    ],
+    [
+     {
+      "n": 80,
+      "name": "Flores"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 76,
+     "name": "Álvarez"
+    },
+    {
+     "n": 14,
+     "name": "Morales"
+    },
+    {
+     "n": 71,
+     "name": "Ordóñez"
+    },
+    {
+     "n": 13,
+     "name": "Morera"
+    },
+    {
+     "n": 6,
+     "name": "Mena"
+    },
+    {
+     "n": 8,
+     "name": "Muñoz"
+    },
+    {
+     "n": 30,
+     "name": "Monge",
+     "c": true
+    },
+    {
+     "n": 77,
+     "name": "Fernández"
+    },
+    {
+     "n": 10,
+     "name": "Fonseca"
+    },
+    {
+     "n": 47,
+     "name": "Camejo"
+    },
+    {
+     "n": 80,
+     "name": "Flores"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "Montenegro"
+    },
+    {
+     "n": 15,
+     "name": "Vega"
+    },
+    {
+     "n": 7,
+     "name": "Hidalgo"
+    },
+    {
+     "n": 16,
+     "name": "Salazar"
+    },
+    {
+     "n": 70,
+     "name": "Dávila"
+    },
+    {
+     "n": 3,
+     "name": "Tello"
+    },
+    {
+     "n": 18,
+     "name": "Peña"
+    },
+    {
+     "n": 19,
+     "name": "Serrano"
+    },
+    {
+     "n": 99,
+     "name": "Pimpinati"
+    },
+    {
+     "n": 24,
+     "name": "Chaves"
+    }
+   ]
+  }
  }
 }
