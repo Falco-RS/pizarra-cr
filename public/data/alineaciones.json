@@ -3697,5 +3697,305 @@
    ],
    "dt": "César Alpízar"
   }
+ },
+ "1320517908": {
+  "home": {
+   "fuente": "redes de Herediano",
+   "formation": "5-4-1",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "D. Carvajal"
+     }
+    ],
+    [
+     {
+      "n": 5,
+      "name": "H. Quirós"
+     },
+     {
+      "n": 99,
+      "name": "K. Brown"
+     },
+     {
+      "n": 38,
+      "name": "G. Montes"
+     },
+     {
+      "n": 32,
+      "name": "A. Hudson"
+     },
+     {
+      "n": 24,
+      "name": "S. Rodríguez"
+     }
+    ],
+    [
+     {
+      "n": 25,
+      "name": "E. Bravo"
+     },
+     {
+      "n": 8,
+      "name": "A. Cruz"
+     },
+     {
+      "n": 46,
+      "name": "A. Morera"
+     },
+     {
+      "n": 11,
+      "name": "R. Araya"
+     }
+    ],
+    [
+     {
+      "n": 10,
+      "name": "E. Aguilar",
+      "c": true
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "D. Carvajal"
+    },
+    {
+     "n": 5,
+     "name": "H. Quirós"
+    },
+    {
+     "n": 99,
+     "name": "K. Brown"
+    },
+    {
+     "n": 38,
+     "name": "G. Montes"
+    },
+    {
+     "n": 32,
+     "name": "A. Hudson"
+    },
+    {
+     "n": 24,
+     "name": "S. Rodríguez"
+    },
+    {
+     "n": 25,
+     "name": "E. Bravo"
+    },
+    {
+     "n": 8,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 46,
+     "name": "A. Morera"
+    },
+    {
+     "n": 11,
+     "name": "R. Araya"
+    },
+    {
+     "n": 10,
+     "name": "E. Aguilar",
+     "c": true
+    }
+   ],
+   "subs": [
+    {
+     "n": 31,
+     "name": "A. Lezcano"
+    },
+    {
+     "n": 21,
+     "name": "E. Rubio"
+    },
+    {
+     "n": 22,
+     "name": "A. Murillo"
+    },
+    {
+     "n": 26,
+     "name": "E. Juárez"
+    },
+    {
+     "n": 27,
+     "name": "A. Suárez"
+    },
+    {
+     "n": 34,
+     "name": "J. Henestrosa"
+    },
+    {
+     "n": 37,
+     "name": "K. Fuller"
+    },
+    {
+     "n": 42,
+     "name": "D. González"
+    },
+    {
+     "n": 80,
+     "name": "D. Matthews"
+    },
+    {
+     "n": 97,
+     "name": "R. Leal"
+    }
+   ],
+   "dt": "Jafet Soto Molina"
+  },
+  "away": {
+   "fuente": "redes de Inter San Carlos",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "A. Cruz"
+     }
+    ],
+    [
+     {
+      "n": 19,
+      "name": "J. L. Pérez"
+     },
+     {
+      "n": 4,
+      "name": "J. Ramos"
+     },
+     {
+      "n": 13,
+      "name": "A. Rodríguez"
+     },
+     {
+      "n": 67,
+      "name": "C. Martínez"
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "W. Azofeifa"
+     },
+     {
+      "n": 8,
+      "name": "Y. Villán"
+     },
+     {
+      "n": 40,
+      "name": "Y. Leal"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "S. Castro"
+     },
+     {
+      "n": 9,
+      "name": "E. Torres"
+     },
+     {
+      "n": 10,
+      "name": "J. Campbell"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 19,
+     "name": "J. L. Pérez"
+    },
+    {
+     "n": 4,
+     "name": "J. Ramos"
+    },
+    {
+     "n": 13,
+     "name": "A. Rodríguez"
+    },
+    {
+     "n": 67,
+     "name": "C. Martínez"
+    },
+    {
+     "n": 20,
+     "name": "W. Azofeifa"
+    },
+    {
+     "n": 8,
+     "name": "Y. Villán"
+    },
+    {
+     "n": 40,
+     "name": "Y. Leal"
+    },
+    {
+     "n": 7,
+     "name": "S. Castro"
+    },
+    {
+     "n": 9,
+     "name": "E. Torres"
+    },
+    {
+     "n": 10,
+     "name": "J. Campbell"
+    }
+   ],
+   "subs": [
+    {
+     "n": 99,
+     "name": "Jiménez"
+    },
+    {
+     "n": 16,
+     "name": "Ramos"
+    },
+    {
+     "n": 2,
+     "name": "Chacón"
+    },
+    {
+     "n": 14,
+     "name": "Porras"
+    },
+    {
+     "n": 12,
+     "name": "Leal"
+    },
+    {
+     "n": 6,
+     "name": "Casanova"
+    },
+    {
+     "n": 5,
+     "name": "Mendoza"
+    },
+    {
+     "n": 70,
+     "name": "Román"
+    },
+    {
+     "n": 50,
+     "name": "Vega"
+    },
+    {
+     "n": 33,
+     "name": "Gómez"
+    }
+   ],
+   "dt": "Douglas Sequeira"
+  }
  }
 }
