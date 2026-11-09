@@ -422,15 +422,14 @@ function statsHtml() {
   /* equipos, de los resultados */
   const res = {}; for (const t of tids) res[t] = { cs: 0, ns: 0, gf: 0, gc: 0 };
   let hw = 0, dw = 0, aw = 0, goals = 0, big = null;
-  // estadísticas con el marcador de cancha (el de mesa solo cuenta para la tabla)
-  for (const m of P) { goals += m.hs + m.as; m.hs > m.as ? hw++ : m.hs < m.as ? aw++ : dw++;
+  for (const m0 of P) { const m = off(m0); goals += m.hs + m.as; m.hs > m.as ? hw++ : m.hs < m.as ? aw++ : dw++;
     if (!big || Math.abs(m.hs - m.as) > Math.abs(big.hs - big.as) || (Math.abs(m.hs - m.as) === Math.abs(big.hs - big.as) && m.hs + m.as > big.hs + big.as)) big = m;
     for (const [t, gf, gc] of [[m.h, m.hs, m.as], [m.a, m.as, m.hs]]) { const r = res[t]; if (!r) continue; r.gf += gf; r.gc += gc; if (!gc) r.cs++; if (!gf) r.ns++; } }
   const tRes = (f, asc) => { const rows = tids.map(t => ({ t, name: T[t].name, v: f(res[t], t) })).sort((a, b) => asc ? a.v - b.v : b.v - a.v); const max = Math.max(...rows.map(r => r.v)) || 1; return ranked(rows.map(r => ({ ...r, bar: 100 * r.v / max })), 'v'); };
   const pct = n => Math.round(100 * n / (P.length || 1)) + '%';
   const fair = tids.map(t => ({ t, name: T[t].name, y: (teamCards[t] || {}).y || 0, r: (teamCards[t] || {}).r || 0 })).map(r => ({ ...r, v: r.y + 3 * r.r, sub: `${r.y} amarillas · ${r.r} rojas` })).sort((a, b) => a.v - b.v);
-  const sinEv = P.filter(m => m.hs + m.as > 0 && !(m.ev || []).some(e => ['goal', 'pen', 'og'].includes(e[1])));
-  const noEv = sinEv.length ? `No incluye ${sinEv.map(m => `${esc(T[m.h].name)} ${m.hs}-${m.as} ${esc(T[m.a].name)} (J${m.r})`).join(', ')}.` : '';
+  const sinEv = P.filter(m => off(m).hs + off(m).as > 0 && !(m.ev || []).some(e => ['goal', 'pen', 'og'].includes(e[1])));
+  const noEv = sinEv.length ? `No incluye ${sinEv.map(m => `${esc(T[m.h].name)} ${off(m).hs}-${off(m).as} ${esc(T[m.a].name)} (J${m.r})`).join(', ')}.` : '';
   const kpi = (v, l) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
   const srcNote = 'Fuente: datos de cada partido; se actualiza solo.';
   const noApi = '<p class="hint">Todavía no hay datos. Se cargan automáticamente en las próximas horas.</p>';
