@@ -1,6 +1,6 @@
 {
  "_nota": "Asistidores oficiales de UNAFUT. Se actualiza A MANO al final de cada jornada. Solo jugadores con 3 o más. equipo = nombre como sale en la página.",
- "jornada": 15,
+ "jornada": 16,
  "minimo": 3,
  "lista": [
   {
@@ -29,6 +29,16 @@
    "a": 4
   },
   {
+   "jugador": "Newton Williams",
+   "equipo": "Saprissa",
+   "a": 4
+  },
+  {
+   "jugador": "Joel Campbell",
+   "equipo": "Inter San Carlos",
+   "a": 4
+  },
+  {
    "jugador": "Dominic Chévez",
    "equipo": "Sporting",
    "a": 3
@@ -49,18 +59,8 @@
    "a": 3
   },
   {
-   "jugador": "Joel Campbell",
-   "equipo": "Inter San Carlos",
-   "a": 3
-  },
-  {
    "jugador": "Creichel Pérez",
    "equipo": "Alajuelense",
-   "a": 3
-  },
-  {
-   "jugador": "Newton Williams",
-   "equipo": "Saprissa",
    "a": 3
   },
   {
@@ -74,5 +74,5 @@
    "a": 3
   }
  ],
- "actualizado": "5/11/26"
+ "actualizado": "9/11/26"
 }
