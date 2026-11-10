@@ -386,3 +386,14 @@ tr.aq td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .apos-l{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
 
 #ldetail:not(:empty){margin-top:12px}
+/* La Sele: convocatoria */
+.conv .lead{margin:0 0 12px;color:var(--muted);font-size:14px}
+.cvgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 18px}
+.cvgrid h3{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.conv .plist li{display:flex;align-items:center;gap:10px}
+.conv .crest{width:22px;height:22px;flex:none}
+.conv .crest.ph{font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+.cvn{display:flex;flex-direction:column;min-width:0}
+.conv .cvn .x{margin:0;font-size:12px;text-align:left}
+@media (max-width:900px){.cvgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.cvgrid{grid-template-columns:1fr}}

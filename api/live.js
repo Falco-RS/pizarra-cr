@@ -29,6 +29,12 @@ export default async function handler(req, res) {
       const ax = await (await fetch(`${proto}://${host}/data/ascenso-api.json`)).json();
       ascenso = Object.values(ax.series || {}).flatMap(s => s.legs || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: 139497, comp: 'Liga de Ascenso', h: { id: m.h.id, name: m.h.n }, a: { id: m.a.id, name: m.a.n } }));
     } catch { /* sin Ascenso */ }
+    // La Sele: partidos por jugar que el bot dejó en sele.json (con el id del torneo de la API)
+    let sele = [];
+    try {
+      const sx = await (await fetch(`${proto}://${host}/data/sele.json`)).json();
+      sele = (sx.matches || []).filter(m => m.lg && m.hs == null).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.lg, comp: 'La Sele', h: m.h, a: m.a }));
+    } catch { /* sin Sele */ }
 
     const now = Date.now();
     const done = s => /finish|award|cancel|postpon|abandon/i.test(s || '');
@@ -36,6 +42,7 @@ export default async function handler(req, res) {
       ...season.matches.map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: season.league.id, comp: season.league.name, h: season.teams[m.h], a: season.teams[m.a] })),
       ...(season.intl || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.leagueId, comp: m.comp, h: m.h, a: m.a })),
       ...ascenso,
+      ...sele,
     // En juego, o ya terminado pero todavía sin guardar en los datos (hasta 24 h después),
     // para que la página siga mostrando el resultado final mientras corre la actualización.
     ].filter(m => { const k = new Date(m.d).getTime(); return now >= k - BEFORE && now <= k + 24 * 3600e3 && !done(m.s); });
@@ -81,9 +88,17 @@ export default async function handler(req, res) {
     }
     // Un partido terminó y todavía no está en los datos: pedir la actualización a GitHub ya
     // (necesita GH_TOKEN en Vercel; sin él, la actualización horaria lo recoge igual).
-    const pendingSave = live.some(m => m.finished && m.comp !== 'Liga de Ascenso');
+    const pendingSave = live.some(m => m.finished && m.comp !== 'Liga de Ascenso' && m.comp !== 'La Sele');
     if (pendingSave && process.env.GH_TOKEN) {
       await fetch('https://api.github.com/repos/' + (process.env.GH_REPO || 'Falco-RS/pizarra-cr') + '/actions/workflows/actualizar-datos.yml/dispatches', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'pizarra-cr' },
+        body: JSON.stringify({ ref: 'main' }),
+      }).catch(() => {});
+    }
+    // La Sele terminó: correr el bot de la Sele para guardar el resultado y el minuto a minuto
+    if (live.some(m => m.finished && m.comp === 'La Sele') && process.env.GH_TOKEN) {
+      await fetch('https://api.github.com/repos/' + (process.env.GH_REPO || 'Falco-RS/pizarra-cr') + '/actions/workflows/sele.yml/dispatches', {
         method: 'POST',
         headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'pizarra-cr' },
         body: JSON.stringify({ ref: 'main' }),

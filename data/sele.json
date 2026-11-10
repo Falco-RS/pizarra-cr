@@ -3,7 +3,7 @@
   "staff": [
     {
       "rol": "Entrenador",
-      "nombre": "Brian Ruiz"
+      "nombre": "Bryan Ruiz"
     },
     {
       "rol": "Asistente técnico",
@@ -25,14 +25,131 @@
       "local": "Ecuador",
       "visita": "Costa Rica",
       "torneo": "Amistoso",
-      "sede": "Ecuador (estadio por confirmar)"
+      "sede": "Estadio Olímpico Atahualpa, Quito"
     },
     {
       "fecha": "2026-11-17",
       "local": "Argentina",
       "visita": "Costa Rica",
       "torneo": "Amistoso",
-      "sede": "Buenos Aires (estadio por definir)"
+      "sede": "Estadio Mario Alberto Kempes, Córdoba"
     }
-  ]
+  ],
+  "convocatoria": {
+    "titulo": "Convocatoria · fecha FIFA de noviembre",
+    "grupos": [
+      {
+        "pos": "Arqueros",
+        "jugadores": [
+          {
+            "nombre": "Abraham Madriz",
+            "club": "Saprissa"
+          },
+          {
+            "nombre": "Bayron Mora",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Patrick Sequeira",
+            "club": "Casa Pia (Portugal)"
+          }
+        ]
+      },
+      {
+        "pos": "Defensas",
+        "jugadores": [
+          {
+            "nombre": "Aarón Salazar",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Alexis Gamboa",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "John Paul Ruiz",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Yerlan Sosa",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Diego Mesén",
+            "club": "Cartaginés"
+          },
+          {
+            "nombre": "Joseph Mora",
+            "club": "Saprissa"
+          },
+          {
+            "nombre": "Francisco Calvo",
+            "club": "Nacional (Uruguay)"
+          },
+          {
+            "nombre": "Juan Pablo Vargas",
+            "club": "Puebla (México)"
+          },
+          {
+            "nombre": "Kenay Myrie",
+            "club": "Copenhague (Dinamarca)"
+          }
+        ]
+      },
+      {
+        "pos": "Volantes",
+        "jugadores": [
+          {
+            "nombre": "Andrey Soto",
+            "club": "Saprissa"
+          },
+          {
+            "nombre": "Celso Borges",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Roan Wilson",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Douglas López",
+            "club": "Cartaginés"
+          },
+          {
+            "nombre": "Gian Mauro Morera",
+            "club": "Cartaginés"
+          },
+          {
+            "nombre": "Gabriel Leiva",
+            "club": "Sporting"
+          }
+        ]
+      },
+      {
+        "pos": "Delanteros",
+        "jugadores": [
+          {
+            "nombre": "Kenyel Michel",
+            "club": "Alajuelense"
+          },
+          {
+            "nombre": "Josimar Méndez",
+            "club": "Sporting"
+          },
+          {
+            "nombre": "Carlos Mora",
+            "club": "Universitatea Craiova (Rumania)"
+          },
+          {
+            "nombre": "Josimar Alcócer",
+            "club": "Sparta Praga (Chequia)"
+          },
+          {
+            "nombre": "Manfred Ugalde",
+            "club": "Spartak Moscú (Rusia)"
+          }
+        ]
+      }
+    ]
+  }
 }

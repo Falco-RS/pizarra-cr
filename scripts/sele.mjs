@@ -50,7 +50,7 @@ const slimTeam = t => ({ id: t.id, name: fixText(t.name), logo: t.logo || null }
 let matches = [...got.values()].map(x => {
   const o = oldById.get(x.id) || {};
   const sc = x.state?.score?.current;
-  const rec = { id: x.id, d: x.date, comp: x.league?.name, round: x.round, s: x.state?.description, h: slimTeam(x.homeTeam), a: slimTeam(x.awayTeam) };
+  const rec = { id: x.id, d: x.date, comp: x.league?.name, lg: x.league?.id, round: x.round, s: x.state?.description, h: slimTeam(x.homeTeam), a: slimTeam(x.awayTeam) };
   if (sc && isFinal(rec.s)) [rec.hs, rec.as] = sc.split(' - ').map(Number);
   if (o.ev) { rec.ev = o.ev; rec.stats = o.stats; }
   return rec;
@@ -68,5 +68,5 @@ for (const m of need) {
   if (st.length === 2) m.stats = st.map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(s => [s.displayName, s.value])) }));
 }
 
-await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, staff: cfg.staff, proximos: cfg.proximos || [], matches }));
+await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, staff: cfg.staff, proximos: cfg.proximos || [], convocatoria: cfg.convocatoria || null, matches }));
 console.log(`Listo: ${matches.length} partidos (${matches.filter(m => m.hs === undefined).length} por jugar). Consultas restantes hoy: ${remaining}.`);
