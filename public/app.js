@@ -641,7 +641,7 @@ function intlDetailHtml(m) {
       return `<li><span class="res ${r}">${({W:'G',D:'E',L:'P'})[r]}</span>${x.home ? 'vs' : 'en'} ${esc(clean(x.opp))}<span class="x">${x.gf}–${x.ga} · ${esc(new Date(x.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}</span></li>`; }).join('')}</ul>` : '<p class="hint">Sin partidos cargados.</p>'}</div>`; };
   const cfSeg = `<div class="seg" role="group" aria-label="Últimos resultados">${[['copa', 'Copa'], ['liga', 'Liga local']].map(([k, l]) => `<button type="button" data-cf="${k}" aria-pressed="${(S.cf || 'copa') === k}">${l}</button>`).join('')}</div>`;
   const luFrom = L => L && L.vs ? `vs ${esc(clean(L.vs))}, ${esc(new Date(L.d).toLocaleDateString('es-CR', { ...tz, day: 'numeric', month: 'short' }))}` : '';
-  return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
+  return `<div class="detail cd">${head(m.tbd ? '<div class="dnum" style="font-size:20px;white-space:nowrap">Hora por definir</div>' : `<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${esc(roundName)} · ${esc(fmtDay(m.d))}${venueHtml(m.venue || (P && P.venue?.name) || '')}</div>${prob}
     <div class="pv"><section class="pv-lu" style="${kitVars(H.name, A.name)}"><h3>Alineaciones</h3><p class="lead">${off_ ? '<span class="chip ok">Alineación oficial</span>' : '<span class="chip">Probable</span> la última que usó cada equipo. La oficial sale cerca del pitazo.'}</p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(H.name)}</span><span class="f">${esc(HL?.formation || '')}</span></div>${pitchHtml(HL, AL)}
@@ -907,7 +907,7 @@ function renderSele(v) {
   const manual = (SE.proximos || []).map((x, i) => ({ id: -(i + 1), manual: true, d: x.fecha + 'T12:00:00-06:00', comp: x.torneo, sede: x.sede,
       h: { id: nn(x.local) === 'costa rica' ? CR : null, name: x.local, logo: null }, a: { id: nn(x.visita) === 'costa rica' ? CR : null, name: x.visita, logo: null } }))
     .filter(x => new Date(x.d).getTime() > now - 864e5 && !ms.some(m => Math.abs(new Date(m.d) - new Date(x.d)) < 3 * 864e5 && [m.h.name, m.a.name].some(n => nn(n) === nn(x.h.id === CR ? x.a.name : x.h.name))));
-  for (const m of apiNext) if (!m.sede) { const x = (SE.proximos || []).find(x => Math.abs(new Date(x.fecha + 'T12:00:00-06:00') - new Date(m.d)) < 2 * 864e5); if (x) m.sede = x.sede; }
+  for (const m of apiNext) if (!m.sede) { const x = (SE.proximos || []).find(x => Math.abs(new Date(x.fecha + 'T12:00:00-06:00') - new Date(m.d)) < 2 * 864e5); if (x) { m.sede = x.sede; if (x.hora === false) m.tbd = true; } }
   const next = [...apiNext, ...manual].sort((a, b) => new Date(a.d) - new Date(b.d));
   const logoOf = name => { for (const m of ms) for (const t of [m.h, m.a]) if (nn(t.name) === nn(name) && t.logo) return t.logo; return null; };
   for (const x of manual) for (const t of [x.h, x.a]) t.logo = logoOf(t.name);
@@ -919,7 +919,7 @@ function renderSele(v) {
   const card = m => { const p = m.hs != null, r = p ? resOf(m) : null, lv = seleLive(m.id), [lh, la] = lv ? (lv.score || '0 - 0').split(' - ') : [];
     const tag = lv ? (lv.finished ? '<b>Final</b>' : `<span class="lv">${/half time/i.test(lv.status) ? 'ENTRETIEMPO' : `EN VIVO ${lv.clock ?? ''}'`}</span>`) : null;
     return `<button type="button" class="cc" data-sele="${m.id}" aria-pressed="${SEsel === m.id}">
-      <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${tag || (p ? `<b class="sr ${r}">${({ W: 'Ganó', D: 'Empató', L: 'Perdió' })[r]}</b>` : m.manual ? 'Hora por definir' : esc(fmtTime(m.d)))}</span></span>
+      <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${tag || (p ? `<b class="sr ${r}">${({ W: 'Ganó', D: 'Empató', L: 'Perdió' })[r]}</b>` : m.manual || m.tbd ? 'Hora por definir' : esc(fmtTime(m.d)))}</span></span>
       ${[[m.h, lv ? lh : m.hs], [m.a, lv ? la : m.as]].map(([t, g]) => `<span class="row${t.id === CR ? ' tico' : ''}${p && t.id !== CR && r !== 'L' ? ' lose' : ''}">${cr(t)}<span>${esc(t.name)}</span><span class="sc">${g ?? ''}</span></span>`).join('')}
       <span class="meta"><span>${esc(compName(m.comp))}${m.sede ? ' · ' + esc(m.sede) : ''}</span></span></button>`; };
   // números del año y goleadores (de los partidos con minuto a minuto)
@@ -1012,7 +1012,7 @@ function seleDetailHtml(m, CR, compName) {
   const last5 = ms.filter(x => x.hs != null).slice(-5).reverse();
   const line = x => { const home = x.h.id === CR, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
     return `<li><span class="res ${r}">${({ W: 'G', D: 'E', L: 'P' })[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.a.name : x.h.name)}<span class="x">${gf}–${ga} · ${esc(fmtDay(x.d))}</span></li>`; };
-  return `<div class="detail cd">${head(`<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
+  return `<div class="detail cd">${head(m.tbd ? '<div class="dnum" style="font-size:20px;white-space:nowrap">Hora por definir</div>' : `<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${meta}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
     <div class="pv">${lu ? `<section class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><p class="lead"><span class="chip ok">Alineación oficial</span></p>
       <div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(lu.home.formation || '')}</span></div>${pitchHtml(lu.home, lu.away)}

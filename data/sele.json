@@ -32,7 +32,8 @@
       "local": "Argentina",
       "visita": "Costa Rica",
       "torneo": "Amistoso",
-      "sede": "Estadio Mario Alberto Kempes, Córdoba"
+      "sede": "Estadio Mario Alberto Kempes, Córdoba",
+      "hora": false
     }
   ],
   "convocatoria": {
