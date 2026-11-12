@@ -1,8 +1,8 @@
 {
  "_nota": "Liga de Ascenso (Liasce). Se actualiza A MANO con lo que publica Liasce. En cada serie, 'a' es el de arriba (abre de local) y 'b' el de abajo (cierra de local). Marcadores: null = por jugar. 'pasa' = 'a' o 'b' cuando la serie se define (si hace falta penales u otro criterio, se pone a mano).",
  "torneo": "Apertura 2026",
- "actualizado": "3/11/26",
- "fase": "Cuartos de final",
+ "actualizado": "12/11/26",
+ "fase": "Cuartos de final · vuelta",
  "equipos": {
   "guadalupe": {
    "nombre": "Guadalupe FC",
@@ -78,9 +78,9 @@
     "gb": null
    },
    "vuelta": {
-    "fecha": null,
-    "estadio": null,
-    "tv": null,
+    "fecha": "2026-11-15T11:00:00-06:00",
+    "estadio": "Estadio A. Cívica Jicaraleña",
+    "tv": "TD+",
     "ga": null,
     "gb": null
    },
@@ -98,9 +98,9 @@
     "gb": null
    },
    "vuelta": {
-    "fecha": null,
-    "estadio": null,
-    "tv": null,
+    "fecha": "2026-11-14T19:00:00-06:00",
+    "estadio": "Estadio Puente Piedra",
+    "tv": "TD+",
     "ga": null,
     "gb": null
    },
@@ -118,9 +118,9 @@
     "gb": null
    },
    "vuelta": {
-    "fecha": null,
-    "estadio": null,
-    "tv": null,
+    "fecha": "2026-11-16T19:00:00-06:00",
+    "estadio": "Estadio Carlos Alvarado",
+    "tv": "TD+",
     "ga": null,
     "gb": null
    },
@@ -138,9 +138,9 @@
     "gb": null
    },
    "vuelta": {
-    "fecha": null,
-    "estadio": null,
-    "tv": null,
+    "fecha": "2026-11-14T13:00:00-06:00",
+    "estadio": "Estadio Piedades",
+    "tv": "FUTV",
     "ga": null,
     "gb": null
    },

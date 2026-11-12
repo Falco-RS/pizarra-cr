@@ -27,7 +27,11 @@ export default async function handler(req, res) {
     let ascenso = [];
     try {
       const ax = await (await fetch(`${proto}://${host}/data/ascenso-api.json`)).json();
-      ascenso = Object.values(ax.series || {}).flatMap(s => s.legs || []).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: 139497, comp: 'Liga de Ascenso', h: { id: m.h.id, name: m.h.n }, a: { id: m.a.id, name: m.a.n } }));
+      // la fecha oficial (puesta a mano en ascenso.json) manda sobre la de la API, que a veces trae una provisional
+      let man = {};
+      try { man = await (await fetch(`${proto}://${host}/data/ascenso.json`)).json(); } catch { /* sin datos a mano */ }
+      const fechaOficial = (n, m) => { const s = (man.series || []).find(x => x.n === +n); if (!s) return null; const ida = m.h.id === (ax.ids || {})[s.a]; return (ida ? s.ida : s.vuelta)?.fecha || null; };
+      ascenso = Object.entries(ax.series || {}).flatMap(([n, s]) => (s.legs || []).map(m => ({ id: m.id, d: fechaOficial(n, m) || m.d, s: m.s, leagueId: 139497, comp: 'Liga de Ascenso', h: { id: m.h.id, name: m.h.n }, a: { id: m.a.id, name: m.a.n } })));
     } catch { /* sin Ascenso */ }
     // La Sele: partidos por jugar que el bot dejó en sele.json (con el id del torneo de la API)
     let sele = [];
@@ -66,6 +70,12 @@ export default async function handler(req, res) {
     for (const g of groups.values()) {
       const page = await api(`/matches?leagueId=${g.leagueId}&date=${g.day}&limit=100`);
       for (const m of page?.data || []) if (g.ids.has(m.id)) states.set(m.id, m);
+    }
+    // si la API lo tiene en otra fecha, se pide el partido directo (pasa con la Liga de Ascenso)
+    for (const c of candidates) if (!states.has(c.id) && (c.comp === 'Liga de Ascenso' || c.comp === 'La Sele')) {
+      const m = await api(`/matches/${c.id}`).catch(() => null);
+      const x = Array.isArray(m) ? m[0] : m;
+      if (x && x.id) states.set(c.id, x);
     }
 
     const live = [];
