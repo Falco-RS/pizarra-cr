@@ -987,6 +987,9 @@ function renderSele(v) {
     if (SEsel && el) window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - (document.querySelector('.top')?.offsetHeight || 0) - 12, behavior: 'smooth' });
   });
 }
+// alineación cargada a mano en data/sele.json (la que publica la Fede), cuando la API no la trae
+const seleLu = m => { const x = SE && SE.alineaciones && SE.alineaciones[m.id]; return x ? { home: x.home, away: x.away } : null; };
+const seleSubs = (m, lu) => [['home', m.h], ['away', m.a]].filter(([k]) => lu[k]?.subs?.length).map(([k, t]) => `<p class="foot" style="margin:8px 0 0"><b>${esc(t.name)} · suplentes:</b> ${lu[k].subs.map(p => esc(p.name)).join(', ')}${lu[k].dt ? ` · DT ${esc(lu[k].dt)}` : ''}</p>`).join('');
 const seleLive = id => LIVE.find(x => x.id === id && x.comp === 'La Sele' && x.started);
 /* Convocatoria: lista a mano en data/sele.json; a los de la Primera se les suman sus goles del torneo y asistencias (UNAFUT) */
 function convHtml(C) {
@@ -1019,6 +1022,7 @@ function seleDetailHtml(m, CR, compName) {
     const vivo = lv.finished ? 'Final' : /half time/i.test(lv.status) ? 'Entretiempo' : `En vivo · ${lv.clock ?? ''}'`;
     return `<div class="detail cd">${head(`<div class="dnum">${h} – ${a}</div>`)}<div class="dmeta">${esc(vivo)} · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div>
       <div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Todavía sin eventos.</p>'}</div>
+      ${(() => { const L = seleLu(m); return L ? `<div class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(L.home?.formation || '')}</span></div>${pitchHtml(L.home, L.away)}<div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(L.away?.formation || '')}</span></div>${seleSubs(m, L)}</div>` : ''; })()}
       ${ph != null && pa != null ? `<div><h3>Posesión</h3><div class="apos"><b>${Math.round(ph * 100)}%</b><span class="bar"><i style="width:${ph * 100}%"></i></span><b>${Math.round(pa * 100)}%</b></div><div class="apos-l"><span>${esc(m.h.name)}</span><span>${esc(m.a.name)}</span></div></div>` : ''}</div></div>`;
   }
   if (m.manual) return `<div class="detail cd">${head('<div class="dnum" style="font-size:20px;white-space:nowrap">Por definir</div>')}<div class="dmeta">Previa · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div></div>`;
@@ -1033,7 +1037,7 @@ function seleDetailHtml(m, CR, compName) {
   }
   const P = PREVIA[m.id];
   if (P === undefined) { PREVIA[m.id] = null; fetch('/api/previa?id=' + m.id).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { PREVIA[m.id] = j || {}; if (S.view === 'sele' && SEsel === m.id) renderView(); }); }
-  const lu = P && P.lineups;
+  const lu = (P && P.lineups) || seleLu(m);
   const pr = P && P.predictions?.prematch?.length ? P.predictions.prematch[P.predictions.prematch.length - 1].probabilities : null;
   const prob = pr ? (() => { const h = parseFloat(pr.home), d = parseFloat(pr.draw), a = parseFloat(pr.away);
     return `<div class="pred"><div class="bar"><i style="flex:${h};background:var(--accent)"></i><i style="flex:${d};background:var(--draw)"></i><i style="flex:${a};background:var(--away)"></i></div>
@@ -1048,8 +1052,8 @@ function seleDetailHtml(m, CR, compName) {
   return `<div class="detail cd">${head(m.tbd ? '<div class="dnum" style="font-size:20px;white-space:nowrap">Hora por definir</div>' : `<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
     <div class="dmeta">Previa · ${meta}${P && P.venue?.name ? ' · ' + esc(P.venue.name) : ''}</div>${prob}
     <div class="pv">${lu ? `<section class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><p class="lead"><span class="chip ok">Alineación oficial</span></p>
-      <div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(lu.home.formation || '')}</span></div>${pitchHtml(lu.home, lu.away)}
-      <div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(lu.away.formation || '')}</span></div></section>`
+      <div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(lu.home?.formation || '')}</span></div>${pitchHtml(lu.home, lu.away)}
+      <div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(lu.away?.formation || '')}</span></div>${seleSubs(m, lu)}</section>`
       : `<section class="pv-lu"><h3>Alineaciones</h3><p class="hint">La alineación oficial aparece aquí cerca del pitazo.</p></section>`}
     <div class="pv-data">
       <section><h3>Costa Rica · últimos 5</h3><ul class="plist">${last5.map(line).join('') || '<li><span class="x" style="margin:0">Sin partidos cargados</span></li>'}</ul></section>
