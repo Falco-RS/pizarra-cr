@@ -361,6 +361,116 @@
           }
         ],
         "dt": "Bryan Ruiz"
+      },
+      "home": {
+        "fuente": "Selección de Ecuador",
+        "formation": "4-2-3-1",
+        "rows": [
+          [
+            {
+              "n": 1,
+              "name": "H. Galíndez"
+            }
+          ],
+          [
+            {
+              "n": 17,
+              "name": "A. Preciado"
+            },
+            {
+              "n": 6,
+              "name": "W. Pacho"
+            },
+            {
+              "n": 25,
+              "name": "J. Porozo"
+            },
+            {
+              "n": 3,
+              "name": "P. Hincapié"
+            }
+          ],
+          [
+            {
+              "n": 23,
+              "name": "M. Caicedo",
+              "c": true
+            },
+            {
+              "n": 15,
+              "name": "P. Vite"
+            }
+          ],
+          [
+            {
+              "n": 24,
+              "name": "K. Arroyo"
+            },
+            {
+              "n": 10,
+              "name": "J. Yeboah"
+            },
+            {
+              "n": 20,
+              "name": "N. Angulo"
+            }
+          ],
+          [
+            {
+              "n": 9,
+              "name": "J. Caicedo"
+            }
+          ]
+        ],
+        "aprox": true,
+        "list": [
+          {
+            "n": 1,
+            "name": "H. Galíndez"
+          },
+          {
+            "n": 17,
+            "name": "A. Preciado"
+          },
+          {
+            "n": 6,
+            "name": "W. Pacho"
+          },
+          {
+            "n": 25,
+            "name": "J. Porozo"
+          },
+          {
+            "n": 3,
+            "name": "P. Hincapié"
+          },
+          {
+            "n": 23,
+            "name": "M. Caicedo",
+            "c": true
+          },
+          {
+            "n": 15,
+            "name": "P. Vite"
+          },
+          {
+            "n": 24,
+            "name": "K. Arroyo"
+          },
+          {
+            "n": 10,
+            "name": "J. Yeboah"
+          },
+          {
+            "n": 20,
+            "name": "N. Angulo"
+          },
+          {
+            "n": 9,
+            "name": "J. Caicedo"
+          }
+        ],
+        "subs": []
       }
     }
   }
