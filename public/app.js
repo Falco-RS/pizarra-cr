@@ -145,7 +145,39 @@ function statusLine(m) {
   if (played(m)) return 'Final';
   return fmtTime(m.d);
 }
+/* Fecha FIFA: mientras dure, la franja de Inicio muestra los partidos de la Sele en vez de la jornada de la Primera */
+const FIFA_HASTA = new Date('2026-11-18T12:00:00-06:00');
+const fifaBoard = () => new Date() < FIFA_HASTA && !S.verPrimera;
+function renderBoardSele() {
+  const step = document.querySelector('.jhead .step'), sub = document.querySelector('.jhead .sub');
+  document.getElementById('jt').textContent = 'La Sele';
+  sub.textContent = 'Fecha FIFA · amistosos de noviembre';
+  step.hidden = true;
+  document.getElementById('detail').innerHTML = '';
+  if (!SE) { if (SE === null) { SE = false; fetch('/data/sele.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : { matches: [] }).catch(() => ({ matches: [] })).then(j => { SE = j; renderBoard(); if (S.view === 'sele') renderView(); }); } return; }
+  const CR = SE.teamId || 25463, desde = new Date('2026-11-10T00:00:00-06:00');
+  const ms = (SE.matches || []).filter(m => new Date(m.d) >= desde).sort((a, b) => new Date(a.d) - new Date(b.d));
+  const flag = t => t.logo ? `<img class="crest" src="${esc(t.logo)}" alt="" loading="lazy">` : '';
+  document.getElementById('mgrid').innerHTML = ms.map(m => {
+    const lv = LIVE.find(x => x.id === m.id && x.started && x.score);
+    const [hs, as] = lv ? lv.score.split(' - ').map(Number) : [m.hs, m.as];
+    const p = hs != null, live = lv && !lv.finished;
+    const px = (SE.proximos || []).find(x => Math.abs(new Date(x.fecha + 'T12:00:00-06:00') - new Date(m.d)) < 2 * 864e5);
+    const st = live ? (/half time/i.test(lv.status) ? 'ENTRETIEMPO' : `EN VIVO ${lv.clock ?? ''}'`) : p ? 'Final' : px && px.hora === false ? 'Hora por definir' : fmtTime(m.d);
+    const name = t => t.id === CR ? 'Costa Rica' : t.name;
+    return `<button class="mc" data-sele-board="${m.id}">
+      <span class="meta"><span>${esc(fmtDay(m.d))}</span><span>${live ? `<span class="lv">${esc(st)}</span>` : esc(st)}</span></span>
+      <span class="row${p && !live && hs < as ? ' lose' : ''}">${flag(m.h)}<span>${esc(name(m.h))}</span><span class="sc">${p ? hs : ''}</span></span>
+      <span class="row${p && !live && as < hs ? ' lose' : ''}">${flag(m.a)}<span>${esc(name(m.a))}</span><span class="sc">${p ? as : ''}</span></span>
+    </button>`;
+  }).join('') + `<button class="mc mc-alt" data-ver-primera>Ver la jornada de la Primera →</button>`;
+  document.querySelectorAll('[data-sele-board]').forEach(b => b.onclick = () => { SEsel = +b.dataset.seleBoard; go('sele'); });
+  document.querySelector('[data-ver-primera]').onclick = () => { S.verPrimera = true; renderBoard(); };
+}
 function renderBoard() {
+  if (fifaBoard()) return renderBoardSele();
+  document.querySelector('.jhead .step').hidden = false;
+  document.querySelector('.jhead .sub').textContent = 'Primera División · Apertura 2026';
   const list = M.filter(m => m.r === S.j);
   document.getElementById('jt').textContent = `Jornada ${S.j}`;
   jsel.value = S.j;
