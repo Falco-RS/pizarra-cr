@@ -229,7 +229,7 @@ function lastLineup(tid) {
 }
 const surname = n => { const parts = String(n || '').split(' '); return /^[A-ZÁÉÍÓÚÑ]\.$/.test(parts[0]) ? parts.slice(1).join(' ') : String(n || ''); };
 /* Colores de cada equipo en la cancha (si los dos se parecen, la visita usa el azul de siempre) */
-const KIT = { 'Saprissa': ['#7B1E57', '#fff'], 'Alajuelense': ['#D7263D', '#fff'], 'Herediano': ['#F2C200', '#141A16'], 'Cartaginés': ['#1F3B8A', '#fff'],
+const KIT = { 'Costa Rica': ['#D21034', '#fff'], 'Ecuador': ['#FFD100', '#141A16'], 'Argentina': ['#75AADB', '#141A16'], 'Saprissa': ['#7B1E57', '#fff'], 'Alajuelense': ['#D7263D', '#fff'], 'Herediano': ['#F2C200', '#141A16'], 'Cartaginés': ['#1F3B8A', '#fff'],
   'San Carlos': ['#1F3B8A', '#fff'], 'Puntarenas': ['#F37021', '#141A16'], 'Pérez Zeledón': ['#3D5FBF', '#fff'], 'Escorpiones Belén': ['#F5D300', '#141A16'],
   'Inter San Carlos': ['#2E8B57', '#fff'], 'Sporting': ['#F4F6F2', '#141A16'] };
 function kitVars(hName, aName) {
