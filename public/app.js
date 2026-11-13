@@ -1042,6 +1042,7 @@ function seleDetailHtml(m, CR, compName) {
   const ms = SEms;
   const h2h = ms.filter(x => x.hs != null && (x.h.id === rival.id || x.a.id === rival.id));
   const last5 = ms.filter(x => x.hs != null).slice(-5).reverse();
+  const HI = (SE.historial || {})[rival.name];
   const line = x => { const home = x.h.id === CR, gf = home ? x.hs : x.as, ga = home ? x.as : x.hs, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
     return `<li><span class="res ${r}">${({ W: 'G', D: 'E', L: 'P' })[r]}</span>${home ? 'vs' : 'en'} ${esc(home ? x.a.name : x.h.name)}<span class="x">${gf}–${ga} · ${esc(fmtDay(x.d))}</span></li>`; };
   return `<div class="detail cd">${head(m.tbd ? '<div class="dnum" style="font-size:20px;white-space:nowrap">Hora por definir</div>' : `<div class="dnum" style="font-size:40px">${esc(fmtTime(m.d))}</div>`)}
@@ -1052,7 +1053,9 @@ function seleDetailHtml(m, CR, compName) {
       : `<section class="pv-lu"><h3>Alineaciones</h3><p class="hint">La alineación oficial aparece aquí cerca del pitazo.</p></section>`}
     <div class="pv-data">
       <section><h3>Costa Rica · últimos 5</h3><ul class="plist">${last5.map(line).join('') || '<li><span class="x" style="margin:0">Sin partidos cargados</span></li>'}</ul></section>
-      <section><h3>Contra ${esc(rival.name)}, últimos dos años</h3><ul class="plist">${h2h.map(line).join('') || '<li><span class="x" style="margin:0">No se enfrentaron en este periodo</span></li>'}</ul></section>
+      ${HI ? `<section><h3>Historial ante ${esc(rival.name)}</h3><p class="foot" style="margin:0 0 6px">${esc(HI.resumen)}</p><ul class="plist">${HI.partidos.map(x => { const home = x.local === 'Costa Rica', gf = home ? x.gl : x.gv, ga = home ? x.gv : x.gl, r = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+        return `<li><span class="res ${r}">${({ W: 'G', D: 'E', L: 'P' })[r]}</span>${home ? 'vs' : 'en'} ${esc(rival.name)}<span class="x">${gf}–${ga} · ${esc(new Date(x.d + 'T12:00:00-06:00').toLocaleDateString('es-CR', { day: 'numeric', month: 'short', year: 'numeric' }))} · ${esc(x.comp)}</span></li>`; }).join('')}</ul></section>`
+      : `<section><h3>Contra ${esc(rival.name)}, últimos dos años</h3><ul class="plist">${h2h.map(line).join('') || '<li><span class="x" style="margin:0">No se enfrentaron en este periodo</span></li>'}</ul></section>`}
     </div></div></div>`;
 }
 function go(view) { S.view = view; try { history.replaceState(null, '', '#' + view); } catch(e){} renderView(); try { renderLive(); renderLdet(); } catch (e) {} window.scrollTo({ top: 0 }); }

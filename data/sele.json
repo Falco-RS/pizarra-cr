@@ -152,5 +152,52 @@
         ]
       }
     ]
+  },
+  "historial": {
+    "Ecuador": {
+      "resumen": "12 partidos: Ecuador ganó 6, empataron 5 y Costa Rica ganó 1 (2-1 en San José, 1992)",
+      "partidos": [
+        {
+          "d": "2023-06-21",
+          "comp": "Amistoso",
+          "local": "Ecuador",
+          "gl": 3,
+          "gv": 1,
+          "sede": "Subaru Park, Estados Unidos"
+        },
+        {
+          "d": "2011-09-06",
+          "comp": "Amistoso",
+          "local": "Ecuador",
+          "gl": 4,
+          "gv": 0,
+          "sede": "Estadio Olímpico Atahualpa, Quito"
+        },
+        {
+          "d": "2011-08-10",
+          "comp": "Amistoso",
+          "local": "Costa Rica",
+          "gl": 0,
+          "gv": 2,
+          "sede": "Costa Rica"
+        },
+        {
+          "d": "2006-06-15",
+          "comp": "Mundial Alemania 2006",
+          "local": "Ecuador",
+          "gl": 3,
+          "gv": 0,
+          "sede": "Hamburgo, Alemania"
+        },
+        {
+          "d": "2005-02-17",
+          "comp": "Amistoso",
+          "local": "Costa Rica",
+          "gl": 1,
+          "gv": 2,
+          "sede": "Estadio Rosabal Cordero"
+        }
+      ]
+    }
   }
 }
