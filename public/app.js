@@ -1018,12 +1018,22 @@ function seleDetailHtml(m, CR, compName) {
   if (lv) {
     const [h, a] = (lv.score || '0 - 0').split(' - ');
     const ev = reconcile(sortEvents({ events: (lv.events || []).map(e => e.slice()) }).events || [], +h, +a, !lv.finished);
-    const st = lv.stats || [], hi = st[0] && st[0].t === m.h.id ? 0 : 1, ph = st[hi]?.s?.Possession, pa = st[1 - hi]?.s?.Possession;
+    const st = lv.stats || [], hi = st[0] && st[0].t === m.h.id ? 0 : 1;
     const vivo = lv.finished ? 'Final' : /half time/i.test(lv.status) ? 'Entretiempo' : `En vivo · ${lv.clock ?? ''}'`;
+    // mismo orden que la Primera: minuto a minuto arriba; abajo alineaciones (izq.) y estadísticas (der.)
+    const SX = [STATS[0], ['Expected Goals', 'Goles esperados (xG)', v => (+v).toFixed(2)], ['Big Chances Created', 'Ocasiones claras'], ...STATS.slice(1)];
+    const bars = st.length === 2 ? SX.map(([k, lab, f = v => v]) => {
+      const x = st[hi].s?.[k], y = st[1 - hi].s?.[k]; if (x == null || y == null) return '';
+      const tot = (x + y) || 1;
+      return `<div class="sbar"><div class="lab"><span>${f(x)}</span><span>${lab}</span><span>${f(y)}</span></div>
+        <div class="bars"><i style="flex:${x / tot || .001};background:var(--accent)"></i><i style="flex:${y / tot || .001};background:var(--draw)"></i></div></div>`;
+    }).join('') : '';
+    const L = seleLu(m);
+    const lineBlock = L ? `<div class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(L.home?.formation || '')}</span></div>${pitchHtml(L.home, L.away)}<div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(L.away?.formation || '')}</span></div>${seleSubs(m, L)}</div>` : '';
+    const statsBlock = `<div><h3>Estadísticas</h3>${bars || '<p class="hint">Todavía sin estadísticas.</p>'}</div>`;
     return `<div class="detail cd">${head(`<div class="dnum">${h} – ${a}</div>`)}<div class="dmeta">${esc(vivo)} · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div>
-      <div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Todavía sin eventos.</p>'}</div>
-      ${(() => { const L = seleLu(m); return L ? `<div class="pv-lu" style="${kitVars(m.h.name, m.a.name)}"><h3>Alineaciones</h3><div class="fbar"><span><i class="dot h"></i> ${esc(m.h.name)}</span><span class="f">${esc(L.home?.formation || '')}</span></div>${pitchHtml(L.home, L.away)}<div class="fbar"><span><i class="dot a"></i> ${esc(m.a.name)}</span><span class="f">${esc(L.away?.formation || '')}</span></div>${seleSubs(m, L)}</div>` : ''; })()}
-      ${ph != null && pa != null ? `<div><h3>Posesión</h3><div class="apos"><b>${Math.round(ph * 100)}%</b><span class="bar"><i style="width:${ph * 100}%"></i></span><b>${Math.round(pa * 100)}%</b></div><div class="apos-l"><span>${esc(m.h.name)}</span><span>${esc(m.a.name)}</span></div></div>` : ''}</div></div>`;
+      <div class="dcols"><div><h3>Minuto a minuto</h3>${ev.length ? `<ol class="tl">${ev.map(e => `<li><span class="h">${e[2] ? evHtml(e) : ''}</span><span class="min">${esc(e[0])}'</span><span>${e[2] ? '' : evHtml(e)}</span></li>`).join('')}</ol>` : '<p class="hint">Todavía sin eventos.</p>'}</div></div>
+      <div class="dcols">${lineBlock}${statsBlock}</div></div>`;
   }
   if (m.manual) return `<div class="detail cd">${head('<div class="dnum" style="font-size:20px;white-space:nowrap">Por definir</div>')}<div class="dmeta">Previa · ${meta}${m.sede ? ' · ' + esc(m.sede) : ''}</div></div>`;
   if (m.hs != null) {
