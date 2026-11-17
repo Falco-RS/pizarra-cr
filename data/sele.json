@@ -471,6 +471,330 @@
         ],
         "subs": []
       }
+    },
+    "1401914356": {
+      "home": {
+        "fuente": "AFA",
+        "formation": "4-3-3",
+        "rows": [
+          [
+            {
+              "n": 23,
+              "name": "E. Martínez",
+              "c": true
+            }
+          ],
+          [
+            {
+              "n": 19,
+              "name": "Giay"
+            },
+            {
+              "n": 6,
+              "name": "Li. Martínez"
+            },
+            {
+              "n": 25,
+              "name": "Medina"
+            },
+            {
+              "n": 33,
+              "name": "Vega"
+            }
+          ],
+          [
+            {
+              "n": 20,
+              "name": "Mac Allister"
+            },
+            {
+              "n": 16,
+              "name": "Perrone"
+            },
+            {
+              "n": 8,
+              "name": "Fernández"
+            }
+          ],
+          [
+            {
+              "n": 17,
+              "name": "Prestianni"
+            },
+            {
+              "n": 9,
+              "name": "Álvarez"
+            },
+            {
+              "n": 18,
+              "name": "Paz"
+            }
+          ]
+        ],
+        "aprox": true,
+        "list": [
+          {
+            "n": 23,
+            "name": "E. Martínez",
+            "c": true
+          },
+          {
+            "n": 19,
+            "name": "Giay"
+          },
+          {
+            "n": 6,
+            "name": "Li. Martínez"
+          },
+          {
+            "n": 25,
+            "name": "Medina"
+          },
+          {
+            "n": 33,
+            "name": "Vega"
+          },
+          {
+            "n": 20,
+            "name": "Mac Allister"
+          },
+          {
+            "n": 16,
+            "name": "Perrone"
+          },
+          {
+            "n": 8,
+            "name": "Fernández"
+          },
+          {
+            "n": 17,
+            "name": "Prestianni"
+          },
+          {
+            "n": 9,
+            "name": "Álvarez"
+          },
+          {
+            "n": 18,
+            "name": "Paz"
+          }
+        ],
+        "subs": [
+          {
+            "n": 1,
+            "name": "Musso"
+          },
+          {
+            "n": 2,
+            "name": "Balerdi"
+          },
+          {
+            "n": 3,
+            "name": "Tagliafico"
+          },
+          {
+            "n": 4,
+            "name": "Montiel"
+          },
+          {
+            "n": 7,
+            "name": "Simeone"
+          },
+          {
+            "n": 11,
+            "name": "Almada"
+          },
+          {
+            "n": 14,
+            "name": "Palacios"
+          },
+          {
+            "n": 21,
+            "name": "López"
+          },
+          {
+            "n": 24,
+            "name": "Barco"
+          },
+          {
+            "n": 26,
+            "name": "Troilo"
+          },
+          {
+            "n": 27,
+            "name": "Beltrán"
+          },
+          {
+            "n": 28,
+            "name": "Soulé"
+          },
+          {
+            "n": 29,
+            "name": "Castro"
+          },
+          {
+            "n": 30,
+            "name": "Mastantuono"
+          },
+          {
+            "n": 34,
+            "name": "Anselmino"
+          }
+        ],
+        "dt": "Lionel Scaloni"
+      },
+      "away": {
+        "fuente": "FCRF",
+        "formation": "4-2-3-1",
+        "rows": [
+          [
+            {
+              "n": 1,
+              "name": "P. Sequeira"
+            }
+          ],
+          [
+            {
+              "n": 6,
+              "name": "A. Salazar"
+            },
+            {
+              "n": 15,
+              "name": "F. Calvo"
+            },
+            {
+              "n": 4,
+              "name": "J.P. Vargas"
+            },
+            {
+              "n": 2,
+              "name": "G. Taylor"
+            }
+          ],
+          [
+            {
+              "n": 5,
+              "name": "C. Borges",
+              "c": true
+            },
+            {
+              "n": 12,
+              "name": "A. Soto"
+            }
+          ],
+          [
+            {
+              "n": 20,
+              "name": "K. Michel"
+            },
+            {
+              "n": 11,
+              "name": "J. Méndez"
+            },
+            {
+              "n": 17,
+              "name": "Carlos Mora"
+            }
+          ],
+          [
+            {
+              "n": 9,
+              "name": "M. Ugalde"
+            }
+          ]
+        ],
+        "aprox": true,
+        "list": [
+          {
+            "n": 1,
+            "name": "P. Sequeira"
+          },
+          {
+            "n": 6,
+            "name": "A. Salazar"
+          },
+          {
+            "n": 15,
+            "name": "F. Calvo"
+          },
+          {
+            "n": 4,
+            "name": "J.P. Vargas"
+          },
+          {
+            "n": 2,
+            "name": "G. Taylor"
+          },
+          {
+            "n": 5,
+            "name": "C. Borges",
+            "c": true
+          },
+          {
+            "n": 12,
+            "name": "A. Soto"
+          },
+          {
+            "n": 20,
+            "name": "K. Michel"
+          },
+          {
+            "n": 11,
+            "name": "J. Méndez"
+          },
+          {
+            "n": 17,
+            "name": "Carlos Mora"
+          },
+          {
+            "n": 9,
+            "name": "M. Ugalde"
+          }
+        ],
+        "subs": [
+          {
+            "n": 18,
+            "name": "B. Mora"
+          },
+          {
+            "n": 23,
+            "name": "A. Madriz"
+          },
+          {
+            "n": 7,
+            "name": "J. P. Ruiz"
+          },
+          {
+            "n": 8,
+            "name": "Joseph Mora"
+          },
+          {
+            "n": 10,
+            "name": "J. Alcócer"
+          },
+          {
+            "n": 14,
+            "name": "R. Wilson"
+          },
+          {
+            "n": 16,
+            "name": "G. Leiva"
+          },
+          {
+            "n": 19,
+            "name": "K. Myrie"
+          },
+          {
+            "n": 21,
+            "name": "D. López"
+          },
+          {
+            "n": 22,
+            "name": "G. M. Morera"
+          }
+        ],
+        "dt": "Bryan Ruiz"
+      }
     }
   }
 }
