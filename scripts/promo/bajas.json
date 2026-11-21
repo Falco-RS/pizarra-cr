@@ -3,5 +3,6 @@
  "1320516206": {"local": {}, "visita": {"suspendidos": ["Mayron George"], "capilla": ["A. Soto"]}},
  "1360597455": {"local": {"suspendidos": ["J. C. Gaete", "G. M. Morera"], "capilla": ["A. Hernández", "C. Barahona"]}, "visita": {"capilla": ["L. Mena", "N. Monge"]}},
  "1320519610": {"local": {"suspendidos": ["Luis Paradela"], "capilla": ["J. M. Azofeifa"]}, "visita": {"capilla": ["R. Cole"]}},
- "1320517908": {"local": {"suspendidos": ["Nick Bennette"]}, "visita": {"capilla": ["J. L. Pérez"]}}
+ "1320517908": {"local": {"suspendidos": ["Nick Bennette"]}, "visita": {"capilla": ["J. L. Pérez"]}},
+ "1360598306": {"local": {"capilla": ["Leandro Mena", "Néstor Monge"]}, "visita": {"capilla": ["Jeikel Venegas", "Roberto Córdoba"]}}
 }

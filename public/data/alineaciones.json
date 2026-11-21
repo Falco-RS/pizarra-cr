@@ -3997,5 +3997,310 @@
    ],
    "dt": "Douglas Sequeira"
   }
+ },
+ "1360598306": {
+  "away": {
+   "aprox": true,
+   "dt": "Walter Centeno",
+   "formation": "4-2-3-1",
+   "fuente": "redes de San Carlos",
+   "list": [
+    {
+     "n": 23,
+     "name": "J. D. Vega"
+    },
+    {
+     "n": 22,
+     "name": "J. C. Agüero"
+    },
+    {
+     "n": 16,
+     "name": "G. Castillo"
+    },
+    {
+     "c": true,
+     "n": 6,
+     "name": "Y. Piedra"
+    },
+    {
+     "n": 17,
+     "name": "J. Evans"
+    },
+    {
+     "n": 8,
+     "name": "E. Hernández"
+    },
+    {
+     "n": 10,
+     "name": "K. Cerdas"
+    },
+    {
+     "n": 2,
+     "name": "J. Valverde"
+    },
+    {
+     "n": 11,
+     "name": "R. Córdoba"
+    },
+    {
+     "n": 21,
+     "name": "J. Venegas"
+    },
+    {
+     "n": 88,
+     "name": "R. Vidal"
+    }
+   ],
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "J. D. Vega"
+     }
+    ],
+    [
+     {
+      "n": 22,
+      "name": "J. C. Agüero"
+     },
+     {
+      "n": 16,
+      "name": "G. Castillo"
+     },
+     {
+      "c": true,
+      "n": 6,
+      "name": "Y. Piedra"
+     },
+     {
+      "n": 17,
+      "name": "J. Evans"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "E. Hernández"
+     },
+     {
+      "n": 10,
+      "name": "K. Cerdas"
+     }
+    ],
+    [
+     {
+      "n": 2,
+      "name": "J. Valverde"
+     },
+     {
+      "n": 11,
+      "name": "R. Córdoba"
+     },
+     {
+      "n": 21,
+      "name": "J. Venegas"
+     }
+    ],
+    [
+     {
+      "n": 88,
+      "name": "R. Vidal"
+     }
+    ]
+   ],
+   "subs": [
+    {
+     "n": 25,
+     "name": "A. Porras"
+    },
+    {
+     "n": 4,
+     "name": "P. Fonseca"
+    },
+    {
+     "n": 5,
+     "name": "C. Martínez"
+    },
+    {
+     "n": 7,
+     "name": "A. Guevara"
+    },
+    {
+     "n": 15,
+     "name": "A. Carmona"
+    },
+    {
+     "n": 18,
+     "name": "J. Aguilar"
+    },
+    {
+     "n": 20,
+     "name": "C. Agualimpia"
+    },
+    {
+     "n": 24,
+     "name": "J. Rivera"
+    },
+    {
+     "n": 27,
+     "name": "D. Masís"
+    },
+    {
+     "n": 30,
+     "name": "P. Agüero"
+    }
+   ]
+  },
+  "home": {
+   "aprox": true,
+   "formation": "4-2-3-1",
+   "fuente": "redes de Escorpiones",
+   "list": [
+    {
+     "n": 76,
+     "name": "Álvarez"
+    },
+    {
+     "n": 70,
+     "name": "Dávila"
+    },
+    {
+     "n": 3,
+     "name": "Tello"
+    },
+    {
+     "n": 13,
+     "name": "Morera"
+    },
+    {
+     "n": 6,
+     "name": "Mena"
+    },
+    {
+     "n": 8,
+     "name": "Muñoz"
+    },
+    {
+     "c": true,
+     "n": 10,
+     "name": "Fonseca"
+    },
+    {
+     "n": 16,
+     "name": "Salazar"
+    },
+    {
+     "n": 77,
+     "name": "Fernández"
+    },
+    {
+     "n": 7,
+     "name": "Hidalgo"
+    },
+    {
+     "n": 99,
+     "name": "Pimpinati"
+    }
+   ],
+   "rows": [
+    [
+     {
+      "n": 76,
+      "name": "Álvarez"
+     }
+    ],
+    [
+     {
+      "n": 70,
+      "name": "Dávila"
+     },
+     {
+      "n": 3,
+      "name": "Tello"
+     },
+     {
+      "n": 13,
+      "name": "Morera"
+     },
+     {
+      "n": 6,
+      "name": "Mena"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "Muñoz"
+     },
+     {
+      "c": true,
+      "n": 10,
+      "name": "Fonseca"
+     }
+    ],
+    [
+     {
+      "n": 16,
+      "name": "Salazar"
+     },
+     {
+      "n": 77,
+      "name": "Fernández"
+     },
+     {
+      "n": 7,
+      "name": "Hidalgo"
+     }
+    ],
+    [
+     {
+      "n": 99,
+      "name": "Pimpinati"
+     }
+    ]
+   ],
+   "subs": [
+    {
+     "n": 25,
+     "name": "Rodríguez"
+    },
+    {
+     "n": 15,
+     "name": "Vega"
+    },
+    {
+     "n": 47,
+     "name": "Camejo"
+    },
+    {
+     "n": 11,
+     "name": "Fernández"
+    },
+    {
+     "n": 80,
+     "name": "Flores"
+    },
+    {
+     "n": 71,
+     "name": "Ordóñez"
+    },
+    {
+     "n": 18,
+     "name": "Peña"
+    },
+    {
+     "n": 19,
+     "name": "Serrano"
+    },
+    {
+     "n": 34,
+     "name": "Sequeira"
+    },
+    {
+     "n": 39,
+     "name": "Umanzor"
+    }
+   ]
+  }
  }
 }
