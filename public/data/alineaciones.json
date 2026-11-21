@@ -4306,7 +4306,7 @@
  "1320523014": {
   "away": {
    "fuente": "redes de Herediano",
-   "formation": "5-4-1",
+   "formation": "5-3-2",
    "rows": [
     [
      {
@@ -4348,10 +4348,6 @@
      {
       "n": 46,
       "name": "A. Morera"
-     },
-     {
-      "n": 33,
-      "name": "F. Lesme"
      }
     ],
     [
@@ -4359,6 +4355,10 @@
       "n": 10,
       "name": "E. Aguilar",
       "c": true
+     },
+     {
+      "n": 33,
+      "name": "F. Lesme"
      }
     ]
    ],
@@ -4401,13 +4401,13 @@
      "name": "A. Morera"
     },
     {
-     "n": 33,
-     "name": "F. Lesme"
-    },
-    {
      "n": 10,
      "name": "E. Aguilar",
      "c": true
+    },
+    {
+     "n": 33,
+     "name": "F. Lesme"
     }
    ],
    "subs": [
