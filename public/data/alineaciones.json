@@ -4306,7 +4306,7 @@
  "1320523014": {
   "away": {
    "fuente": "redes de Herediano",
-   "formation": "5-3-2",
+   "formation": "4-4-2",
    "rows": [
     [
      {
@@ -4328,15 +4328,15 @@
       "name": "K. Brown"
      },
      {
-      "n": 32,
-      "name": "A. Hudson"
-     },
-     {
       "n": 16,
       "name": "D. Araya"
      }
     ],
     [
+     {
+      "n": 32,
+      "name": "A. Hudson"
+     },
      {
       "n": 22,
       "name": "A. Murillo"
@@ -4381,12 +4381,12 @@
      "name": "K. Brown"
     },
     {
-     "n": 32,
-     "name": "A. Hudson"
-    },
-    {
      "n": 16,
      "name": "D. Araya"
+    },
+    {
+     "n": 32,
+     "name": "A. Hudson"
     },
     {
      "n": 22,
