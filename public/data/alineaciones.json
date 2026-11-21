@@ -4304,6 +4304,154 @@
   }
  },
  "1320523014": {
+  "home": {
+   "fuente": "redes de Puntarenas",
+   "formation": "4-4-2",
+   "rows": [
+    [
+     {
+      "n": 97,
+      "name": "A. Pineda"
+     }
+    ],
+    [
+     {
+      "n": 12,
+      "name": "K. Villalobos"
+     },
+     {
+      "n": 17,
+      "name": "W. Decas"
+     },
+     {
+      "n": 41,
+      "name": "D. Cordero"
+     },
+     {
+      "n": 25,
+      "name": "K. Gómez"
+     }
+    ],
+    [
+     {
+      "n": 6,
+      "name": "K. Cabezas"
+     },
+     {
+      "n": 5,
+      "name": "Y. Tejeda"
+     },
+     {
+      "n": 8,
+      "name": "U. Segura"
+     },
+     {
+      "n": 7,
+      "name": "L. Comachi"
+     }
+    ],
+    [
+     {
+      "n": 22,
+      "name": "D. Castrillo"
+     },
+     {
+      "n": 21,
+      "name": "D. Rodríguez"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 97,
+     "name": "A. Pineda"
+    },
+    {
+     "n": 12,
+     "name": "K. Villalobos"
+    },
+    {
+     "n": 17,
+     "name": "W. Decas"
+    },
+    {
+     "n": 41,
+     "name": "D. Cordero"
+    },
+    {
+     "n": 25,
+     "name": "K. Gómez"
+    },
+    {
+     "n": 6,
+     "name": "K. Cabezas"
+    },
+    {
+     "n": 5,
+     "name": "Y. Tejeda"
+    },
+    {
+     "n": 8,
+     "name": "U. Segura"
+    },
+    {
+     "n": 7,
+     "name": "L. Comachi"
+    },
+    {
+     "n": 22,
+     "name": "D. Castrillo"
+    },
+    {
+     "n": 21,
+     "name": "D. Rodríguez"
+    }
+   ],
+   "subs": [
+    {
+     "n": 35,
+     "name": "J. D. Rojas"
+    },
+    {
+     "n": 3,
+     "name": "K. Fajardo"
+    },
+    {
+     "n": 10,
+     "name": "R. Cole"
+    },
+    {
+     "n": 20,
+     "name": "B. Segura"
+    },
+    {
+     "n": 33,
+     "name": "J. Hadden"
+    },
+    {
+     "n": 11,
+     "name": "R. Taylor"
+    },
+    {
+     "n": 18,
+     "name": "A. Álvarez"
+    },
+    {
+     "n": 77,
+     "name": "P. Álvarez"
+    },
+    {
+     "n": 15,
+     "name": "H. Muñoz"
+    },
+    {
+     "n": 16,
+     "name": "W. Hernández"
+    }
+   ],
+   "dt": "César Alpízar"
+  },
   "away": {
    "fuente": "redes de Herediano",
    "formation": "5-4-1",
