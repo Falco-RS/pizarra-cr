@@ -4306,7 +4306,7 @@
  "1320523014": {
   "away": {
    "fuente": "redes de Herediano",
-   "formation": "4-4-2",
+   "formation": "5-4-1",
    "rows": [
     [
      {
@@ -4324,6 +4324,10 @@
       "name": "E. Rubio"
      },
      {
+      "n": 46,
+      "name": "A. Morera"
+     },
+     {
       "n": 99,
       "name": "K. Brown"
      },
@@ -4338,24 +4342,20 @@
       "name": "A. Hudson"
      },
      {
-      "n": 22,
-      "name": "A. Murillo"
-     },
-     {
       "n": 8,
       "name": "A. Cruz"
      },
-     {
-      "n": 46,
-      "name": "A. Morera"
-     }
-    ],
-    [
      {
       "n": 10,
       "name": "E. Aguilar",
       "c": true
      },
+     {
+      "n": 22,
+      "name": "A. Murillo"
+     }
+    ],
+    [
      {
       "n": 33,
       "name": "F. Lesme"
@@ -4377,6 +4377,10 @@
      "name": "E. Rubio"
     },
     {
+     "n": 46,
+     "name": "A. Morera"
+    },
+    {
      "n": 99,
      "name": "K. Brown"
     },
@@ -4389,21 +4393,17 @@
      "name": "A. Hudson"
     },
     {
-     "n": 22,
-     "name": "A. Murillo"
-    },
-    {
      "n": 8,
      "name": "A. Cruz"
-    },
-    {
-     "n": 46,
-     "name": "A. Morera"
     },
     {
      "n": 10,
      "name": "E. Aguilar",
      "c": true
+    },
+    {
+     "n": 22,
+     "name": "A. Murillo"
     },
     {
      "n": 33,
