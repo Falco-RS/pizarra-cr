@@ -4302,5 +4302,157 @@
     }
    ]
   }
+ },
+ "1320523014": {
+  "away": {
+   "fuente": "redes de Herediano",
+   "formation": "5-4-1",
+   "rows": [
+    [
+     {
+      "n": 31,
+      "name": "A. Lezcano"
+     }
+    ],
+    [
+     {
+      "n": 5,
+      "name": "H. Quirós"
+     },
+     {
+      "n": 21,
+      "name": "E. Rubio"
+     },
+     {
+      "n": 99,
+      "name": "K. Brown"
+     },
+     {
+      "n": 32,
+      "name": "A. Hudson"
+     },
+     {
+      "n": 16,
+      "name": "D. Araya"
+     }
+    ],
+    [
+     {
+      "n": 22,
+      "name": "A. Murillo"
+     },
+     {
+      "n": 8,
+      "name": "A. Cruz"
+     },
+     {
+      "n": 46,
+      "name": "A. Morera"
+     },
+     {
+      "n": 33,
+      "name": "F. Lesme"
+     }
+    ],
+    [
+     {
+      "n": 10,
+      "name": "E. Aguilar",
+      "c": true
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 31,
+     "name": "A. Lezcano"
+    },
+    {
+     "n": 5,
+     "name": "H. Quirós"
+    },
+    {
+     "n": 21,
+     "name": "E. Rubio"
+    },
+    {
+     "n": 99,
+     "name": "K. Brown"
+    },
+    {
+     "n": 32,
+     "name": "A. Hudson"
+    },
+    {
+     "n": 16,
+     "name": "D. Araya"
+    },
+    {
+     "n": 22,
+     "name": "A. Murillo"
+    },
+    {
+     "n": 8,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 46,
+     "name": "A. Morera"
+    },
+    {
+     "n": 33,
+     "name": "F. Lesme"
+    },
+    {
+     "n": 10,
+     "name": "E. Aguilar",
+     "c": true
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "D. Carvajal"
+    },
+    {
+     "n": 11,
+     "name": "R. Araya"
+    },
+    {
+     "n": 24,
+     "name": "S. Rodríguez"
+    },
+    {
+     "n": 25,
+     "name": "E. Bravo"
+    },
+    {
+     "n": 26,
+     "name": "E. Juárez"
+    },
+    {
+     "n": 27,
+     "name": "A. Suárez"
+    },
+    {
+     "n": 28,
+     "name": "S. Vargas"
+    },
+    {
+     "n": 37,
+     "name": "K. Fuller"
+    },
+    {
+     "n": 42,
+     "name": "D. González"
+    },
+    {
+     "n": 55,
+     "name": "Y. Román"
+    }
+   ],
+   "dt": "Jafet Soto Molina"
+  }
  }
 }
