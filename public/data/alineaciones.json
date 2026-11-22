@@ -4882,5 +4882,295 @@
    ],
    "dt": "Hernán Medford"
   }
+ },
+ "1320521312": {
+  "home": {
+   "fuente": "redes de Inter San Carlos",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "A. Cruz"
+     }
+    ],
+    [
+     {
+      "n": 19,
+      "name": "J. L. Pérez"
+     },
+     {
+      "n": 4,
+      "name": "J. Ramos"
+     },
+     {
+      "n": 13,
+      "name": "A. Rodríguez"
+     },
+     {
+      "n": 67,
+      "name": "C. Martínez"
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "W. Azofeifa"
+     },
+     {
+      "n": 8,
+      "name": "Y. Villán"
+     },
+     {
+      "n": 79,
+      "name": "J. Bolaños"
+     }
+    ],
+    [
+     {
+      "n": 50,
+      "name": "R. Vega"
+     },
+     {
+      "n": 9,
+      "name": "E. Torres"
+     },
+     {
+      "n": 10,
+      "name": "J. Campbell"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "A. Cruz"
+    },
+    {
+     "n": 19,
+     "name": "J. L. Pérez"
+    },
+    {
+     "n": 4,
+     "name": "J. Ramos"
+    },
+    {
+     "n": 13,
+     "name": "A. Rodríguez"
+    },
+    {
+     "n": 67,
+     "name": "C. Martínez"
+    },
+    {
+     "n": 20,
+     "name": "W. Azofeifa"
+    },
+    {
+     "n": 8,
+     "name": "Y. Villán"
+    },
+    {
+     "n": 79,
+     "name": "J. Bolaños"
+    },
+    {
+     "n": 50,
+     "name": "R. Vega"
+    },
+    {
+     "n": 9,
+     "name": "E. Torres"
+    },
+    {
+     "n": 10,
+     "name": "J. Campbell"
+    }
+   ],
+   "subs": [
+    {
+     "n": 30,
+     "name": "Monreal"
+    },
+    {
+     "n": 27,
+     "name": "Arias"
+    },
+    {
+     "n": 2,
+     "name": "Chacón"
+    },
+    {
+     "n": 12,
+     "name": "O. Leal"
+    },
+    {
+     "n": 40,
+     "name": "Y. Leal"
+    },
+    {
+     "n": 6,
+     "name": "Casanova"
+    },
+    {
+     "n": 33,
+     "name": "Gómez"
+    },
+    {
+     "n": 14,
+     "name": "Porras"
+    },
+    {
+     "n": 70,
+     "name": "Román"
+    },
+    {
+     "n": 7,
+     "name": "Castro"
+    }
+   ],
+   "dt": "Douglas Sequeira"
+  },
+  "away": {
+   "fuente": "redes de Sporting",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "L. Moreira"
+     }
+    ],
+    [
+     {
+      "n": 35,
+      "name": "J. C. Batista"
+     },
+     {
+      "n": 3,
+      "name": "K. Espinoza"
+     },
+     {
+      "n": 33,
+      "name": "E. Pastrana"
+     },
+     {
+      "n": 27,
+      "name": "A. Chévez"
+     }
+    ],
+    [
+     {
+      "n": 8,
+      "name": "C. Pineda"
+     },
+     {
+      "n": 10,
+      "name": "A. López"
+     }
+    ],
+    [
+     {
+      "n": 28,
+      "name": "J. Navarro"
+     },
+     {
+      "n": 21,
+      "name": "M. Ureña"
+     },
+     {
+      "n": 7,
+      "name": "J. M. Pinto"
+     }
+    ],
+    [
+     {
+      "n": 11,
+      "name": "R. Carballo"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "L. Moreira"
+    },
+    {
+     "n": 35,
+     "name": "J. C. Batista"
+    },
+    {
+     "n": 3,
+     "name": "K. Espinoza"
+    },
+    {
+     "n": 33,
+     "name": "E. Pastrana"
+    },
+    {
+     "n": 27,
+     "name": "A. Chévez"
+    },
+    {
+     "n": 8,
+     "name": "C. Pineda"
+    },
+    {
+     "n": 10,
+     "name": "A. López"
+    },
+    {
+     "n": 28,
+     "name": "J. Navarro"
+    },
+    {
+     "n": 21,
+     "name": "M. Ureña"
+    },
+    {
+     "n": 7,
+     "name": "J. M. Pinto"
+    },
+    {
+     "n": 11,
+     "name": "R. Carballo"
+    }
+   ],
+   "subs": [
+    {
+     "name": "R. Leal"
+    },
+    {
+     "name": "Y. Salinas"
+    },
+    {
+     "name": "I. Gómez"
+    },
+    {
+     "name": "R. Bolaños"
+    },
+    {
+     "name": "D. Salas"
+    },
+    {
+     "name": "J. Hernández"
+    },
+    {
+     "name": "G. Leiva"
+    },
+    {
+     "name": "R. Ramírez"
+    },
+    {
+     "name": "D. Colindres"
+    },
+    {
+     "name": "M. George"
+    }
+   ],
+   "dt": "Andrés Carevic"
+  }
  }
 }
