@@ -1,7 +1,7 @@
 {
  "_nota": "Liga de Ascenso (Liasce). Se actualiza A MANO con lo que publica Liasce. En cada serie, 'a' es el de arriba (abre de local) y 'b' el de abajo (cierra de local). Marcadores: null = por jugar. 'pasa' = 'a' o 'b' cuando la serie se define (si hace falta penales u otro criterio, se pone a mano).",
  "torneo": "Apertura 2026",
- "actualizado": "22/11/26",
+ "actualizado": "22/11/26 ",
  "fase": "Semifinales · ida",
  "equipos": {
   "guadalupe": {

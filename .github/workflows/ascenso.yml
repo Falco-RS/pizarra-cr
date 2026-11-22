@@ -5,6 +5,9 @@ on:
     # cada 2 horas: partidos, historial y resultados de los playoffs
     - cron: '27 */2 * * *'
   workflow_dispatch: {}
+  # al cambiar las series a mano, que traiga de una vez los partidos nuevos (para el en vivo)
+  push:
+    paths: ['public/data/ascenso.json']
 
 permissions:
   contents: write
