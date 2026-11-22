@@ -1,8 +1,8 @@
 {
  "_nota": "Liga de Ascenso (Liasce). Se actualiza A MANO con lo que publica Liasce. En cada serie, 'a' es el de arriba (abre de local) y 'b' el de abajo (cierra de local). Marcadores: null = por jugar. 'pasa' = 'a' o 'b' cuando la serie se define (si hace falta penales u otro criterio, se pone a mano).",
  "torneo": "Apertura 2026",
- "actualizado": "12/11/26",
- "fase": "Cuartos de final · vuelta",
+ "actualizado": "22/11/26",
+ "fase": "Semifinales · ida",
  "equipos": {
   "guadalupe": {
    "nombre": "Guadalupe FC",
@@ -67,6 +67,48 @@
  },
  "series": [
   {
+   "n": 5,
+   "titulo": "Semifinal 1",
+   "a": "sarchi",
+   "b": "grecia",
+   "ida": {
+    "fecha": "2026-11-22T11:00:00-06:00",
+    "estadio": "Estadio Eliécer Pérez C.",
+    "tv": "TDMAX",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  },
+  {
+   "n": 6,
+   "titulo": "Semifinal 2",
+   "a": "pitbulls",
+   "b": "jicaral",
+   "ida": {
+    "fecha": "2026-11-23T18:00:00-06:00",
+    "estadio": "Estadio Carlos Alvarado",
+    "tv": "TDMAX",
+    "ga": null,
+    "gb": null
+   },
+   "vuelta": {
+    "fecha": null,
+    "estadio": null,
+    "tv": null,
+    "ga": null,
+    "gb": null
+   },
+   "pasa": null
+  },
+  {
    "n": 1,
    "a": "guadalupe",
    "b": "jicaral",
@@ -74,17 +116,18 @@
     "fecha": "2026-11-06T20:00:00-06:00",
     "estadio": "Estadio “Colleya” Fonseca",
     "tv": "Liasce TV",
-    "ga": null,
-    "gb": null
+    "ga": 2,
+    "gb": 2
    },
    "vuelta": {
     "fecha": "2026-11-15T11:00:00-06:00",
     "estadio": "Estadio A. Cívica Jicaraleña",
     "tv": "TD+",
-    "ga": null,
-    "gb": null
+    "ga": 1,
+    "gb": 3
    },
-   "pasa": null
+   "pasa": "b",
+   "titulo": "Cuartos · Serie 1"
   },
   {
    "n": 2,
@@ -94,17 +137,18 @@
     "fecha": "2026-11-07T19:00:00-06:00",
     "estadio": "Estadio Bernardo Veach",
     "tv": "TD+",
-    "ga": null,
-    "gb": null
+    "ga": 0,
+    "gb": 0
    },
    "vuelta": {
     "fecha": "2026-11-14T19:00:00-06:00",
     "estadio": "Estadio Puente Piedra",
     "tv": "TD+",
-    "ga": null,
-    "gb": null
+    "ga": 1,
+    "gb": 2
    },
-   "pasa": null
+   "pasa": "b",
+   "titulo": "Cuartos · Serie 2"
   },
   {
    "n": 3,
@@ -114,17 +158,18 @@
     "fecha": "2026-11-09T19:00:00-06:00",
     "estadio": "Estadio Rafael Bolaños",
     "tv": "TD+",
-    "ga": null,
-    "gb": null
+    "ga": 0,
+    "gb": 0
    },
    "vuelta": {
     "fecha": "2026-11-16T19:00:00-06:00",
     "estadio": "Estadio Carlos Alvarado",
     "tv": "TD+",
-    "ga": null,
-    "gb": null
+    "ga": 0,
+    "gb": 2
    },
-   "pasa": null
+   "pasa": "b",
+   "titulo": "Cuartos · Serie 3"
   },
   {
    "n": 4,
@@ -134,17 +179,18 @@
     "fecha": "2026-11-08T11:00:00-06:00",
     "estadio": "Estadio Eliécer Pérez C.",
     "tv": "Liasce TV",
-    "ga": null,
-    "gb": null
+    "ga": 4,
+    "gb": 2
    },
    "vuelta": {
     "fecha": "2026-11-14T13:00:00-06:00",
     "estadio": "Estadio Piedades",
     "tv": "FUTV",
-    "ga": null,
-    "gb": null
+    "ga": 1,
+    "gb": 1
    },
-   "pasa": null
+   "pasa": "a",
+   "titulo": "Cuartos · Serie 4"
   }
  ],
  "grupos": [
@@ -312,21 +358,21 @@
   }
  ],
  "goleadores": {
-  "actualizado": "3/11/26",
+  "actualizado": "17/11/26",
   "lista": [
    {
     "jugador": "Brayton Lewis",
     "equipo": "jicaral",
+    "g": 9
+   },
+   {
+    "jugador": "Davis Paniagua",
+    "equipo": "cariari",
     "g": 7
    },
    {
     "jugador": "Andrés Jiménez",
     "equipo": "quepos",
-    "g": 6
-   },
-   {
-    "jugador": "Davis Paniagua",
-    "equipo": "cariari",
     "g": 6
    },
    {

@@ -837,7 +837,7 @@ function renderAscenso(v) {
     const pasa = s.pasa || (both && ta !== tb ? (ta > tb ? 'a' : 'b') : null);
     const tag = l => l.vivo ? `<span class="alive">${esc(l.vivo)}</span>` : '';
     const row = (side, k, g1, g2, tot) => `<div class="asr${pasa === side ? ' win' : pasa ? ' out' : ''}">${cr(k)}<b>${nm(k)}</b><span class="g">${sc(g1)}</span><span class="g">${sc(g2)}</span><span class="g tot">${i.ga != null ? tot : ''}</span></div>`;
-    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>Serie ${s.n} · <u>${i.vivo || vu.vivo ? 'en vivo' : i.ga != null ? 'partido' : 'previa'}</u> ${tag(i)}${tag(vu)}</span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
+    return `<article class="aser${S.asel === s.n ? ' on' : ''}" data-aser="${s.n}" role="button" tabindex="0" aria-pressed="${S.asel === s.n}"><div class="ash"><span>${esc(s.titulo || 'Serie ' + s.n)} · <u>${i.vivo || vu.vivo ? 'en vivo' : i.ga != null ? 'partido' : 'previa'}</u> ${tag(i)}${tag(vu)}</span><span class="cols"><i>Ida</i><i>Vuelta</i><i>Global</i></span></div>
       ${row('a', s.a, i.ga, vu.ga, ta)}${row('b', s.b, i.gb, vu.gb, tb)}
       <ul class="aleg"><li><b>Ida</b> (local ${nm(s.a)}): ${esc(when(i))}${i.estadio ? ` · ${venueHtml(i.estadio).replace(/^ · /, '')}` : ''}${i.tv ? ` · ${esc(i.tv)}` : ''}</li>
       <li><b>Vuelta</b> (local ${nm(s.b)}): ${esc(when(vu))}${vu.estadio ? ` · ${venueHtml(vu.estadio).replace(/^ · /, '')}` : ''}${vu.tv ? ` · ${esc(vu.tv)}` : ''}</li></ul>
