@@ -4602,5 +4602,285 @@
    ],
    "dt": "Jafet Soto Molina"
   }
+ },
+ "1320523865": {
+  "home": {
+   "fuente": "redes de Pérez Zeledón",
+   "formation": "4-4-2",
+   "rows": [
+    [
+     {
+      "n": 99,
+      "name": "M. Ajú"
+     }
+    ],
+    [
+     {
+      "n": 4,
+      "name": "R. Rodríguez"
+     },
+     {
+      "n": 28,
+      "name": "M. Núñez"
+     },
+     {
+      "n": 12,
+      "name": "M. Aguilar"
+     },
+     {
+      "n": 5,
+      "name": "W. Fernández"
+     }
+    ],
+    [
+     {
+      "n": 11,
+      "name": "B. Sequeira"
+     },
+     {
+      "n": 23,
+      "name": "J. Aguirre",
+      "c": true
+     },
+     {
+      "n": 15,
+      "name": "A. Porras"
+     },
+     {
+      "n": 62,
+      "name": "A. Amador"
+     }
+    ],
+    [
+     {
+      "n": 9,
+      "name": "J. Alvarado"
+     },
+     {
+      "n": 19,
+      "name": "W. Rentería"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 99,
+     "name": "M. Ajú"
+    },
+    {
+     "n": 4,
+     "name": "R. Rodríguez"
+    },
+    {
+     "n": 28,
+     "name": "M. Núñez"
+    },
+    {
+     "n": 12,
+     "name": "M. Aguilar"
+    },
+    {
+     "n": 5,
+     "name": "W. Fernández"
+    },
+    {
+     "n": 11,
+     "name": "B. Sequeira"
+    },
+    {
+     "n": 23,
+     "name": "J. Aguirre",
+     "c": true
+    },
+    {
+     "n": 15,
+     "name": "A. Porras"
+    },
+    {
+     "n": 62,
+     "name": "A. Amador"
+    },
+    {
+     "n": 9,
+     "name": "J. Alvarado"
+    },
+    {
+     "n": 19,
+     "name": "W. Rentería"
+    }
+   ],
+   "subs": [
+    {
+     "name": "B. Segura"
+    },
+    {
+     "name": "D. Muñoz"
+    },
+    {
+     "name": "K. Carvajal"
+    },
+    {
+     "name": "A. Fallas"
+    },
+    {
+     "name": "K. McLean"
+    },
+    {
+     "name": "M. Angulo"
+    },
+    {
+     "name": "K. González"
+    },
+    {
+     "name": "E. Quesada"
+    },
+    {
+     "name": "J. P. Córdoba"
+    },
+    {
+     "name": "E. Marín"
+    }
+   ],
+   "dt": "Ronald Gómez"
+  },
+  "away": {
+   "fuente": "redes de Saprissa",
+   "formation": "4-3-3",
+   "rows": [
+    [
+     {
+      "n": 40,
+      "name": "A. Madriz"
+     }
+    ],
+    [
+     {
+      "n": 17,
+      "name": "G. Taylor"
+     },
+     {
+      "n": 4,
+      "name": "K. Waston"
+     },
+     {
+      "n": 21,
+      "name": "F. Escobar"
+     },
+     {
+      "n": 5,
+      "name": "J. Mora"
+     }
+    ],
+    [
+     {
+      "n": 50,
+      "name": "M. Elizondo"
+     },
+     {
+      "n": 20,
+      "name": "M. Torres"
+     },
+     {
+      "n": 26,
+      "name": "A. Soto"
+     }
+    ],
+    [
+     {
+      "n": 23,
+      "name": "L. Paradela"
+     },
+     {
+      "n": 7,
+      "name": "N. Williams"
+     },
+     {
+      "n": 28,
+      "name": "G. Torres"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 40,
+     "name": "A. Madriz"
+    },
+    {
+     "n": 17,
+     "name": "G. Taylor"
+    },
+    {
+     "n": 4,
+     "name": "K. Waston"
+    },
+    {
+     "n": 21,
+     "name": "F. Escobar"
+    },
+    {
+     "n": 5,
+     "name": "J. Mora"
+    },
+    {
+     "n": 50,
+     "name": "M. Elizondo"
+    },
+    {
+     "n": 20,
+     "name": "M. Torres"
+    },
+    {
+     "n": 26,
+     "name": "A. Soto"
+    },
+    {
+     "n": 23,
+     "name": "L. Paradela"
+    },
+    {
+     "n": 7,
+     "name": "N. Williams"
+    },
+    {
+     "n": 28,
+     "name": "G. Torres"
+    }
+   ],
+   "subs": [
+    {
+     "name": "I. Alfaro"
+    },
+    {
+     "name": "J. Azofeifa"
+    },
+    {
+     "name": "S. Taylor"
+    },
+    {
+     "name": "P. Arboine"
+    },
+    {
+     "name": "D. Guzmán"
+    },
+    {
+     "name": "D. Sequeira"
+    },
+    {
+     "name": "S. Acuña"
+    },
+    {
+     "name": "D. Woodly"
+    },
+    {
+     "name": "K. Arboine"
+    },
+    {
+     "name": "A. Rodríguez"
+    }
+   ],
+   "dt": "Hernán Medford"
+  }
  }
 }
