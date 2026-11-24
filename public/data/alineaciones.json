@@ -5172,5 +5172,308 @@
    ],
    "dt": "Andrés Carevic"
   }
+ },
+ "1320520461": {
+  "home": {
+   "fuente": "redes de Alajuelense",
+   "formation": "4-2-3-1",
+   "rows": [
+    [
+     {
+      "n": 23,
+      "name": "W. Ortega"
+     }
+    ],
+    [
+     {
+      "n": 42,
+      "name": "J. P. Ruiz"
+     },
+     {
+      "n": 21,
+      "name": "Y. Molina"
+     },
+     {
+      "n": 3,
+      "name": "G. González",
+      "c": true
+     },
+     {
+      "n": 28,
+      "name": "Y. Sosa"
+     }
+    ],
+    [
+     {
+      "n": 5,
+      "name": "C. Borges"
+     },
+     {
+      "n": 24,
+      "name": "A. Salazar"
+     }
+    ],
+    [
+     {
+      "n": 34,
+      "name": "C. Pérez"
+     },
+     {
+      "n": 10,
+      "name": "J. P. Añor"
+     },
+     {
+      "n": 99,
+      "name": "K. Michel"
+     }
+    ],
+    [
+     {
+      "n": 18,
+      "name": "R. Cisneros"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 23,
+     "name": "W. Ortega"
+    },
+    {
+     "n": 42,
+     "name": "J. P. Ruiz"
+    },
+    {
+     "n": 21,
+     "name": "Y. Molina"
+    },
+    {
+     "n": 3,
+     "name": "G. González",
+     "c": true
+    },
+    {
+     "n": 28,
+     "name": "Y. Sosa"
+    },
+    {
+     "n": 5,
+     "name": "C. Borges"
+    },
+    {
+     "n": 24,
+     "name": "A. Salazar"
+    },
+    {
+     "n": 34,
+     "name": "C. Pérez"
+    },
+    {
+     "n": 10,
+     "name": "J. P. Añor"
+    },
+    {
+     "n": 99,
+     "name": "K. Michel"
+    },
+    {
+     "n": 18,
+     "name": "R. Cisneros"
+    }
+   ],
+   "subs": [
+    {
+     "n": 1,
+     "name": "B. Mora"
+    },
+    {
+     "n": 2,
+     "name": "D. Paz"
+    },
+    {
+     "n": 7,
+     "name": "A. Hernández"
+    },
+    {
+     "n": 9,
+     "name": "A. Zaldívar"
+    },
+    {
+     "n": 11,
+     "name": "L. Díaz"
+    },
+    {
+     "n": 15,
+     "name": "F. Samadian"
+    },
+    {
+     "n": 26,
+     "name": "F. Piñar"
+    },
+    {
+     "n": 29,
+     "name": "D. Aguilar"
+    },
+    {
+     "n": 35,
+     "name": "R. Parkins"
+    },
+    {
+     "n": 39,
+     "name": "E. Cruz"
+    }
+   ]
+  },
+  "away": {
+   "fuente": "redes de Cartaginés",
+   "formation": "4-4-2",
+   "rows": [
+    [
+     {
+      "n": 1,
+      "name": "K. Briceño",
+      "c": true
+     }
+    ],
+    [
+     {
+      "n": 20,
+      "name": "D. Mesén"
+     },
+     {
+      "n": 4,
+      "name": "L. Olivas"
+     },
+     {
+      "n": 12,
+      "name": "J. Quirós"
+     },
+     {
+      "n": 18,
+      "name": "C. Barahona"
+     }
+    ],
+    [
+     {
+      "n": 7,
+      "name": "M. Morán"
+     },
+     {
+      "n": 15,
+      "name": "L. Flores"
+     },
+     {
+      "n": 31,
+      "name": "G. Morera"
+     },
+     {
+      "n": 39,
+      "name": "M. Villalobos"
+     }
+    ],
+    [
+     {
+      "n": 9,
+      "name": "J. González"
+     },
+     {
+      "n": 22,
+      "name": "A. Hernández"
+     }
+    ]
+   ],
+   "aprox": true,
+   "list": [
+    {
+     "n": 1,
+     "name": "K. Briceño",
+     "c": true
+    },
+    {
+     "n": 20,
+     "name": "D. Mesén"
+    },
+    {
+     "n": 4,
+     "name": "L. Olivas"
+    },
+    {
+     "n": 12,
+     "name": "J. Quirós"
+    },
+    {
+     "n": 18,
+     "name": "C. Barahona"
+    },
+    {
+     "n": 7,
+     "name": "M. Morán"
+    },
+    {
+     "n": 15,
+     "name": "L. Flores"
+    },
+    {
+     "n": 31,
+     "name": "G. Morera"
+    },
+    {
+     "n": 39,
+     "name": "M. Villalobos"
+    },
+    {
+     "n": 9,
+     "name": "J. González"
+    },
+    {
+     "n": 22,
+     "name": "A. Hernández"
+    }
+   ],
+   "subs": [
+    {
+     "n": 33,
+     "name": "C. Moya"
+    },
+    {
+     "n": 2,
+     "name": "R. Cordero"
+    },
+    {
+     "n": 21,
+     "name": "J. Cortés"
+    },
+    {
+     "n": 19,
+     "name": "D. González"
+    },
+    {
+     "n": 30,
+     "name": "A. Mora"
+    },
+    {
+     "n": 6,
+     "name": "C. Montero"
+    },
+    {
+     "n": 27,
+     "name": "J. Mora"
+    },
+    {
+     "n": 8,
+     "name": "D. López"
+    },
+    {
+     "n": 17,
+     "name": "Y. López"
+    },
+    {
+     "n": 13,
+     "name": "J. Gaete"
+    }
+   ],
+   "dt": "Amarini Villatoro"
+  }
  }
 }
