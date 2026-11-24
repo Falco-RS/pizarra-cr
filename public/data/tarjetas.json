@@ -56,6 +56,18 @@
       "equipo": "Herediano",
       "r": 11,
       "fuente": "FCRF, sanciones tras J16: 5 amarillas, suspendido para J17 (la tabla de UNAFUT aún le muestra 4; jornada de la faltante aproximada)"
+    },
+    {
+      "jugador": "Y. Piedra",
+      "equipo": "San Carlos",
+      "r": 16,
+      "fuente": "UNAFUT: 4 amarillas tras J17, la API tiene 3 (jornada aproximada)"
+    },
+    {
+      "jugador": "E. Salazar",
+      "equipo": "Escorpiones Belén",
+      "r": 16,
+      "fuente": "UNAFUT: 4 amarillas tras J17, la API tiene 3 (jornada aproximada)"
     }
   ],
   "quitar": [
@@ -93,6 +105,13 @@
       "r": 16,
       "partidos": 2,
       "fuente": "Tribunal Disciplinario tras J16: roja directa, 2 partidos (se pierde J17 y J18)"
+    },
+    {
+      "jugador": "L. Diaz",
+      "equipo": "Alajuelense",
+      "r": 17,
+      "partidos": 2,
+      "fuente": "Roja directa en J17 vs Cartaginés: 2 partidos"
     }
   ]
 }

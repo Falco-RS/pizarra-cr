@@ -1,6 +1,6 @@
 {
  "_nota": "Asistidores oficiales de UNAFUT. Se actualiza A MANO al final de cada jornada. Solo jugadores con 3 o más. equipo = nombre como sale en la página.",
- "jornada": 16,
+ "jornada": 17,
  "minimo": 3,
  "lista": [
   {
@@ -9,18 +9,23 @@
    "a": 8
   },
   {
+   "jugador": "Mariano Torres",
+   "equipo": "Saprissa",
+   "a": 6
+  },
+  {
    "jugador": "Manuel Morán",
    "equipo": "Cartaginés",
    "a": 6
   },
   {
-   "jugador": "Mariano Torres",
-   "equipo": "Saprissa",
-   "a": 4
-  },
-  {
    "jugador": "Kenneth Cerdas",
    "equipo": "San Carlos",
+   "a": 5
+  },
+  {
+   "jugador": "Joel Campbell",
+   "equipo": "Inter San Carlos",
    "a": 4
   },
   {
@@ -34,9 +39,14 @@
    "a": 4
   },
   {
-   "jugador": "Joel Campbell",
-   "equipo": "Inter San Carlos",
+   "jugador": "Juan Pablo Añor",
+   "equipo": "Alajuelense",
    "a": 4
+  },
+  {
+   "jugador": "Elías Aguilar",
+   "equipo": "Herediano",
+   "a": 3
   },
   {
    "jugador": "Dominic Chévez",
@@ -54,6 +64,11 @@
    "a": 3
   },
   {
+   "jugador": "Douglas López",
+   "equipo": "Cartaginés",
+   "a": 3
+  },
+  {
    "jugador": "Marcos Ureña",
    "equipo": "Sporting",
    "a": 3
@@ -67,12 +82,7 @@
    "jugador": "Mayron George",
    "equipo": "Sporting",
    "a": 3
-  },
-  {
-   "jugador": "Juan Pablo Añor",
-   "equipo": "Alajuelense",
-   "a": 3
   }
  ],
- "actualizado": "9/11/26"
+ "actualizado": "24/11/26"
 }
