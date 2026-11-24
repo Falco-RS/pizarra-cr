@@ -106,7 +106,7 @@ function enqueue(min,ch){
  const sh=(ch.h?.Attacks||0)-(ch.a?.Attacks||0);cur.h.Possession=Math.min(.68,Math.max(.32,cur.h.Possession+sh*.004));cur.a.Possession=1-cur.h.Possession;
 }
 function show(txt,s,big){const b=$('banner');b.className='banner on'+(big?' big':'');b.innerHTML=(big?'':`<i style="background:${C[s]}"></i>`)+txt;}
-function feed(min,s,txt){const li=document.createElement('li');li.innerHTML=`<em>${min}'</em><i style="background:${C[s]}"></i>${txt}`;$('feed').prepend(li);}
+function feed(min,s,txt){const ph=$('feed').querySelector('li em:empty');if(ph)ph.parentNode.remove();const li=document.createElement('li');li.innerHTML=`<em>${min}'</em><i style="background:${C[s]}"></i>${txt}`;$('feed').prepend(li);}
 function play(){
  if(busy||!q.length)return; busy=true;
  const e=q.shift(); let a;
@@ -140,7 +140,6 @@ if(!qs.has('vivo')) run(); else {
    const min=m.clock||0;
    if(first){cur=st;score={h:gh,a:ga};mom=[];first=false;}
    else{
-    const ph=$('feed').querySelector('li em:empty');if(ph)ph.parentNode.remove();
     const ch={h:{},a:{}};
     for(const s of ['h','a'])for(const k of K)if(k!=='Possession'){const dlt=st[s][k]-(last.st[s][k]||0);if(dlt>0)ch[s][k]=dlt;}
     enqueue(min,ch); for(const s of ['h','a'])cur[s].Possession=st[s].Possession;
