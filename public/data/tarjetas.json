@@ -82,6 +82,13 @@
       "equipo": "Herediano",
       "r": 15,
       "fuente": "La amarilla del 36' se cambió por roja tras el VAR: no cuenta"
+    },
+    {
+      "jugador": "L. Diaz",
+      "equipo": "Alajuelense",
+      "r": 17,
+      "tipo": "rc",
+      "fuente": "Comisión de Arbitraje anuló la roja de J17 vs Cartaginés"
     }
   ],
   "sanciones": [
@@ -105,13 +112,6 @@
       "r": 16,
       "partidos": 2,
       "fuente": "Tribunal Disciplinario tras J16: roja directa, 2 partidos (se pierde J17 y J18)"
-    },
-    {
-      "jugador": "L. Diaz",
-      "equipo": "Alajuelense",
-      "r": 17,
-      "partidos": 2,
-      "fuente": "Roja directa en J17 vs Cartaginés: 2 partidos"
     }
   ]
 }
