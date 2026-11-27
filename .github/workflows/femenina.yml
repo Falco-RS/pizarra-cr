@@ -1,0 +1,28 @@
+name: Sele Femenina (buscar partido de hoy)
+on:
+  workflow_dispatch: {}
+  push:
+    paths: ['scripts/tools/femenina.mjs', 'data/femenina-trigger.txt']
+permissions:
+  contents: write
+jobs:
+  fem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/tools/femenina.mjs
+        env:
+          HIGHLIGHTLY_KEY: ${{ secrets.HIGHLIGHTLY_KEY }}
+          FECHA: '2026-11-27'
+      - name: Guardar
+        run: |
+          git add public/data/sele.json
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git config user.name "pizarra-bot"
+          git config user.email "pizarra-bot@users.noreply.github.com"
+          git commit -m "Sele Femenina: partido de hoy"
+          git pull --rebase origin main
+          git push
