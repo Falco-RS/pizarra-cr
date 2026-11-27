@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     let sele = [];
     try {
       const sx = await (await fetch(`${proto}://${host}/data/sele.json`)).json();
-      sele = (sx.matches || []).filter(m => m.lg && m.hs == null).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.lg, comp: 'La Sele', h: m.h, a: m.a }));
+      sele = (sx.matches || []).filter(m => m.lg && m.hs == null).map(m => ({ id: m.id, d: m.d, s: m.s, leagueId: m.lg, comp: 'La Sele', label: m.fem ? 'Sele Femenina' : undefined, h: m.h, a: m.a }));
     } catch { /* sin Sele */ }
 
     const now = Date.now();
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         events = (full?.events || []).map(e => [String(e.time), TYPE[e.type] || e.type, e.team?.id === m.homeTeam.id ? 1 : 0, e.player, e.substituted]);
         stats = (full?.statistics || []).map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(x => [x.displayName, x.value])) }));
       }
-      live.push({ id: c.id, comp: c.comp, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events, stats });
+      live.push({ id: c.id, comp: c.comp, label: c.label, d: c.d, h: c.h, a: c.a, score: st.score?.current || null, clock: st.clock ?? null, status: st.description || '', started, finished: done(st.description), events, stats });
     }
     // Un partido terminó y todavía no está en los datos: pedir la actualización a GitHub ya
     // (necesita GH_TOKEN en Vercel; sin él, la actualización horaria lo recoge igual).

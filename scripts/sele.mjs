@@ -31,6 +31,7 @@ const oldById = new Map((old.matches || []).map(m => [m.id, m]));
 
 // 1) La selección en la API (una sola vez; después queda guardado en data/sele.json o en la salida)
 let teamId = cfg.teamId || old.teamId;
+old.femId = old.femId || cfg.femId;
 if (!teamId) {
   const res = (await api(`/teams?name=${encodeURIComponent('Costa Rica')}&limit=20`))?.data || [];
   console.log('Opciones:', res.map(t => `${t.name} ${t.type || ''} (${t.id})`).join(', '));
@@ -57,6 +58,14 @@ let matches = [...got.values()].map(x => {
 }).sort((a, b) => new Date(a.d) - new Date(b.d));
 
 // 3) Minuto a minuto y estadísticas de los últimos jugados que todavía no lo tienen
+// partidos de la Sele Femenina agregados a mano (scripts/tools/femenina.mjs): se conservan y se actualiza el marcador
+for (const o of old.matches || []) if (o.fem && !matches.some(m => m.id === o.id)) matches.push({ ...o });
+for (const m of matches.filter(m => m.fem && m.hs == null && new Date(m.d) < new Date())) {
+  const raw = await api(`/matches/${m.id}`); const x = Array.isArray(raw) ? raw[0] : raw;
+  const sc = x?.state?.score?.current; m.s = x?.state?.description || m.s;
+  if (sc && isFinal(m.s)) [m.hs, m.as] = sc.split(' - ').map(Number);
+}
+matches.sort((a, b) => new Date(a.d) - new Date(b.d));
 const need = matches.filter(m => m.hs !== undefined && !m.ev).slice(-6).reverse();
 for (const m of need) {
   if (budget <= 0) break;
@@ -68,5 +77,5 @@ for (const m of need) {
   if (st.length === 2) m.stats = st.map(t => ({ t: t.team?.id, s: Object.fromEntries((t.statistics || []).map(s => [s.displayName, s.value])) }));
 }
 
-await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, staff: cfg.staff, proximos: cfg.proximos || [], convocatoria: cfg.convocatoria || null, historial: cfg.historial || null, alineaciones: cfg.alineaciones || null, matches }));
+await fs.writeFile(OUT, JSON.stringify({ updated: new Date().toISOString(), teamId, femId: old.femId, staff: cfg.staff, proximos: cfg.proximos || [], convocatoria: cfg.convocatoria || null, historial: cfg.historial || null, alineaciones: cfg.alineaciones || null, matches }));
 console.log(`Listo: ${matches.length} partidos (${matches.filter(m => m.hs === undefined).length} por jugar). Consultas restantes hoy: ${remaining}.`);
