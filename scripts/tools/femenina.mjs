@@ -6,19 +6,22 @@ const FECHA = process.env.FECHA || new Date().toISOString().slice(0, 10);
 const BASE = 'https://soccer.highlightly.net';
 const api = async p => { const r = await fetch(BASE + p, { headers: { 'x-rapidapi-key': KEY } }); console.log(r.status, p); return r.ok ? r.json() : null; };
 const fixText = s => (typeof s === 'string' && /[ÃÂ]/.test(s)) ? Buffer.from(s, 'latin1').toString('utf8') : s;
-const teams = (await api(`/teams?name=${encodeURIComponent('Costa Rica')}&limit=50`))?.data || [];
-console.log('Equipos:', teams.map(t => `${t.name} | ${t.type || ''} | ${t.id}`).join('\n'));
 const OUT = 'public/data/sele.json';
 const sj = JSON.parse(await fs.readFile(OUT, 'utf8'));
-const cands = teams.filter(t => t.id !== sj.teamId && /w(omen)?\b|fem/i.test(`${t.name} ${t.type || ''}`) && !/u\d\d/i.test(t.name));
 let found = null, femId = null;
-for (const t of cands.length ? cands : teams.filter(t => t.id !== sj.teamId)) {
-  for (const side of ['homeTeamId', 'awayTeamId']) {
-    const page = await api(`/matches?${side}=${t.id}&date=${FECHA}&limit=10`);
-    const x = (page?.data || [])[0];
-    if (x) { found = x; femId = t.id; break; }
+for (const q of ['Costa Rica W', 'Costa Rica Women', 'Jamaica W', 'Jamaica Women']) {
+  const ts = (await api(`/teams?name=${encodeURIComponent(q)}&limit=50`))?.data || [];
+  console.log(q, '=>', ts.map(t => `${t.name}|${t.type || ''}|${t.id}`).join(' ; '));
+}
+// recorrer los partidos del día buscando Jamaica vs Costa Rica
+for (let off = 0; off < 1500 && !found; off += 100) {
+  const page = await api(`/matches?date=${FECHA}&limit=100&offset=${off}`);
+  const arr = page?.data || [];
+  for (const x of arr) {
+    const n = `${x.homeTeam?.name} ${x.awayTeam?.name}`;
+    if (/costa rica/i.test(n) && /jamaica/i.test(n)) { found = x; femId = /costa rica/i.test(x.homeTeam.name) ? x.homeTeam.id : x.awayTeam.id; console.log('ENCONTRADO', n, x.league?.name); break; }
   }
-  if (found) break;
+  if (arr.length < 100) break;
 }
 if (!found) { console.error('No encontré el partido'); process.exit(1); }
 const slim = t => ({ id: t.id, name: fixText(t.name).replace(/\s+W(omen)?$/i, ''), logo: t.logo || null });
